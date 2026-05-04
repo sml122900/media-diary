@@ -186,7 +186,7 @@ function StarRating({ value, onChange, readonly }) {
 
 // ─── 상세 모달 ──────────────────────────────────────────────────────────────
 
-function DetailModal({ item, posterUrl, tmdbUrlCache, tmdbIdCache, tmdbDetailCache, onClose, onSave, onDeleteReview, onDeleteItem, onEditItem, onOpenPicker }) {
+function DetailModal({ item, posterUrl, tmdbUrlCache, tmdbIdCache, tmdbDetailCache, onClose, onSave, onDeleteReview, onDeleteItem, onEditItem }) {
   const [rating, setRating] = useState(item.rating || 0);
   const [reviewText, setReviewText] = useState(item.review_text || '');
   const [editMode, setEditMode] = useState(false);
@@ -370,88 +370,6 @@ function DetailModal({ item, posterUrl, tmdbUrlCache, tmdbIdCache, tmdbDetailCac
   );
 }
 
-// ─── 포스터 피커 모달 ────────────────────────────────────────────────────────
-
-function PosterPickerModal({ item, onClose, onApply }) {
-  const [query, setQuery] = useState(item.title);
-  const [results, setResults] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [searching, setSearching] = useState(false);
-  const [applying, setApplying] = useState(false);
-
-  useEffect(() => { handleSearch(); }, []);
-
-  const handleSearch = async () => {
-    if (!query.trim()) return;
-    setSearching(true);
-    try {
-      const [r1, r2] = await Promise.all([
-        fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}&language=ko-KR`).then(r => r.json()),
-        fetch(`https://api.themoviedb.org/3/search/tv?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}&language=ko-KR`).then(r => r.json()),
-      ]);
-      const all = [...(r1.results || []), ...(r2.results || [])].filter(r => r.poster_path);
-      setResults(all.slice(0, 16));
-    } catch { setResults([]); }
-    setSearching(false);
-  };
-
-  const handleApply = async () => {
-    if (!selected) return;
-    setApplying(true);
-    const posterUrl = IMG_BASE + selected.path;
-    const tmdbType = selected.tmdbType;
-    const slug = selected.tmdbTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    const tmdbUrl = `https://www.themoviedb.org/${tmdbType}/${selected.tmdbId}${slug ? '-' + slug : ''}`;
-    await onApply(item, posterUrl, tmdbUrl, selected.tmdbId, tmdbType);
-    setApplying(false);
-    onClose();
-  };
-
-  return (
-    <div className="backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="picker-modal">
-        <h2>포스터 변경 — {item.title}</h2>
-        <div className="picker-search-row">
-          <input
-            className="add-input"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            placeholder="다른 제목으로 검색..."
-          />
-          <button className="btn btn-primary" onClick={handleSearch}>검색</button>
-        </div>
-        <div className="picker-grid">
-          {searching && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: '#aaa', fontSize: 13 }}>검색 중...</div>}
-          {!searching && results.length === 0 && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: '#aaa', fontSize: 13 }}>결과 없음</div>}
-          {results.map(r => {
-            const title = r.title || r.name || '';
-            const tmdbType = r.title ? 'movie' : 'tv';
-            const isSelected = selected?.path === r.poster_path;
-            return (
-              <div
-                key={r.id}
-                className={`picker-item ${isSelected ? 'selected' : ''}`}
-                onClick={() => setSelected({ path: r.poster_path, tmdbId: r.id, tmdbType, tmdbTitle: title })}
-                title={`${title} (${(r.release_date || r.first_air_date || '').slice(0, 4)})`}
-              >
-                🎬
-                <img src={IMG_BASE + r.poster_path} alt={title} onError={e => e.target.remove()} />
-              </div>
-            );
-          })}
-        </div>
-        <div className="picker-actions">
-          <button className="btn" onClick={onClose}>취소</button>
-          <button className="btn btn-primary" onClick={handleApply} disabled={!selected || applying}>
-            {applying ? '저장 중...' : '적용'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── 추가 모달 ──────────────────────────────────────────────────────────────
 
 function AddModal({ onClose, onAdd, existingItems, currentTab }) {
@@ -468,16 +386,22 @@ function AddModal({ onClose, onAdd, existingItems, currentTab }) {
 
   const existingTmdbIds = useMemo(() => new Set(existingItems.map(i => i.tmdb_id).filter(Boolean)), [existingItems]);
 
-  const searchSingle = async () => {
-    if (!singleQ.trim()) return;
+  const searchSingle = async (q = singleQ) => {
+    if (!q.trim()) { setSingleResults([]); return; }
     setSingleSearching(true);
     const type = addType === 'movie' ? 'movie' : 'tv';
     try {
-      const r = await fetch(`https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_KEY}&query=${encodeURIComponent(singleQ)}&language=ko-KR`).then(r => r.json());
+      const r = await fetch(`https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=ko-KR`).then(r => r.json());
       setSingleResults(r.results?.slice(0, 8) || []);
     } catch { setSingleResults([]); }
     setSingleSearching(false);
   };
+
+  // 입력 시 400ms 디바운스 자동 검색
+  useEffect(() => {
+    const timer = setTimeout(() => searchSingle(singleQ), 400);
+    return () => clearTimeout(timer);
+  }, [singleQ, addType]);
 
   const handleAddSingle = async (r) => {
     const tmdbType = r.title ? 'movie' : 'tv';
@@ -598,7 +522,6 @@ function AddModal({ onClose, onAdd, existingItems, currentTab }) {
                 className="add-input"
                 value={singleQ}
                 onChange={e => setSingleQ(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && searchSingle()}
                 placeholder="제목으로 검색..."
               />
               <button className="btn btn-primary" onClick={searchSingle}>검색</button>
@@ -724,7 +647,6 @@ function HomePage() {
   const [sortBy, setSortBy] = useState('year');
   const [detailItem, setDetailItem] = useState(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [pickerItem, setPickerItem] = useState(null);
   const [posters, setPosters] = useState({});
 
   // 세션 캐시 (TMDB URL/ID/Detail)
@@ -882,21 +804,6 @@ function HomePage() {
     setDetailItem(updated);
   };
 
-  // 포스터 변경
-  const handleApplyPoster = async (item, posterUrl, tmdbUrl, tmdbId, tmdbType) => {
-    const key = `${item.title}_${item.year}`;
-    tmdbUrlCache.current[key] = tmdbUrl;
-    tmdbIdCache.current[key] = { id: tmdbId, type: tmdbType };
-    const updated = await updateMediaItem(item.id, {
-      title: item.title, year: item.year, director: item.director,
-      cast_info: item.cast_info, poster_url: posterUrl,
-      rating: item.rating, review_text: item.review_text, review_date: item.review_date,
-    });
-    posterCache.current[key] = posterUrl;
-    savePosterCache();
-    setItems(prev => prev.map(i => i.id === updated.id ? updated : i));
-  };
-
   // 항목 추가
   const handleAdd = async (itemData) => {
     const already = items.some(i => i.title === itemData.title && i.year === itemData.year);
@@ -987,12 +894,6 @@ function HomePage() {
                   )}
                   <span className="poster-ph">🎬</span>
                   {hasReview && <div className="badge-dot" />}
-                  <button
-                    className="poster-btn"
-                    onClick={e => { e.stopPropagation(); setPickerItem(item); }}
-                  >
-                    🖼 포스터 변경
-                  </button>
                 </div>
                 <div className="card-body">
                   <div className="card-title">{item.title}</div>
@@ -1021,16 +922,6 @@ function HomePage() {
           onDeleteReview={handleDeleteReview}
           onDeleteItem={handleDeleteItem}
           onEditItem={handleEditItem}
-          onOpenPicker={setPickerItem}
-        />
-      )}
-
-      {/* 포스터 피커 */}
-      {pickerItem && (
-        <PosterPickerModal
-          item={pickerItem}
-          onClose={() => setPickerItem(null)}
-          onApply={handleApplyPoster}
         />
       )}
 

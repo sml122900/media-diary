@@ -104,15 +104,6 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .card-stars { font-size: 12px; color: #f0a500; margin-top: 2px; }
 .empty { text-align: center; padding: 4rem; color: #aaa; font-size: 15px; }
 
-/* 포스터 변경 버튼 */
-.poster-btn {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,.6); color: #fff; font-size: 11px; font-weight: 500;
-  padding: 6px; text-align: center; opacity: 0; transition: opacity .15s;
-  cursor: pointer; z-index: 3; border: none; width: 100%;
-}
-.card:hover .poster-btn { opacity: 1; }
-
 /* 공통 백드롭 */
 .backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200;
@@ -226,35 +217,11 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .result-add-btn.added { background: #e8f5e9; border-color: #a5d6a7; color: #2e7d32; }
 .searching { text-align: center; padding: 1.5rem; color: #aaa; font-size: 14px; }
 
-/* 포스터 피커 */
-.picker-modal {
-  background: #fff; border-radius: 16px; border: 1px solid #e8e8e6;
-  width: 100%; max-width: 480px; padding: 1.5rem;
-  box-shadow: 0 20px 60px rgba(0,0,0,.15);
-  max-height: 85vh; display: flex; flex-direction: column;
-}
-.picker-modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: #1a1a1a; }
-.picker-search-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.picker-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-  overflow-y: auto; flex: 1; padding: 2px;
-}
-.picker-item {
-  aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; cursor: pointer;
-  border: 2px solid transparent; transition: border-color .15s;
-  background: #f0f0ee; display: flex; align-items: center; justify-content: center;
-  font-size: 20px; opacity: .4; position: relative;
-}
-.picker-item img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; opacity: 1; }
-.picker-item:hover { border-color: #1a1a1a; opacity: 1; }
-.picker-item.selected { border-color: #1a1a1a; opacity: 1; }
-.picker-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
-
 /* 다크모드 */
 @media (prefers-color-scheme: dark) {
   body { background: #111; color: #e8e8e8; }
   .mdb-title { color: #e8e8e8; }
-  .card, .modal, .add-modal, .picker-modal { background: #1c1c1c; border-color: #2e2e2e; }
+  .card, .modal, .add-modal { background: #1c1c1c; border-color: #2e2e2e; }
   .card:hover { border-color: #555; }
   .search-input, .sort-select, .add-input, .review-ta, .btn, .result-add-btn, .result-item {
     background: #1c1c1c; border-color: #2e2e2e; color: #e8e8e8;
@@ -283,8 +250,5 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .tmdb-score { background: #1a3a2a; color: #66bb6a; }
   .tmdb-overview { color: #999; }
   .ott-box { background: #1e1e1e !important; border-color: #2e2e2e !important; }
-  .picker-item { background: #2a2a2a; }
-  .picker-item:hover, .picker-item.selected { border-color: #e8e8e8; }
-  .poster-btn { background: rgba(0,0,0,.75); }
-  .add-modal h2, .picker-modal h2 { color: #e8e8e8; }
+  .add-modal h2 { color: #e8e8e8; }
 }
