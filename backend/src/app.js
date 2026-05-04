@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./db');
 const authRouter = require('./routes/auth');
+const userMediaRouter = require('./routes/userMedia');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use('/api/user-media', userMediaRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -24,6 +26,24 @@ async function initDB() {
       password VARCHAR(255) NOT NULL,
       name VARCHAR(255) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_media (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      type VARCHAR(20) NOT NULL DEFAULT 'movie',
+      title VARCHAR(500) NOT NULL,
+      year INTEGER DEFAULT 0,
+      director VARCHAR(500) DEFAULT '',
+      cast_info VARCHAR(500) DEFAULT '',
+      tmdb_id INTEGER DEFAULT 0,
+      poster_url TEXT DEFAULT '',
+      rating INTEGER DEFAULT 0,
+      review_text TEXT DEFAULT '',
+      review_date VARCHAR(50) DEFAULT '',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, title, year)
     )
   `);
   console.log('Database tables ready');
