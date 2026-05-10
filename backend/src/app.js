@@ -4,6 +4,7 @@ const cors = require('cors');
 const pool = require('./db');
 const authRouter = require('./routes/auth');
 const userMediaRouter = require('./routes/userMedia');
+const tmdbRouter = require('./routes/tmdb');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRouter);
 app.use('/api/user-media', userMediaRouter);
+app.use('/api/tmdb', tmdbRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -42,9 +44,14 @@ async function initDB() {
       rating INTEGER DEFAULT 0,
       review_text TEXT DEFAULT '',
       review_date VARCHAR(50) DEFAULT '',
+      watched_at TIMESTAMP DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(user_id, title, year)
     )
+  `);
+  // 기존 테이블에 watched_at 컬럼이 없으면 추가
+  await pool.query(`
+    ALTER TABLE user_media ADD COLUMN IF NOT EXISTS watched_at TIMESTAMP DEFAULT NULL
   `);
   console.log('Database tables ready');
 }

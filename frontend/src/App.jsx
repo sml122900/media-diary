@@ -10,6 +10,7 @@ import useAuthStore from './store/authStore';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import StatsPage from './pages/StatsPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -43,6 +44,14 @@ function App() {
           element={
             <PrivateRoute>
               <HomePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <PrivateRoute>
+              <StatsPage />
             </PrivateRoute>
           }
         />

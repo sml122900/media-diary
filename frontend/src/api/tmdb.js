@@ -1,0 +1,120 @@
+/**
+ * @file tmdb.js
+ * TMDB API 호출 함수 — 백엔드 프록시(/api/tmdb)를 통해 호출
+ * API 키는 백엔드 환경변수에 보관되어 프론트엔드 소스코드에 노출되지 않음
+ */
+
+import { IMG_BASE } from '../utils/constants';
+
+const PROXY = 'http://localhost:4000/api/tmdb';
+
+/** 백엔드 TMDB 프록시 호출 */
+async function tmdbGet(path, params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = `${PROXY}${path}${qs ? '?' + qs : ''}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+/**
+ * TMDB 세부정보(런타임, OTT, 장르 등) 조회
+ * @param {number} tmdbId
+ * @param {'movie'|'tv'} type
+ */
+export async function fetchTmdbDetail(tmdbId, type) {
+  try {
+    const [d, pd] = await Promise.all([
+      tmdbGet(`/${type}/${tmdbId}`, { language: 'ko-KR' }),
+      tmdbGet(`/${type}/${tmdbId}/watch/providers`),
+    ]);
+    if (!d) return null;
+    const kr = pd?.results?.KR || {};
+    const runtime =
+      type === 'movie'
+        ? d.runtime ? `${Math.floor(d.runtime / 60)}h ${d.runtime % 60}m` : null
+        : d.episode_run_time?.[0] ? `회당 ${d.episode_run_time[0]}m` : null;
+    return {
+      tmdbTitle: d.title || d.name || null,
+      runtime,
+      overview: d.overview || null,
+      score: d.vote_average ? Math.round(d.vote_average * 10) / 10 : null,
+      genres: (d.genres || []).map(g => g.name).slice(0, 3),
+      providers: {
+        flatrate: (kr.flatrate || []).map(p => ({ name: p.provider_name, logo: p.logo_path })),
+        rent: (kr.rent || []).map(p => ({ name: p.provider_name, logo: p.logo_path })),
+        buy: (kr.buy || []).map(p => ({ name: p.provider_name, logo: p.logo_path })),
+        link: kr.link || null,
+      },
+    };
+  } catch { return null; }
+}
+
+/**
+ * TMDB 제목 검색 → 포스터 URL + ID + type 반환
+ * preferType이 'tv'면 TV 먼저 검색, 'movie'면 영화 먼저 검색
+ * @param {string} title
+ * @param {number} year
+ * @param {'movie'|'tv'} preferType
+ */
+export async function searchTmdbPoster(title, year, preferType) {
+  // anime/drama는 tv 우선, movie는 movie 우선
+  const types = preferType === 'tv' ? ['tv', 'movie'] : ['movie', 'tv'];
+  for (const type of types) {
+    try {
+      const [r1, r2] = await Promise.all([
+        tmdbGet(`/search/${type}`, { query: title, language: 'ko-KR' }),
+        tmdbGet(`/search/${type}`, { query: title, language: 'en-US' }),
+      ]);
+      const results = [...(r1?.results || []), ...(r2?.results || [])];
+      const match =
+        results.find(x => {
+          const y = parseInt((x.release_date || x.first_air_date || '').slice(0, 4));
+          return Math.abs(y - year) <= 1 && x.poster_path;
+        }) || results.find(x => x.poster_path);
+      if (match) {
+        return {
+          posterUrl: IMG_BASE + match.poster_path,
+          tmdbId: match.id,
+          tmdbType: match.title ? 'movie' : 'tv',
+          tmdbTitle: match.title || match.name || '',
+        };
+      }
+    } catch { /* 다음 타입으로 */ }
+  }
+  return null;
+}
+
+/**
+ * TMDB 키워드 검색 (단건 추가·포스터 교체용)
+ * @param {string} query
+ * @param {'movie'|'tv'} type
+ * @returns {Promise<Array>} TMDB 결과 배열 (최대 8개)
+ */
+export async function searchTmdb(query, type) {
+  if (!query.trim()) return [];
+  try {
+    const data = await tmdbGet(`/search/${type}`, { query, language: 'ko-KR' });
+    return (data?.results || []).slice(0, 8);
+  } catch { return []; }
+}
+
+/**
+ * TMDB 포스터 그리드 검색 (PosterPicker용, ko+en 중복 제거)
+ * @param {string} query
+ * @param {'movie'|'tv'} type
+ * @returns {Promise<Array>} 포스터 있는 결과 배열 (최대 12개)
+ */
+export async function searchTmdbPosters(query, type) {
+  if (!query.trim()) return [];
+  try {
+    const [r1, r2] = await Promise.all([
+      tmdbGet(`/search/${type}`, { query, language: 'ko-KR' }),
+      tmdbGet(`/search/${type}`, { query, language: 'en-US' }),
+    ]);
+    const seen = new Set();
+    return [...(r1?.results || []), ...(r2?.results || [])]
+      .filter(r => r.poster_path && !seen.has(r.id) && seen.add(r.id))
+      .slice(0, 12);
+  } catch { return []; }
+}

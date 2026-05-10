@@ -108,24 +108,51 @@ router.post('/', auth, async (req, res) => {
 /**
  * PUT /api/user-media/:id
  * 미디어 항목 정보 업데이트 (제목, 감독, 포스터, 리뷰 등)
+ * set_watched_at: true → 리뷰 저장 시 watched_at 갱신, false → 항목 정보 편집 시 유지
  */
 router.put('/:id', auth, async (req, res) => {
   const {
     title, year, director, cast_info, poster_url,
-    rating, review_text, review_date,
+    type, rating, review_text, review_date, set_watched_at,
   } = req.body;
   try {
     const result = await pool.query(
       `UPDATE user_media SET
          title=$1, year=$2, director=$3, cast_info=$4, poster_url=$5,
-         rating=$6, review_text=$7, review_date=$8
-       WHERE id=$9 AND user_id=$10
+         type=$6, rating=$7, review_text=$8, review_date=$9,
+         watched_at = CASE
+           WHEN $10 AND ($7::int > 0 OR $8::text <> '') THEN NOW()
+           WHEN $10 AND $7::int = 0 AND $8::text = ''   THEN NULL
+           ELSE watched_at
+         END
+       WHERE id=$11 AND user_id=$12
        RETURNING *`,
       [
         title, year, director || '', cast_info || '', poster_url || '',
-        rating || 0, review_text || '', review_date || '',
+        type || 'movie', rating || 0, review_text || '', review_date || '',
+        set_watched_at === true,
         req.params.id, req.user.id,
       ]
+    );
+    if (!result.rows[0]) {
+      return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * PATCH /api/user-media/:id/poster
+ * 포스터 URL만 단독 업데이트 (포스터 교체 기능용)
+ */
+router.patch('/:id/poster', auth, async (req, res) => {
+  const { poster_url } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE user_media SET poster_url=$1 WHERE id=$2 AND user_id=$3 RETURNING *',
+      [poster_url || '', req.params.id, req.user.id]
     );
     if (!result.rows[0]) {
       return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });

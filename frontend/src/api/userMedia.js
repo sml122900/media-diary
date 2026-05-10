@@ -57,3 +57,13 @@ export async function deleteMediaItem(id) {
   const res = await axios.delete(`${BASE}/${id}`, { headers: headers() });
   return res.data;
 }
+
+/**
+ * 포스터 URL만 단독 업데이트
+ * @param {number} id
+ * @param {string} posterUrl
+ */
+export async function updatePosterItem(id, posterUrl) {
+  const res = await axios.patch(`${BASE}/${id}/poster`, { poster_url: posterUrl }, { headers: headers() });
+  return res.data.data;
+}
