@@ -150,27 +150,24 @@
 
 ### 4.1 공개 프로필
 
-- [ ] **users 테이블 확장**
-  - `username` 컬럼 추가 (UNIQUE, NOT NULL)
-  - `bio` 텍스트 컬럼 (자기소개)
-  - `avatar_url` 컬럼
-  - 기존 사용자는 email 기반 자동 username 생성
+- [x] **users 테이블 확장**
+  - `username` (UNIQUE 인덱스), `bio`, `avatar_url`, `is_profile_public` 컬럼
+  - 기존 사용자: email 앞부분 + id로 자동 username 생성
 
-- [ ] **공개 프로필 페이지**
-  - `/u/:username` 라우트
-  - 본 작품 수, 평균 별점, 가장 좋아하는 장르 표시
-  - 공개 설정된 작품 목록만 노출
-  - 비로그인 상태에서도 접근 가능
+- [x] **공개 프로필 페이지**
+  - `/u/:username` 라우트 (PublicProfilePage.jsx)
+  - 총 작품 수, 감상 기록 수, 평균 별점, 선호 장르 표시
+  - 비로그인 접근 가능, is_profile_public=false면 🔒 표시
 
-- [ ] **백엔드 API**
-  - `GET /api/profile/:username` (공개 정보만)
-  - `PATCH /api/me/profile` (본인 정보 수정)
-  - `GET /api/profile/:username/media?public=true`
+- [x] **백엔드 API**
+  - `GET /api/profile/:username` — 공개 프로필 + 통계 + 상위 장르
+  - `PATCH /api/me/profile` — username/bio/avatar/is_public 수정
+  - `GET /api/profile/:username/media` — is_public 항목 (4.2에서 활성화)
+  - `GET /api/me/info` — 본인 전체 프로필 정보
 
-- [ ] **프로필 설정 페이지**
-  - `/settings` 라우트
-  - username, bio, avatar 수정
-  - 프로필 공개/비공개 토글
+- [x] **프로필 설정 페이지**
+  - `/settings` 라우트 (SettingsPage.jsx)
+  - username 유효성 검사 + 중복 확인, bio, avatar URL, 공개 토글
 
 ### 4.2 리뷰 공개/비공개
 
@@ -375,6 +372,18 @@
 - 홈 헤더에 "📸 스크린샷" 버튼 추가
 
 **Phase 3 (AI 추천 시스템) 전체 완료** ✅
+
+### 2026-05-11 (Phase 4.1 완료)
+- users 테이블: username/bio/avatar_url/is_profile_public 컬럼 + UNIQUE 인덱스
+- user_media 테이블: is_public 컬럼 선행 마이그레이션 (Phase 4.2 대비)
+- 기존 유저 username 자동 생성 (email 앞부분 소문자+숫자 + id)
+- `backend/src/routes/profile.js` — GET /api/profile/:username, /media
+- `me.js` — PATCH /api/me/profile, GET /api/me/info 추가
+- `SettingsPage.jsx` — username/bio/avatar/공개 토글 설정 폼
+- `PublicProfilePage.jsx` — /u/:username 공개 프로필 (통계+선호장르)
+- App.jsx: /settings, /u/:username 라우트 추가
+- 홈 헤더에 "설정" 링크 추가
+- CSS: settings-*, profile-* 클래스 (다크모드 포함)
 
 <!-- 새 작업은 이 아래에 추가 -->
 

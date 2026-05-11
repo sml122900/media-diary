@@ -10,6 +10,7 @@ const recommendRouter = require('./routes/recommend');
 const searchRouter = require('./routes/search');
 const reportsRouter = require('./routes/reports');
 const importScreenshotRouter = require('./routes/importScreenshot');
+const profileRouter = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -25,6 +26,7 @@ app.use('/api/recommend', recommendRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/me/reports', reportsRouter);
 app.use('/api/import/screenshot', importScreenshotRouter);
+app.use('/api/profile', profileRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -71,6 +73,25 @@ async function initDB() {
   await pool.query(`
     ALTER TABLE users ADD COLUMN IF NOT EXISTS last_ai_reset_at TIMESTAMP DEFAULT NULL
   `);
+
+  // 공개 프로필 컬럼 (Phase 4.1)
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS username          VARCHAR(50)`);
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS bio               TEXT      DEFAULT ''`);
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url        TEXT      DEFAULT ''`);
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_profile_public BOOLEAN   DEFAULT false`);
+
+  // 기존 유저 username 자동 생성 (email 앞부분 + id, 영숫자만)
+  await pool.query(`
+    UPDATE users
+    SET username = lower(regexp_replace(split_part(email,'@',1),'[^a-z0-9]','','g')) || id::text
+    WHERE username IS NULL
+  `);
+
+  // username UNIQUE 인덱스 (IF NOT EXISTS)
+  await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username)`);
+
+  // 리뷰 공개/비공개 컬럼 (Phase 4.2, 선행 마이그레이션)
+  await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT false`);
 
   // 취향 프로필 테이블 (Phase 3.1)
   await pool.query(`

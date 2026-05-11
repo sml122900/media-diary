@@ -12,6 +12,8 @@ import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import StatsPage from './pages/StatsPage';
 import ReportsPage from './pages/ReportsPage';
+import SettingsPage from './pages/SettingsPage';
+import PublicProfilePage from './pages/PublicProfilePage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -64,6 +66,16 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <SettingsPage />
+            </PrivateRoute>
+          }
+        />
+        {/* 공개 프로필 — 비로그인 접근 가능 */}
+        <Route path="/u/:username" element={<PublicProfilePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Routes>
