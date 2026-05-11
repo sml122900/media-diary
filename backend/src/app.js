@@ -13,6 +13,7 @@ const importScreenshotRouter = require('./routes/importScreenshot');
 const profileRouter = require('./routes/profile');
 const listsRouter = require('./routes/lists');
 const socialRouter = require('./routes/social');
+const watchlistsRouter = require('./routes/watchlists');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -32,6 +33,7 @@ app.use('/api/profile', profileRouter);
 app.use('/api/lists', listsRouter);
 // social.js는 여러 경로 처리 (follow, feed, compare, search/users, media/friends)
 app.use('/api', socialRouter);
+app.use('/api/watchlists', watchlistsRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -105,6 +107,35 @@ async function initDB() {
       following_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (follower_id, following_id)
+    )
+  `);
+
+  // 공유 워치리스트 테이블 (Phase 4.7)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS shared_watchlists (
+      id         SERIAL  PRIMARY KEY,
+      creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      title      VARCHAR(200) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS shared_watchlist_members (
+      watchlist_id INTEGER NOT NULL REFERENCES shared_watchlists(id) ON DELETE CASCADE,
+      user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      role         VARCHAR(20) DEFAULT 'member',
+      PRIMARY KEY (watchlist_id, user_id)
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS shared_watchlist_items (
+      id                 SERIAL  PRIMARY KEY,
+      watchlist_id       INTEGER NOT NULL REFERENCES shared_watchlists(id) ON DELETE CASCADE,
+      media_id           INTEGER NOT NULL REFERENCES user_media(id) ON DELETE CASCADE,
+      added_by           INTEGER NOT NULL REFERENCES users(id),
+      watched_by_creator BOOLEAN DEFAULT false,
+      watched_by_member  BOOLEAN DEFAULT false,
+      UNIQUE(watchlist_id, media_id)
     )
   `);
 

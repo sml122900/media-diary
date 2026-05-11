@@ -225,20 +225,12 @@
 
 ### 4.7 같이 볼 영화 리스트
 
-- [ ] **shared_watchlists 테이블 신설**
-  - 컬럼: `id`, `creator_id`, `created_at`, `title`
-  - 멤버 관리는 별도 테이블
-
-- [ ] **shared_watchlist_members**
-  - `watchlist_id`, `user_id`, `role` (creator/member)
-
-- [ ] **shared_watchlist_items**
-  - `watchlist_id`, `media_id`, `added_by`, `watched_by_creator`, `watched_by_member`
-  - 양쪽 모두 봤는지 추적
-
-- [ ] **공유 워치리스트 페이지**
-  - `/watchlists` 내가 속한 워치리스트 목록
-  - 친구 초대 → 작품 추가 → 양쪽 시청 후 비교
+- [x] **shared_watchlists 테이블 신설** (id, creator_id, title)
+- [x] **shared_watchlist_members** (PK: watchlist_id+user_id, role creator/member)
+- [x] **shared_watchlist_items** (watched_by_creator, watched_by_member 시청 추적, UNIQUE watchlist_id+media_id)
+- [x] **공유 워치리스트 페이지** (/watchlists, WatchlistsPage.jsx)
+  - 생성/삭제/나가기, username으로 친구 초대 (creator만)
+  - 내 미디어에서 작품 추가, "봤어요/취소" 토글, 항목 제거
 
 ---
 
@@ -384,6 +376,14 @@
 - ComparePage.jsx: 공통 작품 별점 비교 시각화
 - DetailModal: 친구 활동 인라인 표시 (친구 N명, 평균 별점)
 - CSS: feed-item, user-search-row, compare-row (다크모드 포함)
+
+### 2026-05-11 (Phase 4.7 완료 → Phase 4 전체 완료)
+- shared_watchlists, shared_watchlist_members, shared_watchlist_items 테이블
+- watchlists.js: CRUD + /invite + /leave + /items + /items/:id/watched
+- WatchlistsPage.jsx: 인라인 패널 (멤버/초대/작품추가/시청토글)
+- /watchlists PrivateRoute, 홈 헤더에 "같이보기" 링크
+
+**Phase 4 (소셜 기능) 전체 완료** ✅
 
 <!-- 새 작업은 이 아래에 추가 -->
 

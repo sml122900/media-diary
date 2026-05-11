@@ -204,6 +204,7 @@ export default function HomePage() {
             <Link to="/stats" className="btn">통계</Link>
             <Link to="/reports" className="btn">리포트</Link>
             <Link to="/feed" className="btn">피드</Link>
+            <Link to="/watchlists" className="btn">같이보기</Link>
             <Link to="/lists" className="btn">리스트</Link>
             <Link to="/settings" className="btn">설정</Link>
             <button className="btn" onClick={handleCsvExport} title="CSV 내보내기">내보내기</button>
