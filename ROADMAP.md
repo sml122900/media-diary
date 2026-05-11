@@ -90,26 +90,24 @@
 
 ### 3.4 Claude API 자연어 검색
 
-- [ ] **Anthropic SDK 설치**
+- [x] **Anthropic SDK 설치**
   - `npm install @anthropic-ai/sdk` (backend)
   - `.env`에 `ANTHROPIC_API_KEY` 추가
-  - `CLAUDE.md`에 API 키 환경변수 명시
 
-- [ ] **백엔드 API: POST /api/search/natural**
+- [x] **백엔드 API: POST /api/search/natural**
   - 요청: `{ query: "우주 배경의 잔잔한 SF 영화" }`
-  - Claude API 호출 (tool use 활용)
-  - Claude가 의도 파악 → TMDB 검색 키워드/장르 추출
-  - TMDB 검색 후 결과 반환
+  - Claude Haiku로 의도 파악 → 쉼표 구분 작품명 추출 → 개별 TMDB 검색
+  - 평점순 정렬, 최대 8개 반환
 
-- [ ] **프론트엔드 자연어 검색 UI**
-  - 헤더 검색바를 "AI 검색" 모드와 일반 검색 모드로 토글
-  - AI 검색 시 placeholder 변경: "어떤 작품을 찾으세요? 자연스럽게 입력해주세요"
-  - 로딩 인디케이터 표시
+- [x] **프론트엔드 자연어 검색 UI**
+  - 헤더에 "✨ AI 검색" 버튼 추가
+  - AiSearchModal: 자유 입력 → Claude 해석 표시 → 결과 목록 → 추가 버튼
+  - 로딩/에러/한도 초과 상태 표시
 
-- [ ] **사용량 제한**
-  - 사용자당 일일 호출 횟수 제한 (예: 20회/일)
+- [x] **사용량 제한**
+  - 사용자당 일일 20회 제한
   - `users` 테이블에 `daily_ai_calls`, `last_ai_reset_at` 컬럼 추가
-  - 한도 초과 시 안내 메시지
+  - 한도 초과 시 429 + 안내 메시지
 
 ### 3.5 월간 취향 리포트
 
@@ -345,6 +343,16 @@
   - "다른 추천 보기" 클라이언트 offset 순환
   - 추천 이유 텍스트, 장르 태그, "+ 내 목록에 추가" 버튼
 - CSS: `.daily-rec-*` 클래스 (pulse 애니메이션 스켈레톤 포함)
+
+### 2026-05-11 (Phase 3.4 완료)
+- `@anthropic-ai/sdk` 설치, `ANTHROPIC_API_KEY` .env 추가
+- `backend/src/routes/search.js` 신설 — `POST /api/search/natural`
+  - Claude Haiku: 자연어 → 쉼표 구분 작품명/키워드 추출
+  - 각 키워드 개별 TMDB 검색 (en-US + ko-KR 병렬), 평점순 8개 반환
+  - 일일 20회 제한 (daily_ai_calls, last_ai_reset_at 컬럼)
+- `users` 테이블 AI 사용량 컬럼 마이그레이션
+- `AiSearchModal.jsx` 신설 — "✨ AI 검색" 버튼 → 자유 입력 → Claude 해석 + 결과
+- 주요 디버깅: Claude 쉼표 구분 키워드를 개별 TMDB 요청으로 분리
 
 <!-- 새 작업은 이 아래에 추가 -->
 

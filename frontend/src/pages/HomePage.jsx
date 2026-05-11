@@ -12,6 +12,7 @@ import DetailModal from '../components/DetailModal';
 import AddModal from '../components/AddModal';
 import CsvImportModal from '../components/CsvImportModal';
 import DailyRecommendations from '../components/DailyRecommendations';
+import AiSearchModal from '../components/AiSearchModal';
 import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
 import { useTheme } from '../hooks/useTheme';
@@ -43,6 +44,7 @@ export default function HomePage() {
   const [detailItem, setDetailItem] = useState(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [csvImportOpen, setCsvImportOpen] = useState(false);
+  const [aiSearchOpen, setAiSearchOpen] = useState(false);
 
   // ── 필터 상태 ──────────────────────────────────────────────────────────────
   const [filterOpen, setFilterOpen] = useState(false);
@@ -193,6 +195,7 @@ export default function HomePage() {
             <option value="rated">별점 높은순</option>
             <option value="reviewed">감상 있는 것</option>
           </select>
+          <button className="btn" onClick={() => setAiSearchOpen(true)} title="AI 자연어 검색">✨ AI 검색</button>
           <button className="btn btn-primary" onClick={() => setAddModalOpen(true)}>+ 추가</button>
           <div className="mdb-user">
             <Link to="/stats" className="btn">통계</Link>
@@ -406,6 +409,15 @@ export default function HomePage() {
           onAdd={handleAdd}
           existingItems={items}
           currentTab={tab}
+        />
+      )}
+
+      {/* ── AI 자연어 검색 모달 ── */}
+      {aiSearchOpen && (
+        <AiSearchModal
+          onClose={() => setAiSearchOpen(false)}
+          onAdd={handleAdd}
+          existingItems={items}
         />
       )}
 

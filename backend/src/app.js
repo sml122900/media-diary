@@ -7,6 +7,7 @@ const userMediaRouter = require('./routes/userMedia');
 const tmdbRouter = require('./routes/tmdb');
 const meRouter = require('./routes/me');
 const recommendRouter = require('./routes/recommend');
+const searchRouter = require('./routes/search');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -19,6 +20,7 @@ app.use('/api/user-media', userMediaRouter);
 app.use('/api/tmdb', tmdbRouter);
 app.use('/api/me', meRouter);
 app.use('/api/recommend', recommendRouter);
+app.use('/api/search', searchRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -56,6 +58,14 @@ async function initDB() {
   // 기존 테이블에 watched_at 컬럼이 없으면 추가
   await pool.query(`
     ALTER TABLE user_media ADD COLUMN IF NOT EXISTS watched_at TIMESTAMP DEFAULT NULL
+  `);
+
+  // AI 검색 일일 사용량 컬럼 (Phase 3.4)
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS daily_ai_calls   INTEGER   DEFAULT 0
+  `);
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_ai_reset_at TIMESTAMP DEFAULT NULL
   `);
 
   // 취향 프로필 테이블 (Phase 3.1)
