@@ -109,6 +109,7 @@ function ActivityCalendar({ items }) {
 export default function StatsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const currentYear = new Date().getFullYear();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -177,6 +178,15 @@ export default function StatsPage() {
           <button className="btn" onClick={toggleTheme}>{theme === 'dark' ? '라이트' : '다크'}</button>
           <button className="btn" onClick={() => navigate('/')}>← 돌아가기</button>
         </div>
+      </div>
+
+      {/* 연말 결산 진입 배너 */}
+      <div className="yir-banner" onClick={() => navigate(`/year-in-review/${currentYear}`)}>
+        <div>
+          <div className="yir-banner-text">🎬 {currentYear}년 감상 결산 보기</div>
+          <div className="yir-banner-sub">Spotify Wrapped 스타일로 한 해를 돌아보세요</div>
+        </div>
+        <div className="yir-banner-arrow">›</div>
       </div>
 
       {/* 요약 카드 */}

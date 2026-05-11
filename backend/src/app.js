@@ -14,6 +14,7 @@ const profileRouter = require('./routes/profile');
 const listsRouter = require('./routes/lists');
 const socialRouter = require('./routes/social');
 const watchlistsRouter = require('./routes/watchlists');
+const yearInReviewRouter = require('./routes/yearInReview');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -34,6 +35,7 @@ app.use('/api/lists', listsRouter);
 // social.js는 여러 경로 처리 (follow, feed, compare, search/users, media/friends)
 app.use('/api', socialRouter);
 app.use('/api/watchlists', watchlistsRouter);
+app.use('/api/year-in-review', yearInReviewRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -205,6 +207,22 @@ async function initDB() {
       UNIQUE(user_id, period)
     )
   `);
+  // 연말 결산 캐시 테이블 (Phase 5.1)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS year_in_review_cache (
+      user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      year         INTEGER NOT NULL,
+      data         JSONB   NOT NULL DEFAULT '{}',
+      generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (user_id, year)
+    )
+  `);
+
+  // 시청 시간 합산용 컬럼 (Phase 5.1/5.3 — NULL 허용, 기존 데이터 영향 없음)
+  await pool.query(`
+    ALTER TABLE user_media ADD COLUMN IF NOT EXISTS runtime_minutes INTEGER DEFAULT NULL
+  `);
+
   console.log('Database tables ready');
 }
 

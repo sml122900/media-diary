@@ -377,6 +377,23 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* 연말 결산 배너 (11월~3월 노출) */}
+      {(() => {
+        const m = new Date().getMonth(); // 0-indexed
+        if (m < 10 && m > 2) return null; // 4~9월 숨김
+        const yr = new Date().getFullYear();
+        const reviewYear = m <= 2 ? yr - 1 : yr;
+        return (
+          <div className="yir-banner" onClick={() => navigate(`/year-in-review/${reviewYear}`)}>
+            <div>
+              <div className="yir-banner-text">🎬 {reviewYear}년 감상 결산 보기</div>
+              <div className="yir-banner-sub">Spotify Wrapped 스타일로 한 해를 돌아보세요</div>
+            </div>
+            <div className="yir-banner-arrow">›</div>
+          </div>
+        );
+      })()}
+
       {/* 최근 감상 작품 가로 스크롤 */}
       {widgetData.recent.length > 0 && (
         <div className="recent-section">
