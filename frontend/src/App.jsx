@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import StatsPage from './pages/StatsPage';
+import ReportsPage from './pages/ReportsPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -52,6 +53,14 @@ function App() {
           element={
             <PrivateRoute>
               <StatsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <PrivateRoute>
+              <ReportsPage />
             </PrivateRoute>
           }
         />

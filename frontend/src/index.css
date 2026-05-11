@@ -326,6 +326,42 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 /* 활동 캘린더 */
 .calendar-wrap { overflow-x: auto; padding-bottom: 4px; }
 
+/* ── 월간 리포트 페이지 ── */
+.report-gen-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 20px; background: #fff; border: 1px solid #e8e8e6;
+  border-radius: 14px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.report-list { display: flex; flex-direction: column; gap: 10px; }
+.report-card {
+  background: #fff; border: 1px solid #e8e8e6; border-radius: 14px;
+  padding: 16px 20px; cursor: pointer; transition: all .15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.report-card:hover { border-color: #bbb; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.report-card.active { border-color: #1a1a1a; }
+.report-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.report-card-period { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.report-card-preview { font-size: 13px; color: #888; line-height: 1.5; }
+.report-card-arrow { font-size: 12px; color: #aaa; flex-shrink: 0; margin-top: 2px; }
+.report-card-date { font-size: 11px; color: #bbb; margin-top: 8px; }
+.report-content {
+  background: #fafaf8; border: 1px solid #e8e8e6; border-top: none;
+  border-radius: 0 0 14px 14px; padding: 24px 28px; margin-top: -10px;
+  line-height: 1.8;
+}
+.report-content h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin: 0 0 20px; }
+.report-content h3 { font-size: 15px; font-weight: 700; color: #1a1a1a; margin: 20px 0 10px; }
+.report-content p { font-size: 14px; color: #333; margin-bottom: 12px; }
+.report-content ul, .report-content ol { padding-left: 20px; margin-bottom: 12px; }
+.report-content li { font-size: 14px; color: #333; margin-bottom: 6px; }
+.report-content strong { color: #1a1a1a; font-weight: 600; }
+.report-content em { color: #666; }
+.report-content blockquote {
+  border-left: 3px solid #ddd; padding-left: 14px; margin: 12px 0;
+  color: #666; font-style: italic;
+}
+
 /* ── 오늘의 추천 위젯 ── */
 .daily-rec-section { margin-bottom: 20px; }
 .daily-rec-header {
@@ -515,6 +551,14 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .recent-card-title { color: #e8e8e8; }
   .picker-item:hover { border-color: #e8e8e8; }
   .picker-item-title { color: #666; }
+  .report-gen-bar { background: #1c1c1c; border-color: #2e2e2e; }
+  .report-gen-bar > div > div:first-child { color: #e8e8e8; }
+  .report-card { background: #1c1c1c; border-color: #2e2e2e; }
+  .report-card.active { border-color: #e8e8e8; }
+  .report-card-period { color: #e8e8e8; }
+  .report-content { background: #161616; border-color: #2e2e2e; }
+  .report-content h2, .report-content h3, .report-content strong { color: #e8e8e8; }
+  .report-content p, .report-content li { color: #ccc; }
   .daily-rec-card { background: #1c1c1c; border-color: #2e2e2e; }
   .daily-rec-card.skeleton { background: #222; }
   .daily-rec-poster, .daily-rec-genre-tag { background: #2a2a2a; }

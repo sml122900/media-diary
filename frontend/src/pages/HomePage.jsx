@@ -199,6 +199,7 @@ export default function HomePage() {
           <button className="btn btn-primary" onClick={() => setAddModalOpen(true)}>+ 추가</button>
           <div className="mdb-user">
             <Link to="/stats" className="btn">통계</Link>
+            <Link to="/reports" className="btn">리포트</Link>
             <button className="btn" onClick={handleCsvExport} title="CSV 내보내기">내보내기</button>
             <button className="btn" onClick={() => setCsvImportOpen(true)} title="CSV 가져오기">가져오기</button>
             <span className="mdb-greeting">안녕하세요 <strong>{user?.name}</strong>님</span>

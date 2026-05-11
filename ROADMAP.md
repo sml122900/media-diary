@@ -111,19 +111,19 @@
 
 ### 3.5 월간 취향 리포트
 
-- [ ] **ai_reports 테이블 신설**
+- [x] **ai_reports 테이블 신설**
   - 컬럼: `id`, `user_id`, `period` (YYYY-MM), `content` (text), `created_at`
   - UNIQUE(user_id, period)
 
-- [ ] **리포트 생성 로직**
-  - 매월 1일 자동 생성 (전월 데이터 분석)
-  - 또는 사용자가 "이번 달 리포트 생성" 버튼 클릭 시
-  - Claude API에 감상 기록 전달 → 마크다운 리포트 생성
+- [x] **리포트 생성 로직**
+  - 사용자가 "리포트 생성" 버튼 클릭 시 즉시 생성
+  - 기간 내 watched_at 항목 우선, 없으면 전체 최근 30개 fallback
+  - Claude Haiku → 마크다운 4섹션 리포트 생성
 
-- [ ] **리포트 페이지**
-  - `/reports` 라우트 신설
-  - 월별 리포트 카드 목록
-  - 카드 클릭 시 상세 페이지 (마크다운 렌더링)
+- [x] **리포트 페이지**
+  - `/reports` 라우트 신설 (ReportsPage.jsx)
+  - 월별 리포트 카드 목록 (미리보기 텍스트)
+  - 카드 클릭 시 react-markdown으로 인라인 렌더링
 
 ### 3.6 OTT 시청 기록 이미지 인식
 
@@ -353,6 +353,19 @@
 - `users` 테이블 AI 사용량 컬럼 마이그레이션
 - `AiSearchModal.jsx` 신설 — "✨ AI 검색" 버튼 → 자유 입력 → Claude 해석 + 결과
 - 주요 디버깅: Claude 쉼표 구분 키워드를 개별 TMDB 요청으로 분리
+
+### 2026-05-11 (Phase 3.5 완료)
+- `ai_reports` 테이블 신설 (UNIQUE user_id+period)
+- `backend/src/routes/reports.js` 신설
+  - GET /api/me/reports, GET /api/me/reports/:period
+  - POST /api/me/reports/generate — Claude Haiku 4섹션 마크다운 리포트
+  - watched_at 기간 필터 → 없으면 최근 30개 fallback
+- `react-markdown` 설치, `ReportsPage.jsx` 신설
+  - 월별 카드 목록 + 클릭 시 인라인 마크다운 렌더링
+  - "✨ 리포트 생성" 버튼, 생성 중 로딩 상태
+- App.jsx `/reports` PrivateRoute 추가
+- HomePage 헤더에 "리포트" 링크 추가
+- CSS: `.report-*` 클래스 (다크모드 포함)
 
 <!-- 새 작업은 이 아래에 추가 -->
 

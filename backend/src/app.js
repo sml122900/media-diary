@@ -8,6 +8,7 @@ const tmdbRouter = require('./routes/tmdb');
 const meRouter = require('./routes/me');
 const recommendRouter = require('./routes/recommend');
 const searchRouter = require('./routes/search');
+const reportsRouter = require('./routes/reports');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -21,6 +22,7 @@ app.use('/api/tmdb', tmdbRouter);
 app.use('/api/me', meRouter);
 app.use('/api/recommend', recommendRouter);
 app.use('/api/search', searchRouter);
+app.use('/api/me/reports', reportsRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -98,6 +100,18 @@ async function initDB() {
       user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
       results    JSONB       DEFAULT '[]',
       created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // 월간 AI 리포트 테이블 (Phase 3.5)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ai_reports (
+      id         SERIAL    PRIMARY KEY,
+      user_id    INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      period     VARCHAR(7) NOT NULL,
+      content    TEXT      NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, period)
     )
   `);
   console.log('Database tables ready');
