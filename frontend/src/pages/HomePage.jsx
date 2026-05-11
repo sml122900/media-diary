@@ -11,6 +11,7 @@ import MediaCard from '../components/MediaCard';
 import DetailModal from '../components/DetailModal';
 import AddModal from '../components/AddModal';
 import CsvImportModal from '../components/CsvImportModal';
+import DailyRecommendations from '../components/DailyRecommendations';
 import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
 import { useTheme } from '../hooks/useTheme';
@@ -278,6 +279,9 @@ export default function HomePage() {
           </button>
         </div>
       )}
+
+      {/* ── 오늘의 추천 위젯 ── */}
+      <DailyRecommendations onAdd={handleAdd} existingItems={items} />
 
       {/* ── 홈 위젯 ── */}
       <div className="widget-bar">

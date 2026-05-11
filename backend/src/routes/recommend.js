@@ -147,4 +147,100 @@ router.get('/similar/:mediaId', auth, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/recommend/daily
+ * 오늘의 추천 (취향 프로필 기반, 24h 캐시)
+ * - 별점 4+ 상위 5개 항목의 TMDB 추천을 합산
+ * - 취향 장르 점수로 재정렬 → 최대 12개 후보 캐시
+ * - 클라이언트에서 3개씩 순환 ("다른 추천 보기" 구현)
+ */
+router.get('/daily', auth, async (req, res) => {
+  try {
+    // 캐시 조회 (24h 유효)
+    const { rows: cached } = await pool.query(
+      'SELECT results, created_at FROM daily_recommendations WHERE user_id = $1',
+      [req.user.id]
+    );
+    if (cached[0]) {
+      const ageHours = (Date.now() - new Date(cached[0].created_at)) / 3_600_000;
+      if (ageHours < 24) return res.json({ success: true, data: cached[0].results });
+    }
+
+    // 별점 4+ 상위 5개 항목 (오늘의 추천의 씨앗)
+    const { rows: topItems } = await pool.query(
+      `SELECT tmdb_id, type, title, rating
+       FROM user_media
+       WHERE user_id = $1 AND rating >= 4 AND tmdb_id > 0
+       ORDER BY rating DESC, watched_at DESC NULLS LAST
+       LIMIT 5`,
+      [req.user.id]
+    );
+
+    // 별점 4+ 항목이 없으면 빈 결과 반환
+    if (!topItems.length) return res.json({ success: true, data: [] });
+
+    // 이미 본 작품 집합
+    const { rows: watchedRows } = await pool.query(
+      'SELECT tmdb_id FROM user_media WHERE user_id = $1 AND tmdb_id > 0',
+      [req.user.id]
+    );
+    const watchedIds = new Set(watchedRows.map(r => r.tmdb_id));
+
+    // 취향 프로필 장르 가중치
+    const { rows: profileRows } = await pool.query(
+      'SELECT genres FROM user_taste_profile WHERE user_id = $1',
+      [req.user.id]
+    );
+    const userGenres = profileRows[0]?.genres || {};
+
+    // 씨앗 항목별 TMDB 추천 수집 + 중복 제거
+    const seenIds = new Set();
+    const allRecs = [];
+
+    for (const seedItem of topItems) {
+      const endpoint = seedItem.type === 'movie' ? 'movie' : 'tv';
+      const recs = await getCachedTmdbRecs(seedItem.tmdb_id, endpoint);
+      const genreMap = await getGenreMap(endpoint);
+
+      for (const r of recs) {
+        if (watchedIds.has(r.id) || seenIds.has(r.id)) continue;
+        seenIds.add(r.id);
+
+        const genres = (r.genre_ids || []).map(id => genreMap[id]).filter(Boolean);
+        const score = genres.reduce((s, g) => s + (userGenres[g] || 0), 0);
+
+        allRecs.push({
+          tmdb_id: r.id,
+          title: r.title || r.name || '',
+          year: parseInt((r.release_date || r.first_air_date || '').slice(0, 4)) || 0,
+          type: seedItem.type,
+          poster_url: r.poster_path ? IMG_BASE + r.poster_path : '',
+          overview: r.overview || '',
+          score,
+          genres,
+          // 추천 이유: 씨앗 항목 기준
+          reason: `${seedItem.title}을(를) 좋아하셨다면`,
+        });
+      }
+    }
+
+    // 취향 점수 내림차순 정렬, 최대 12개 후보 캐시
+    const candidates = allRecs
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 12);
+
+    // 캐시 저장
+    await pool.query(
+      `INSERT INTO daily_recommendations (user_id, results, created_at)
+       VALUES ($1, $2, NOW())
+       ON CONFLICT (user_id) DO UPDATE SET results = $2, created_at = NOW()`,
+      [req.user.id, JSON.stringify(candidates)]
+    );
+
+    res.json({ success: true, data: candidates });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

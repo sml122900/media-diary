@@ -81,6 +81,15 @@ async function initDB() {
       PRIMARY KEY (tmdb_id, tmdb_type)
     )
   `);
+
+  // 오늘의 추천 캐시 테이블 (Phase 3.3, 사용자별 24h TTL)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS daily_recommendations (
+      user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      results    JSONB       DEFAULT '[]',
+      created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
   console.log('Database tables ready');
 }
 

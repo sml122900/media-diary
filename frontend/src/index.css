@@ -326,6 +326,46 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 /* 활동 캘린더 */
 .calendar-wrap { overflow-x: auto; padding-bottom: 4px; }
 
+/* ── 오늘의 추천 위젯 ── */
+.daily-rec-section { margin-bottom: 20px; }
+.daily-rec-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.daily-rec-title { font-size: 13px; font-weight: 600; color: #888; }
+.daily-rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.daily-rec-card {
+  background: #fff; border: 1px solid #e8e8e6; border-radius: 12px;
+  overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.daily-rec-card.skeleton {
+  height: 160px; background: #f0f0ee; animation: pulse 1.4s ease infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+.daily-rec-poster {
+  width: 100%; aspect-ratio: 3/2; background: #f0f0ee;
+  display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+}
+.daily-rec-poster img {
+  width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;
+}
+.daily-rec-info { padding: 10px 12px 12px; display: flex; flex-direction: column; flex: 1; }
+.daily-rec-item-title {
+  font-size: 13px; font-weight: 600; color: #1a1a1a; line-height: 1.3;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  margin-bottom: 2px;
+}
+.daily-rec-year { font-size: 11px; color: #aaa; margin-bottom: 4px; }
+.daily-rec-reason {
+  font-size: 11px; color: #888; line-height: 1.4; margin-bottom: 6px;
+  font-style: italic;
+}
+.daily-rec-genres { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 4px; }
+.daily-rec-genre-tag {
+  font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #f0f0ee; color: #888;
+}
+
 /* ── 비슷한 작품 추천 섹션 ── */
 .similar-section {
   margin-top: 20px; padding-top: 16px;
@@ -410,6 +450,9 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .widget-card { padding: 10px 12px; }
   .widget-value { font-size: 22px; }
 
+  /* 오늘의 추천 */
+  .daily-rec-grid { grid-template-columns: 1fr; }
+
   /* 통계 */
   .stats-summary { grid-template-columns: repeat(2, 1fr); }
   .charts-grid { grid-template-columns: 1fr; }
@@ -472,6 +515,10 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .recent-card-title { color: #e8e8e8; }
   .picker-item:hover { border-color: #e8e8e8; }
   .picker-item-title { color: #666; }
+  .daily-rec-card { background: #1c1c1c; border-color: #2e2e2e; }
+  .daily-rec-card.skeleton { background: #222; }
+  .daily-rec-poster, .daily-rec-genre-tag { background: #2a2a2a; }
+  .daily-rec-item-title { color: #e8e8e8; }
   .similar-section { border-color: #2e2e2e; }
   .similar-poster, .similar-genre-tag { background: #2a2a2a; }
   .similar-card-title { color: #e8e8e8; }
