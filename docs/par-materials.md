@@ -84,6 +84,58 @@
 
 ---
 
+### 소재 7 — Spotify Wrapped 스타일 연말 결산 페이지 구현
+
+**Problem (상황/문제)**
+> 1년 치 감상 기록이 쌓여있지만 사용자가 자신의 취향을 한눈에 회고할 방법이 없었다. SNS 공유용 바이럴 기능도 없었다.
+
+**Action (내가 한 것)**
+> Spotify Wrapped 스타일의 9슬라이드 연간 결산 페이지를 구현했다. 백엔드에서 총 감상 수·시청 시간·장르 분포·감독 TOP 3·월별 추이·YoY 비교를 단일 API로 집계하고 1시간/영구 캐시를 적용했다. 프론트엔드는 CSS transition 기반 슬라이드, 키보드 방향키 지원, html2canvas PNG 저장을 구현했다.
+
+**Result (결과)**
+> `/year-in-review/:year` 경로로 접근 가능한 풀스크린 회고 페이지 완성. Spotify Wrapped와 동일한 UX로 연간 감상 패턴을 시각화하고 PNG로 저장·공유할 수 있다.
+
+---
+
+### 소재 8 — PostgreSQL Timezone 버그 디버깅
+
+**Problem (상황/문제)**
+> 연말 결산 캐시가 1시간 TTL로 설계됐으나 매번 `cached: false`를 반환하며 재계산이 일어났다. console.log 추가 후 `ageHours: 9.031`로 캐시가 항상 9시간 전 것으로 인식되는 것을 발견했다.
+
+**Action (내가 한 것)**
+> pg 클라이언트가 `TIMESTAMP WITHOUT TIME ZONE` 컬럼을 서버 로컬 TZ(KST, UTC+9)로 파싱하고, JavaScript `Date.now()`는 UTC 기준이어서 9시간 차이가 발생한다는 원인을 규명했다. 해결책으로 JavaScript에서 비교하는 대신 `EXTRACT(EPOCH FROM (NOW() - generated_at))`로 DB 내부에서 경과 시간을 계산하도록 변경했다.
+
+**Result (결과)**
+> TZ 설정에 무관하게 정확한 캐시 TTL이 동작하게 됐다. Node.js + PostgreSQL 환경에서 재사용 가능한 timezone-safe 패턴을 확립했다.
+
+---
+
+### 소재 9 — Phase 5 전체 기능 감사 프로세스 설계 및 실행
+
+**Problem (상황/문제)**
+> 6개 Phase(5.1~5.6)를 단기간에 구현한 후 체크박스 표시만으로는 실제 동작 여부를 보장할 수 없었다. 선언과 구현이 다른 경우가 실제로 존재할 수 있었다.
+
+**Action (내가 한 것)**
+> 6단계 감사 프로세스(ROADMAP 체크박스 대조 → API 직접 호출 → DB 스키마 확인 → 프론트 컴포넌트 확인 → 코드 품질 → 보고서)를 직접 설계하고 실행했다. PowerShell로 실제 API를 호출해 응답을 검증했고, 3개 버그와 3개 누락 항목을 발견해 즉시 수정했다.
+
+**Result (결과)**
+> 감사를 통해 발견된 6개 항목을 모두 수정·보완했다. 특히 캐시 timezone 버그와 ON CONFLICT 오류는 감사 없이는 운영 환경에서 발견됐을 문제였다. 체계적인 감사 프로세스의 필요성을 실증했다.
+
+---
+
+### 소재 10 — DB UNIQUE 제약 재설계로 재시청 기능 구현
+
+**Problem (상황/문제)**
+> `UNIQUE(user_id, title, year)` 제약으로 같은 작품을 두 번 이상 기록할 수 없었다. 장기 사용자가 재시청한 영화의 새로운 감상을 남길 방법이 없었다.
+
+**Action (내가 한 것)**
+> `rewatch_count INTEGER DEFAULT 1` 컬럼을 추가하고 UNIQUE를 `(user_id, title, year, rewatch_count)`로 확장해 재시청마다 별도 행이 생성되도록 했다. 기존 제약을 안전하게 DROP하고 새 인덱스를 생성하는 멱등성 마이그레이션을 작성했다.
+
+**Result (결과)**
+> 재시청 기록이 가능해졌고 시청 이력 조회 API(`GET /api/user-media/history/:tmdbId`)로 모든 회차를 확인할 수 있다. 카드에 🔁 N회 배지가 표시되어 재시청 작품을 한눈에 식별 가능하다.
+
+---
+
 ## 키워드 뱅크 (기술 스택 & 성과 표현)
 
 - React, Vite, Zustand, React Router
@@ -101,3 +153,13 @@
 - Express 5 Breaking Change 대응 (path-to-regexp)
 - CSV 파싱/생성, BOM UTF-8, 파일 업로드 UX
 - 모바일 반응형 CSS (미디어 쿼리, 하단 시트 모달)
+- Spotify Wrapped 스타일 슬라이드 UX, html2canvas PNG 저장
+- 연간 데이터 집계 API, JSONB 캐시 설계 (PostgreSQL)
+- TIMESTAMP vs TIMESTAMPTZ, pg 클라이언트 TZ 파싱 특성
+- EXTRACT(EPOCH FROM ...), timezone-safe DB 비교 패턴
+- UNIQUE 제약 재설계 (재시청 지원), 멱등성 마이그레이션
+- ON CONFLICT 제약 참조 일관성 관리
+- 체계적 QA 감사 프로세스 (6단계, API E2E 검증)
+- FAB 플로팅 버튼, 키보드 단축키 (Cmd+K)
+- 시청 컨텍스트 메타데이터 설계 (watched_with, mood 등)
+- 개인 위시리스트 (mark-as-watched 흐름, 우선순위 관리)
