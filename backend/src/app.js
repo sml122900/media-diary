@@ -15,6 +15,7 @@ const listsRouter = require('./routes/lists');
 const socialRouter = require('./routes/social');
 const watchlistsRouter = require('./routes/watchlists');
 const yearInReviewRouter = require('./routes/yearInReview');
+const wishlistRouter = require('./routes/wishlist');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -36,6 +37,7 @@ app.use('/api/lists', listsRouter);
 app.use('/api', socialRouter);
 app.use('/api/watchlists', watchlistsRouter);
 app.use('/api/year-in-review', yearInReviewRouter);
+app.use('/api/wishlist', wishlistRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -207,6 +209,24 @@ async function initDB() {
       UNIQUE(user_id, period)
     )
   `);
+  // 개인 위시리스트 테이블 (Phase 5.2)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS wishlist (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      type VARCHAR(20) NOT NULL DEFAULT 'movie',
+      title VARCHAR(500) NOT NULL,
+      year INTEGER DEFAULT 0,
+      tmdb_id INTEGER DEFAULT 0,
+      poster_url TEXT DEFAULT '',
+      priority INTEGER DEFAULT 0,
+      intended_platform TEXT DEFAULT '',
+      note TEXT DEFAULT '',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, tmdb_id, type)
+    )
+  `);
+
   // 연말 결산 캐시 테이블 (Phase 5.1)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS year_in_review_cache (
@@ -222,6 +242,23 @@ async function initDB() {
   await pool.query(`
     ALTER TABLE user_media ADD COLUMN IF NOT EXISTS runtime_minutes INTEGER DEFAULT NULL
   `);
+
+  // 재시청 추적 컬럼 (Phase 5.4)
+  await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS rewatch_count INTEGER DEFAULT 1`);
+  // 기존 행에 rewatch_count = 1 설정
+  await pool.query(`UPDATE user_media SET rewatch_count = 1 WHERE rewatch_count IS NULL`);
+  // 기존 UNIQUE(user_id, title, year) 제약 제거 후 rewatch_count 포함 복합 UNIQUE로 교체
+  await pool.query(`ALTER TABLE user_media DROP CONSTRAINT IF EXISTS user_media_user_id_title_year_key`);
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_user_media_rewatch
+    ON user_media(user_id, title, year, rewatch_count)
+  `);
+
+  // 시청 컨텍스트 컬럼 (Phase 5.6 — 모두 NULL 허용)
+  await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS watched_with TEXT DEFAULT NULL`);
+  await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS watched_at_place TEXT DEFAULT NULL`);
+  await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS mood TEXT DEFAULT NULL`);
+  await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS companion_names TEXT DEFAULT NULL`);
 
   console.log('Database tables ready');
 }

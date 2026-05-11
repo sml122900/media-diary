@@ -49,6 +49,17 @@ export default function DetailModal({
   // 다른 사람들의 공개 리뷰
   const [publicReviews, setPublicReviews] = useState([]);
   const [publicReviewsLoaded, setPublicReviewsLoaded] = useState(false);
+  // 재시청 상태
+  const [rewatchHistory, setRewatchHistory] = useState([]);
+  const [rewatchFormOpen, setRewatchFormOpen] = useState(false);
+  const [rewatchRating, setRewatchRating] = useState(0);
+  const [rewatchNote, setRewatchNote] = useState('');
+  const [rewatchSaving, setRewatchSaving] = useState(false);
+  // 컨텍스트 섹션
+  const [contextOpen, setContextOpen] = useState(false);
+  const [ctxWith, setCtxWith] = useState(item.watched_with || '');
+  const [ctxPlace, setCtxPlace] = useState(item.watched_at_place || '');
+  const [ctxMood, setCtxMood] = useState(item.mood || '');
 
   const cacheKey = `${item.title}_${item.year}`;
   // anime/drama는 tv 타입으로 조회
@@ -57,16 +68,18 @@ export default function DetailModal({
   // 친구 활동 상태
   const [friendsActivity, setFriendsActivity] = useState(null);
 
-  // 다른 사람들의 공개 리뷰 + 친구 활동 로드
+  // 다른 사람들의 공개 리뷰 + 친구 활동 + 시청 이력 로드
   useEffect(() => {
     if (!item.tmdb_id) return;
     const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
     Promise.all([
       axios.get(`http://localhost:4000/api/user-media/public/${item.tmdb_id}`, { headers: auth }),
       axios.get(`http://localhost:4000/api/media/${item.tmdb_id}/friends-activity`, { headers: auth }),
-    ]).then(([pubRes, friendRes]) => {
+      axios.get(`http://localhost:4000/api/user-media/history/${item.tmdb_id}`, { headers: auth }),
+    ]).then(([pubRes, friendRes, histRes]) => {
       setPublicReviews(pubRes.data.data || []);
       setFriendsActivity(friendRes.data.data);
+      setRewatchHistory(histRes.data.data || []);
       setPublicReviewsLoaded(true);
     }).catch(() => setPublicReviewsLoaded(true));
   }, [item.tmdb_id]);
@@ -111,9 +124,36 @@ export default function DetailModal({
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave(item, rating, reviewText, isPublic);
+    // 컨텍스트 필드도 함께 저장
+    await onSave(item, rating, reviewText, isPublic, {
+      watched_with: ctxWith || null,
+      watched_at_place: ctxPlace || null,
+      mood: ctxMood || null,
+    });
     setSaving(false);
     onClose();
+  };
+
+  const handleRewatch = async () => {
+    setRewatchSaving(true);
+    try {
+      const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      await axios.post(
+        `http://localhost:4000/api/user-media/${item.id}/rewatch`,
+        { rating: rewatchRating, review_text: rewatchNote },
+        { headers: auth }
+      );
+      setRewatchFormOpen(false);
+      setRewatchRating(0);
+      setRewatchNote('');
+      // 이력 새로고침
+      const histRes = await axios.get(
+        `http://localhost:4000/api/user-media/history/${item.tmdb_id}`,
+        { headers: auth }
+      );
+      setRewatchHistory(histRes.data.data || []);
+    } catch { /* 에러 무시 */ }
+    setRewatchSaving(false);
   };
 
   const handleDeleteReview = async () => {
@@ -277,6 +317,53 @@ export default function DetailModal({
               </span>
             </div>
 
+            {/* 시청 컨텍스트 (Phase 5.6) */}
+            <div style={{ marginTop: 12 }}>
+              <button
+                style={{ fontSize: 12, color: '#888', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}
+                onClick={() => setContextOpen(v => !v)}
+              >
+                {contextOpen ? '▾' : '▸'} 시청 컨텍스트 {(ctxWith || ctxPlace || ctxMood) ? '✓' : '(선택)'}
+              </button>
+              {contextOpen && (
+                <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,.03)', borderRadius: 8, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>누구와 봤어요?</div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {['혼자', '가족', '친구', '연인'].map(v => (
+                        <button
+                          key={v}
+                          onClick={() => setCtxWith(ctxWith === v ? '' : v)}
+                          style={{ padding: '3px 10px', borderRadius: 12, border: `1px solid ${ctxWith === v ? '#1a1a1a' : '#ddd'}`, background: ctxWith === v ? '#1a1a1a' : 'transparent', color: ctxWith === v ? '#fff' : 'inherit', fontSize: 12, cursor: 'pointer' }}
+                        >{v}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>어디서 봤어요?</div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {['집', '극장', '이동 중', '기타'].map(v => (
+                        <button
+                          key={v}
+                          onClick={() => setCtxPlace(ctxPlace === v ? '' : v)}
+                          style={{ padding: '3px 10px', borderRadius: 12, border: `1px solid ${ctxPlace === v ? '#1a1a1a' : '#ddd'}`, background: ctxPlace === v ? '#1a1a1a' : 'transparent', color: ctxPlace === v ? '#fff' : 'inherit', fontSize: 12, cursor: 'pointer' }}
+                        >{v}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>어떤 기분이었어요?</div>
+                    <input
+                      style={{ width: '100%', padding: '5px 8px', fontSize: 12, border: '1px solid #ddd', borderRadius: 6, background: 'transparent', color: 'inherit' }}
+                      value={ctxMood}
+                      onChange={e => setCtxMood(e.target.value)}
+                      placeholder="감상 당시 무드를 자유롭게..."
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="mactions">
               <div style={{ display: 'flex', gap: 8 }}>
                 {hasReview && (
@@ -291,6 +378,56 @@ export default function DetailModal({
                 </button>
               </div>
             </div>
+
+            {/* 재시청 이력 (Phase 5.4) */}
+            {rewatchHistory.length > 1 && (
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #f0f0ee' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>🔁 시청 이력</div>
+                {rewatchHistory.map((h, i) => (
+                  <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid #f5f5f5', fontSize: 13 }}>
+                    <span style={{ color: '#888', minWidth: 20 }}>{h.rewatch_count}회</span>
+                    {h.rating > 0 && <span style={{ color: '#f0a500' }}>{'★'.repeat(h.rating)}</span>}
+                    {h.watched_at && <span style={{ color: '#aaa', fontSize: 11 }}>{new Date(h.watched_at).toLocaleDateString('ko-KR')}</span>}
+                    {h.review_text && <span style={{ color: '#666', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.review_text}</span>}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 다시 봤어요 버튼 */}
+            {item.tmdb_id > 0 && (
+              <div style={{ marginTop: 12 }}>
+                {!rewatchFormOpen ? (
+                  <button
+                    className="btn"
+                    style={{ fontSize: 12 }}
+                    onClick={() => setRewatchFormOpen(true)}
+                  >🔁 다시 봤어요</button>
+                ) : (
+                  <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,.03)', borderRadius: 8, border: '1px solid #e8e8e8' }}>
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>재시청 별점</div>
+                    <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+                      {[1,2,3,4,5].map(n => (
+                        <button key={n} onClick={() => setRewatchRating(r => r === n ? 0 : n)}
+                          style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: n <= rewatchRating ? '#f0a500' : '#ccc', padding: 0 }}>★</button>
+                      ))}
+                    </div>
+                    <textarea
+                      style={{ width: '100%', fontSize: 12, padding: '6px 8px', border: '1px solid #ddd', borderRadius: 6, resize: 'none', height: 60, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
+                      value={rewatchNote}
+                      onChange={e => setRewatchNote(e.target.value)}
+                      placeholder="재시청 감상 메모..."
+                    />
+                    <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+                      <button className="btn" style={{ fontSize: 12 }} onClick={() => setRewatchFormOpen(false)}>취소</button>
+                      <button className="btn btn-primary" style={{ fontSize: 12 }} onClick={handleRewatch} disabled={rewatchSaving}>
+                        {rewatchSaving ? '저장 중...' : '재시청 기록 저장'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* 다른 사람들의 공개 리뷰 */}
             {publicReviewsLoaded && publicReviews.length > 0 && (

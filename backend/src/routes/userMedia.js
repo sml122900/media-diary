@@ -48,11 +48,11 @@ router.post('/bulk', auth, async (req, res) => {
     const BATCH = 50;
     for (let i = 0; i < items.length; i += BATCH) {
       const batch = items.slice(i, i + BATCH);
-      const F = 8;
+      const F = 9;
       const placeholders = batch
         .map((_, idx) => {
           const b = idx * F;
-          return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5},$${b+6},$${b+7},$${b+8})`;
+          return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5},$${b+6},$${b+7},$${b+8},$${b+9})`;
         })
         .join(',');
       const params = batch.flatMap(item => [
@@ -64,11 +64,12 @@ router.post('/bulk', auth, async (req, res) => {
         item.cast_info || '',
         item.tmdb_id || 0,
         item.poster_url || '',
+        1, // rewatch_count 기본값
       ]);
       const r = await pool.query(
-        `INSERT INTO user_media (user_id,type,title,year,director,cast_info,tmdb_id,poster_url)
+        `INSERT INTO user_media (user_id,type,title,year,director,cast_info,tmdb_id,poster_url,rewatch_count)
          VALUES ${placeholders}
-         ON CONFLICT (user_id,title,year) DO NOTHING`,
+         ON CONFLICT (user_id,title,year,rewatch_count) DO NOTHING`,
         params
       );
       totalCount += r.rowCount;
@@ -81,7 +82,7 @@ router.post('/bulk', auth, async (req, res) => {
 
 /**
  * POST /api/user-media
- * 미디어 항목 추가 또는 리뷰/정보 업서트
+ * 미디어 항목 추가 또는 리뷰/정보 업서트 (rewatch_count=1 기준)
  */
 router.post('/', auth, async (req, res) => {
   const {
@@ -91,9 +92,9 @@ router.post('/', auth, async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO user_media
-         (user_id,type,title,year,director,cast_info,poster_url,tmdb_id,rating,review_text,review_date)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-       ON CONFLICT (user_id,title,year) DO UPDATE SET
+         (user_id,type,title,year,director,cast_info,poster_url,tmdb_id,rating,review_text,review_date,rewatch_count)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,1)
+       ON CONFLICT (user_id,title,year,rewatch_count) DO UPDATE SET
          type        = EXCLUDED.type,
          director    = EXCLUDED.director,
          cast_info   = EXCLUDED.cast_info,
@@ -125,6 +126,7 @@ router.put('/:id', auth, async (req, res) => {
   const {
     title, year, director, cast_info, poster_url,
     type, rating, review_text, review_date, set_watched_at, is_public,
+    watched_with, watched_at_place, mood, companion_names,
   } = req.body;
   try {
     const result = await pool.query(
@@ -136,15 +138,21 @@ router.put('/:id', auth, async (req, res) => {
            WHEN $11 AND ($7::int > 0 OR $8::text <> '') THEN NOW()
            WHEN $11 AND $7::int = 0 AND $8::text = ''   THEN NULL
            ELSE watched_at
-         END
-       WHERE id=$12 AND user_id=$13
+         END,
+         watched_with = COALESCE($13, watched_with),
+         watched_at_place = COALESCE($14, watched_at_place),
+         mood = COALESCE($15, mood),
+         companion_names = COALESCE($16, companion_names)
+       WHERE id=$12 AND user_id=$17
        RETURNING *`,
       [
         title, year, director || '', cast_info || '', poster_url || '',
         type || 'movie', rating || 0, review_text || '', review_date || '',
         is_public === true,
         set_watched_at === true,
-        req.params.id, req.user.id,
+        req.params.id,
+        watched_with ?? null, watched_at_place ?? null, mood ?? null, companion_names ?? null,
+        req.user.id,
       ]
     );
     if (!result.rows[0]) {
@@ -152,6 +160,66 @@ router.put('/:id', auth, async (req, res) => {
     }
     triggerProfileUpdate(req.user.id);
     res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * POST /api/user-media/:id/rewatch
+ * 재시청 기록 추가 — 동일 작품을 새로운 rewatch_count로 삽입
+ */
+router.post('/:id/rewatch', auth, async (req, res) => {
+  try {
+    // 원본 항목 조회
+    const { rows: orig } = await pool.query(
+      'SELECT * FROM user_media WHERE id=$1 AND user_id=$2',
+      [req.params.id, req.user.id]
+    );
+    if (!orig[0]) return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
+    const o = orig[0];
+
+    // 현재 최대 rewatch_count 조회
+    const { rows: maxRow } = await pool.query(
+      'SELECT MAX(rewatch_count) AS max FROM user_media WHERE user_id=$1 AND title=$2 AND year=$3',
+      [req.user.id, o.title, o.year]
+    );
+    const nextCount = (maxRow[0]?.max || 1) + 1;
+
+    // 새 시청 기록 삽입
+    const { rows } = await pool.query(
+      `INSERT INTO user_media
+         (user_id,type,title,year,director,cast_info,poster_url,tmdb_id,rating,review_text,rewatch_count,watched_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW())
+       RETURNING *`,
+      [
+        req.user.id, o.type, o.title, o.year,
+        o.director, o.cast_info, o.poster_url, o.tmdb_id,
+        req.body.rating || 0, req.body.review_text || '', nextCount,
+      ]
+    );
+    triggerProfileUpdate(req.user.id);
+    res.json({ success: true, data: rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/user-media/history/:tmdbId
+ * 특정 TMDB 작품의 내 시청 이력 전체 (재시청 포함)
+ */
+router.get('/history/:tmdbId', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, rating, review_text, review_date, watched_at, rewatch_count,
+              watched_with, watched_at_place, mood, companion_names
+       FROM user_media
+       WHERE user_id=$1 AND tmdb_id=$2
+       ORDER BY rewatch_count ASC`,
+      [req.user.id, req.params.tmdbId]
+    );
+    res.json({ success: true, data: rows });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

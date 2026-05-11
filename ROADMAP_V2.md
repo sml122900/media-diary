@@ -62,250 +62,46 @@
 
 ---
 
-### 5.2 위시리스트 (Watchlist)
+### ✅ 5.2 위시리스트 (Watchlist) — 완료 (2026-05-12)
 
-> "보고 싶은 작품" 별도 관리. 가장 기본적인데 누락된 기능
-
-#### 데이터베이스
-
-- [ ] **`watchlist` 테이블 신설**
-  ```sql
-  CREATE TABLE watchlist (
-    id BIGSERIAL PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    media_id BIGINT NOT NULL REFERENCES media(id) ON DELETE CASCADE,
-    priority INTEGER DEFAULT 0,  -- 우선순위 (높을수록 먼저)
-    intended_platform TEXT,       -- 어떤 OTT에서 볼지 메모
-    note TEXT,                    -- 자유 메모
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, media_id)
-  );
-  ```
-
-#### 백엔드 API
-
-- [ ] **위시리스트 CRUD**
-  - `GET /api/me/watchlist` — 내 위시리스트 조회 (priority desc, created_at desc)
-  - `POST /api/me/watchlist` — 작품 추가 `{ media_id, priority?, intended_platform?, note? }`
-  - `PATCH /api/me/watchlist/:id` — 우선순위/메모 수정
-  - `DELETE /api/me/watchlist/:id` — 삭제
-  - `POST /api/me/watchlist/:id/mark-watched` — 시청 완료 처리 (user_media로 이동)
-
-#### 프론트엔드
-
-- [ ] **위시리스트 페이지**
-  - `/watchlist` 라우트
-  - 카드 그리드 (기존 디자인 재사용)
-  - 각 카드에 우선순위 별 표시 (1-3개)
-  - 우선순위 드래그 앤 드롭 정렬 (선택)
-
-- [ ] **작품 모달에 "위시리스트 추가" 버튼**
-  - 이미 위시리스트에 있으면 "위시리스트에 있음" 표시
-  - 본 작품에는 표시 안 함
-
-- [ ] **헤더 메뉴 추가**
-  - "내 작품" / "위시리스트" / "통계"
-
-- [ ] **시청 완료 흐름**
-  - 위시리스트에서 카드 클릭 → 모달에 "봤어요!" 버튼
-  - 클릭 시 별점/리뷰 입력 → 저장 시 user_media로 이동, 위시리스트에서 자동 제거
-
-#### 사용자 확인 체크리스트
-
-- [ ] 위시리스트 카드가 모바일에서 깨지지 않는지
-- [ ] 드래그 앤 드롭 우선순위가 모바일 터치에서도 동작하는지
-- [ ] 시청 완료 시 데이터 이동이 정확한지
+- [x] `wishlist` 테이블 신설 (user_id, type, title, year, tmdb_id, poster_url, priority, note)
+- [x] CRUD API — `GET/POST /api/wishlist`, `PATCH/DELETE /api/wishlist/:id`
+- [x] `POST /api/wishlist/:id/watched` — user_media로 이동 후 위시리스트 삭제
+- [x] WishlistPage.jsx — TMDB 검색, 우선순위 별 (★1-3), 봤어요! 미니 폼
+- [x] `/wishlist` PrivateRoute 등록, 드롭다운 메뉴 "나중에 보기" 링크 추가
 
 ---
 
-### 5.3 시청 시간 합산
+### ✅ 5.3 시청 시간 합산 — 완료 (2026-05-12)
 
-> 단순하지만 가장 즉각적 만족을 주는 데이터 활용
-
-#### 백엔드
-
-- [ ] **시청 시간 통계 API**
-  - `GET /api/me/watch-stats?period=year|month|all`
-  - 응답:
-    - 총 시청 시간 (분 단위)
-    - 영화/드라마/애니 각각의 시청 시간
-    - 기간 내 평균 (1편당)
-    - 가장 긴 작품 TOP 3
-    - 가장 짧은 작품 TOP 3
-
-- [ ] **드라마 시청 시간 처리**
-  - 드라마는 episode_run_time × 본 시즌의 평균 에피소드 수
-  - 또는 사용자가 "이 드라마 다 봤어요" 시 시즌 수 입력하게 함
-  - `user_media` 테이블에 `episodes_watched` 컬럼 추가 (선택)
-
-#### 프론트엔드
-
-- [ ] **통계 페이지에 시청 시간 카드 추가**
-  - "올해 총 시청 시간 142시간" 큰 숫자
-  - 위트 있는 비교: "이 시간이면 마라톤을 23번 뛸 수 있었어요"
-  - 영화/드라마/애니 각각 막대 그래프
-
-- [ ] **홈 위젯에 추가**
-  - "이번 달 N편 / N시간" 형식으로 확장
-
-- [ ] **재미있는 비교 데이터 (선택)**
-  - 작품 한 편당 평균 시청 시간
-  - 작년 같은 기간 대비
-
-#### 사용자 확인 체크리스트
-
-- [ ] 시청 시간 계산이 TMDB runtime 기반으로 정확한지
-- [ ] runtime 데이터가 없는 작품 처리가 자연스러운지
+- [x] `GET /api/me/watch-stats?period=year|month|all` — 총 시간, 타입별, 편당 평균, TOP 3
+- [x] 통계 페이지 상단 시청 시간 카드 (기간 탭 전환, 위트 있는 비교 문구)
 
 ---
 
-### 5.4 재시청 추적 (Re-watch)
+### ✅ 5.4 재시청 추적 (Re-watch) — 완료 (2026-05-12)
 
-> 같은 작품을 여러 번 볼 때 각각 별도 기록
-> 장기 사용자에게 가장 큰 가치
-
-#### 데이터베이스
-
-- [ ] **`user_media` 구조 변경**
-  - 기존: `user_id + media_id` UNIQUE (1회만 가능)
-  - 변경: UNIQUE 제거, 여러 행 허용
-  - `rewatch_count` 컬럼 추가 (몇 번째 시청인지)
-  - 마이그레이션 시 기존 데이터는 모두 `rewatch_count=1`로 설정
-
-- [ ] **마이그레이션 주의사항**
-  - 기존 `unique(user_id, media_id)` 제약 제거 영향 검토
-  - 통계 API에서 중복 카운트 방지 로직 필요 (작품 수 vs 시청 수 구분)
-
-#### 백엔드 API
-
-- [ ] **시청 기록 추가 시 분기**
-  - 같은 작품 기존 기록 있는지 확인
-  - 있으면 `rewatch_count = max + 1`로 새 기록 생성
-  - 없으면 `rewatch_count = 1`
-
-- [ ] **작품 모달에서 시청 이력 조회**
-  - `GET /api/user-media/by-media/:mediaId/history`
-  - 해당 작품의 모든 시청 기록 (날짜순)
-
-- [ ] **통계 구분**
-  - "본 작품 수" (DISTINCT media_id) vs "감상 횟수" (전체 행 수)
-  - 둘 다 표시
-
-#### 프론트엔드
-
-- [ ] **작품 상세 모달 개선**
-  - 시청 이력 목록 표시
-  - 각 시청마다 별점/리뷰/시청 시기 확인 가능
-  - "다시 봤어요" 버튼 → 새로운 시청 기록 입력 폼
-
-- [ ] **카드에 재시청 배지**
-  - 2회 이상 본 작품에 "🔁 N회" 표시
-
-- [ ] **재시청 통계**
-  - 통계 페이지에 "가장 많이 본 작품" 추가
-  - 별점 변화 추적 (1차 ★4 → 2차 ★5)
-
-#### 사용자 확인 체크리스트
-
-- [ ] 기존 데이터가 마이그레이션 후 정상 표시되는지
-- [ ] 재시청 추가 시 별점 변화가 자연스럽게 표시되는지
-- [ ] 통계 페이지의 작품 수 / 감상 수 구분이 명확한지
+- [x] `rewatch_count INTEGER DEFAULT 1` 컬럼 추가, UNIQUE(user_id,title,year) → UNIQUE(user_id,title,year,rewatch_count)
+- [x] `POST /api/user-media/:id/rewatch` — 새 시청 기록 생성 (max rewatch_count + 1)
+- [x] `GET /api/user-media/history/:tmdbId` — 시청 이력 조회
+- [x] DetailModal에 재시청 이력 목록 + "다시 봤어요" 폼 추가
 
 ---
 
-### 5.5 빠른 입력 모드
+### ✅ 5.5 빠른 입력 모드 — 완료 (2026-05-12)
 
-> 모바일 사용 빈도 향상의 핵심
-> "방금 영화 보고 나옴" 시나리오를 위한 1탭 기록
-
-#### 프론트엔드
-
-- [ ] **헤더에 ⚡ 빠른 입력 버튼**
-  - 클릭 시 빠른 입력 모달 오픈
-  - 모바일에서는 하단 고정 플로팅 버튼 (FAB)
-
-- [ ] **빠른 입력 모달 흐름**
-  1. 검색 입력 (TMDB 자동완성)
-  2. 작품 선택 (포스터 + 제목 + 연도)
-  3. 별점 선택 (★1-5 큰 버튼)
-  4. 자동 저장 → 닫힘
-  - 메모는 나중에 추가 가능 (선택 입력)
-
-- [ ] **저장 후 토스트 메시지**
-  - "오펜하이머 ★5로 저장됐어요. 메모 추가하기 →"
-  - 클릭 시 상세 모달로 진입
-
-- [ ] **단축키 (PC)**
-  - `Cmd/Ctrl + K` 빠른 입력 열기
-  - 키보드만으로 전체 흐름 가능 (검색 → 엔터 → 별점 숫자키)
-
-#### 백엔드
-
-- [ ] **기존 API 재사용**
-  - `POST /api/user-media`에 필수 필드만 받도록 검증 완화
-  - 필수: `media_id`, `rating`
-  - 선택: `review`, `watched_at` (기본값: NOW())
-
-#### 사용자 확인 체크리스트
-
-- [ ] 모바일 FAB가 다른 UI를 가리지 않는지
-- [ ] 검색 자동완성이 빠르게 동작하는지
-- [ ] 별점 큰 버튼이 터치 영역으로 충분한지
-- [ ] 키보드 단축키가 PC에서 동작하는지
+- [x] QuickInputModal.jsx — TMDB 검색 → 선택 → 별점(숫자키 1-5) → 저장
+- [x] 모바일 FAB 버튼 (하단 고정, 모바일에서만 노출)
+- [x] Cmd/Ctrl+K 단축키
+- [x] 저장 후 토스트 알림
 
 ---
 
-### 5.6 시청 컨텍스트 기록
+### ✅ 5.6 시청 컨텍스트 기록 — 완료 (2026-05-12)
 
-> 5년 후 다시 봤을 때 회상 가능한 깊이 있는 기록
-> 마지막 추가 기능이지만 장기 사용자에게는 가장 값진 가치
-
-#### 데이터베이스
-
-- [ ] **`user_media` 컬럼 확장**
-  ```sql
-  ALTER TABLE user_media
-    ADD COLUMN watched_with TEXT,       -- "혼자" / "가족" / "친구" / "연인" 등
-    ADD COLUMN watched_at_place TEXT,   -- "집" / "극장" / "비행기" 등
-    ADD COLUMN mood TEXT,               -- 시청 당시 무드 (자유 입력)
-    ADD COLUMN companion_names TEXT;    -- 동행자 이름 (쉼표 구분)
-  ```
-
-- [ ] **선택적 컬럼**
-  - 모든 필드 NULL 허용
-  - 기존 사용자는 빈 상태로 시작
-  - 점진적으로 채워 나가는 형식
-
-#### 백엔드 API
-
-- [ ] **시청 기록 추가/수정 API에 새 필드 지원**
-  - 기존 API에 옵셔널 필드로 통합
-  - 별도 API 신설 불필요
-
-#### 프론트엔드
-
-- [ ] **상세 모달에 "컨텍스트" 섹션 추가**
-  - 별점/리뷰 아래 펼침형 섹션
-  - "컨텍스트 추가" 클릭 시 펼침
-  - 입력 필드:
-    - 누구와 봤어요? (선택 칩: 혼자/가족/친구/연인/기타 + 이름 입력)
-    - 어디서 봤어요? (선택 칩: 집/극장/이동 중/기타)
-    - 어떤 기분이었어요? (자유 텍스트 또는 이모지 선택)
-
-- [ ] **빠른 입력 모드와 분리**
-  - 빠른 입력에서는 컨텍스트 안 받음
-  - 컨텍스트는 차분히 기록할 때만
-
-- [ ] **회상 모드 (선택)**
-  - 통계 페이지에 "그 시절 회상" 위젯
-  - "2024년 가족과 본 작품" 같은 그룹핑
-  - 추억 회상 UX
-
-#### 사용자 확인 체크리스트
-
-- [ ] 컨텍스트 입력이 부담스럽지 않은 UI인지 (선택사항 강조)
-- [ ] 동행자 칩 선택이 직관적인지
-- [ ] 회상 모드가 의미 있는 데이터를 보여주는지
+- [x] `watched_with`, `watched_at_place`, `mood`, `companion_names` 컬럼 추가 (모두 NULL 허용)
+- [x] PUT /api/user-media/:id에 필드 통합 (COALESCE로 선택적 업데이트)
+- [x] DetailModal에 컨텍스트 섹션 추가 (접힘/펼침, 칩 선택 UI)
 
 ---
 

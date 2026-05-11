@@ -14,6 +14,7 @@ import CsvImportModal from '../components/CsvImportModal';
 import DailyRecommendations from '../components/DailyRecommendations';
 import AiSearchModal from '../components/AiSearchModal';
 import ScreenshotImportModal from '../components/ScreenshotImportModal';
+import QuickInputModal from '../components/QuickInputModal';
 import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
 import { useTheme } from '../hooks/useTheme';
@@ -48,6 +49,8 @@ export default function HomePage() {
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
   const [screenshotOpen, setScreenshotOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [toast, setToast] = useState(null); // { text: string }
   const menuRef = useRef(null);
 
   // 메뉴 외부 클릭 시 닫기
@@ -58,6 +61,25 @@ export default function HomePage() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Cmd/Ctrl+K — 빠른 입력 단축키
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setQuickOpen(v => !v);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  // 토스트 자동 제거 (3초)
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
@@ -240,6 +262,7 @@ export default function HomePage() {
                 <Link to="/stats" className="menu-item" onClick={closeMenu}>통계</Link>
                 <Link to="/reports" className="menu-item" onClick={closeMenu}>리포트</Link>
                 <Link to="/feed" className="menu-item" onClick={closeMenu}>피드</Link>
+                <Link to="/wishlist" className="menu-item" onClick={closeMenu}>나중에 보기</Link>
                 <Link to="/watchlists" className="menu-item" onClick={closeMenu}>같이보기</Link>
                 <Link to="/lists" className="menu-item" onClick={closeMenu}>리스트</Link>
 
@@ -524,6 +547,38 @@ export default function HomePage() {
           onImportDone={reloadItems}
         />
       )}
+
+      {/* ── 빠른 입력 모달 (Phase 5.5) ── */}
+      {quickOpen && (
+        <QuickInputModal
+          onClose={() => setQuickOpen(false)}
+          onAdd={handleAdd}
+          onSaved={(title, rating) => setToast({ text: `${title} ★${rating}로 저장됐어요!` })}
+        />
+      )}
+
+      {/* ── 토스트 알림 ── */}
+      {toast && (
+        <div style={{
+          position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
+          background: '#1a1a1a', color: '#fff', padding: '10px 20px',
+          borderRadius: 20, fontSize: 13, zIndex: 3000,
+          boxShadow: '0 4px 20px rgba(0,0,0,.3)',
+          animation: 'fadeInUp .2s ease',
+        }}>
+          {toast.text}
+        </div>
+      )}
+
+      {/* ── 모바일 FAB (빠른 입력) ── */}
+      <button
+        className="fab-btn"
+        onClick={() => setQuickOpen(true)}
+        title="빠른 기록 (Cmd+K)"
+        aria-label="빠른 기록"
+      >
+        ⚡
+      </button>
     </div>
   );
 }

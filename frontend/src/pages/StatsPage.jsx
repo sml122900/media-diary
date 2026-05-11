@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -106,18 +107,37 @@ function ActivityCalendar({ items }) {
   );
 }
 
+const RUNTIME_EST = { movie: 110, drama: 60, anime: 24 };
+
+function watchTimeQuip(minutes) {
+  const hours = Math.round(minutes / 60);
+  if (hours >= 200) return `서울-부산 KTX를 ${Math.floor(minutes / 112)}번 탈 수 있어요`;
+  if (hours >= 50)  return `마라톤을 ${Math.floor(minutes / 300)}번 뛸 수 있는 시간이에요`;
+  if (hours >= 10)  return `잠을 ${Math.floor(minutes / 480)}일치 더 잘 수 있었어요`;
+  return '이제 막 시작하는 감상가예요!';
+}
+
 export default function StatsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const currentYear = new Date().getFullYear();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [watchStats, setWatchStats] = useState(null);
+  const [statsPeriod, setStatsPeriod] = useState('year');
 
   useEffect(() => {
     fetchUserMedia()
       .then(data => { setItems(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get(`http://localhost:4000/api/me/watch-stats?period=${statsPeriod}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(res => setWatchStats(res.data.data)).catch(() => {});
+  }, [statsPeriod]);
 
   // 분류 파이차트 데이터
   const typeData = useMemo(() => {
@@ -202,6 +222,42 @@ export default function StatsPage() {
             <div className="summary-label">{label}</div>
           </div>
         ))}
+      </div>
+
+      {/* 시청 시간 카드 (Phase 5.3) */}
+      <div className="chart-card chart-card-wide" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div className="chart-title" style={{ marginBottom: 0 }}>시청 시간</div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[['year', '올해'], ['month', '이번 달'], ['all', '전체']].map(([p, label]) => (
+              <button
+                key={p}
+                className={statsPeriod === p ? 'tab-btn active' : 'tab-btn'}
+                style={{ fontSize: 12, padding: '3px 10px' }}
+                onClick={() => setStatsPeriod(p)}
+              >{label}</button>
+            ))}
+          </div>
+        </div>
+        {watchStats ? (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'flex-start' }}>
+            <div>
+              <div style={{ fontSize: 48, fontWeight: 900, lineHeight: 1 }}>{Math.floor(watchStats.total_hours)}<span style={{ fontSize: 20, fontWeight: 400 }}>시간</span></div>
+              <div style={{ fontSize: 13, color: '#888', marginTop: 6 }}>{watchStats.total_count}편 · 편당 평균 {watchStats.avg_minutes}분</div>
+              <div style={{ fontSize: 12, color: '#aaa', marginTop: 4, fontStyle: 'italic' }}>{watchTimeQuip(watchStats.total_minutes)}</div>
+            </div>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              {Object.entries(watchStats.by_type).filter(([, v]) => v > 0).map(([type, mins]) => (
+                <div key={type} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700 }}>{Math.round(mins / 60)}h</div>
+                  <div style={{ fontSize: 11, color: '#888' }}>{TYPE_LABEL[type]}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div style={{ color: '#aaa', fontSize: 14 }}>해당 기간 시청 기록이 없습니다</div>
+        )}
       </div>
 
       {/* 차트 섹션 */}
