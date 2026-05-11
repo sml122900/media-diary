@@ -13,16 +13,18 @@ import AddModal from '../components/AddModal';
 import CsvImportModal from '../components/CsvImportModal';
 import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
+import { useTheme } from '../hooks/useTheme';
 
 export default function HomePage() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   // 미디어 데이터 + CRUD 훅
   const {
     items, loading, seedingMsg,
     handleSave, handleDeleteReview, handleDeleteItem,
-    handleEditItem, handleAdd, handleUpdatePoster,
+    handleEditItem, handleAdd, handleUpdatePoster, reloadItems,
   } = useMediaList(user);
 
   // 포스터 캐시 훅
@@ -196,6 +198,7 @@ export default function HomePage() {
             <button className="btn" onClick={handleCsvExport} title="CSV 내보내기">내보내기</button>
             <button className="btn" onClick={() => setCsvImportOpen(true)} title="CSV 가져오기">가져오기</button>
             <span className="mdb-greeting">안녕하세요 <strong>{user?.name}</strong>님</span>
+            <button className="btn" onClick={toggleTheme}>{theme === 'dark' ? '라이트' : '다크'}</button>
             <button className="btn" onClick={handleLogout}>로그아웃</button>
           </div>
         </div>
@@ -264,7 +267,12 @@ export default function HomePage() {
           <button
             className="btn"
             style={{ fontSize: 12, padding: '4px 10px' }}
-            onClick={() => { setDirectorFilter(''); setRatingFilter(0); yearInitRef.current = false; }}
+            onClick={() => {
+              setDirectorFilter('');
+              setRatingFilter(0);
+              const years = items.map(i => i.year).filter(y => y > 0);
+              if (years.length) { setYearMin(Math.min(...years)); setYearMax(Math.max(...years)); }
+            }}
           >
             초기화
           </button>
@@ -401,6 +409,7 @@ export default function HomePage() {
           onClose={() => setCsvImportOpen(false)}
           onAdd={handleAdd}
           existingItems={items}
+          onImportDone={reloadItems}
         />
       )}
     </div>

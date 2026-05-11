@@ -5,6 +5,7 @@ const pool = require('./db');
 const authRouter = require('./routes/auth');
 const userMediaRouter = require('./routes/userMedia');
 const tmdbRouter = require('./routes/tmdb');
+const meRouter = require('./routes/me');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/user-media', userMediaRouter);
 app.use('/api/tmdb', tmdbRouter);
+app.use('/api/me', meRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -52,6 +54,19 @@ async function initDB() {
   // 기존 테이블에 watched_at 컬럼이 없으면 추가
   await pool.query(`
     ALTER TABLE user_media ADD COLUMN IF NOT EXISTS watched_at TIMESTAMP DEFAULT NULL
+  `);
+
+  // 취향 프로필 테이블 (Phase 3.1)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_taste_profile (
+      user_id     INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      genres      JSONB    DEFAULT '{}',
+      directors   JSONB    DEFAULT '{}',
+      decades     JSONB    DEFAULT '{}',
+      avg_rating  FLOAT    DEFAULT 0,
+      total_count INTEGER  DEFAULT 0,
+      updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
   `);
   console.log('Database tables ready');
 }

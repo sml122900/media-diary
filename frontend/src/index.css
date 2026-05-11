@@ -383,7 +383,7 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 }
 
 /* ── 다크모드 ── */
-@media (prefers-color-scheme: dark) {
+[data-theme="dark"] {
   body { background: #111; color: #e8e8e8; }
   .mdb-title { color: #e8e8e8; }
   .card, .modal, .add-modal { background: #1c1c1c; border-color: #2e2e2e; }

@@ -7,6 +7,16 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const { updateTasteProfile } = require('../services/tasteProfile');
+
+// 응답 후 취향 프로필을 백그라운드로 재계산 (응답 속도에 영향 없음)
+const triggerProfileUpdate = (userId) => {
+  setImmediate(() =>
+    updateTasteProfile(userId).catch(err =>
+      console.error('취향 프로필 갱신 실패:', err.message)
+    )
+  );
+};
 
 /**
  * GET /api/user-media
@@ -99,6 +109,7 @@ router.post('/', auth, async (req, res) => {
         rating || 0, review_text || '', review_date || '',
       ]
     );
+    triggerProfileUpdate(req.user.id);
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -137,6 +148,7 @@ router.put('/:id', auth, async (req, res) => {
     if (!result.rows[0]) {
       return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
     }
+    triggerProfileUpdate(req.user.id);
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -173,6 +185,7 @@ router.delete('/:id', auth, async (req, res) => {
       'DELETE FROM user_media WHERE id=$1 AND user_id=$2',
       [req.params.id, req.user.id]
     );
+    triggerProfileUpdate(req.user.id);
     res.json({ success: true, message: '삭제됐습니다' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

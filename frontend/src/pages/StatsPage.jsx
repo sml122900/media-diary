@@ -10,7 +10,7 @@ import {
   PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import { fetchUserMedia } from '../api/userMedia';
-import useAuthStore from '../store/authStore';
+import { useTheme } from '../hooks/useTheme';
 
 // 파이차트 색상
 const PIE_COLORS = { movie: '#1a1a1a', anime: '#4a90d9', drama: '#e07a3f' };
@@ -107,13 +107,15 @@ function ActivityCalendar({ items }) {
 }
 
 export default function StatsPage() {
-  const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserMedia().then(data => { setItems(data); setLoading(false); });
+    fetchUserMedia()
+      .then(data => { setItems(data); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
   // 분류 파이차트 데이터
@@ -172,6 +174,7 @@ export default function StatsPage() {
       <div className="mdb-header" style={{ marginBottom: 24 }}>
         <h1 className="mdb-title">통계</h1>
         <div className="mdb-controls">
+          <button className="btn" onClick={toggleTheme}>{theme === 'dark' ? '라이트' : '다크'}</button>
           <button className="btn" onClick={() => navigate('/')}>← 돌아가기</button>
         </div>
       </div>

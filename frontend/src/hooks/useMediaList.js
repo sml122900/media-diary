@@ -114,6 +114,12 @@ export function useMediaList(user) {
     return updated;
   };
 
+  /** 서버에서 최신 목록 재로드 (CSV overwrite 후 등) */
+  const reloadItems = async () => {
+    const data = await fetchUserMedia();
+    setItems(data);
+  };
+
   return {
     items, setItems,
     loading, seedingMsg,
@@ -123,5 +129,6 @@ export function useMediaList(user) {
     handleEditItem,
     handleAdd,
     handleUpdatePoster,
+    reloadItems,
   };
 }

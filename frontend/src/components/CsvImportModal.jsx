@@ -10,7 +10,7 @@ import { saveMediaItem } from '../api/userMedia';
 /**
  * @param {{ onClose: Function, onAdd: Function, existingItems: Array }} props
  */
-export default function CsvImportModal({ onClose, onAdd, existingItems }) {
+export default function CsvImportModal({ onClose, onAdd, existingItems, onImportDone }) {
   const [rows, setRows] = useState([]);
   const [fileName, setFileName] = useState('');
   const [adding, setAdding] = useState(false);
@@ -104,6 +104,7 @@ export default function CsvImportModal({ onClose, onAdd, existingItems }) {
     setAdding(false);
     setProgress('');
     setDone(true);
+    if (onImportDone) await onImportDone();
   };
 
   const TYPE_LABEL = { movie: '영화', anime: '애니메이션', drama: '드라마' };
