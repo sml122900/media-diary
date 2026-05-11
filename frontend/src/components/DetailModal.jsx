@@ -3,7 +3,7 @@
  * 미디어 상세 모달 — 리뷰 작성, 항목 편집, 포스터 교체, 삭제
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import TmdbInfoPanel from './TmdbInfoPanel';
 import StarRating from './StarRating';

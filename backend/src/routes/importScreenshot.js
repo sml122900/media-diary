@@ -13,6 +13,9 @@ const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
 
+// 스크린샷 인식 일일 한도 (Claude Vision API 비용 제어)
+const SCREENSHOT_DAILY_LIMIT = 10;
+
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const TMDB_KEY = process.env.TMDB_API_KEY;
@@ -53,6 +56,31 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: '이미지를 업로드해주세요' });
+    }
+
+    // 일일 스크린샷 인식 한도 확인 (daily_ai_calls 컬럼 공유)
+    const { rows: uRows } = await pool.query(
+      'SELECT daily_ai_calls, last_ai_reset_at FROM users WHERE id = $1',
+      [req.user.id]
+    );
+    const u = uRows[0];
+    if (u) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const resetAt = u.last_ai_reset_at ? new Date(u.last_ai_reset_at) : null;
+      const needsReset = !resetAt || resetAt < todayStart;
+      if (!needsReset && u.daily_ai_calls >= SCREENSHOT_DAILY_LIMIT) {
+        return res.status(429).json({
+          success: false,
+          message: `일일 AI 인식 한도(${SCREENSHOT_DAILY_LIMIT}회)에 도달했습니다. 내일 다시 시도해주세요.`,
+        });
+      }
+      // 카운트 증가
+      if (needsReset) {
+        await pool.query('UPDATE users SET daily_ai_calls = 1, last_ai_reset_at = NOW() WHERE id = $1', [req.user.id]);
+      } else {
+        await pool.query('UPDATE users SET daily_ai_calls = daily_ai_calls + 1 WHERE id = $1', [req.user.id]);
+      }
     }
 
     // 이미지를 base64로 읽기

@@ -6,7 +6,6 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import { IMG_BASE } from '../utils/constants';
 
 const BASE = 'http://localhost:4000/api';
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
