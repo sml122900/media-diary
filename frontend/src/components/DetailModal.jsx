@@ -3,7 +3,8 @@
  * 미디어 상세 모달 — 리뷰 작성, 항목 편집, 포스터 교체, 삭제
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import TmdbInfoPanel from './TmdbInfoPanel';
 import StarRating from './StarRating';
 import PosterPicker from './PosterPicker';
@@ -43,10 +44,26 @@ export default function DetailModal({
   const [saving, setSaving] = useState(false);
   const [posterPickerOpen, setPosterPickerOpen] = useState(false);
   const [currentPosterUrl, setCurrentPosterUrl] = useState(posterUrl);
+  // 리뷰 공개/비공개
+  const [isPublic, setIsPublic] = useState(item.is_public || false);
+  // 다른 사람들의 공개 리뷰
+  const [publicReviews, setPublicReviews] = useState([]);
+  const [publicReviewsLoaded, setPublicReviewsLoaded] = useState(false);
 
   const cacheKey = `${item.title}_${item.year}`;
   // anime/drama는 tv 타입으로 조회
   const tmdbType = item.type === 'movie' ? 'movie' : 'tv';
+
+  // 다른 사람들의 공개 리뷰 로드 (tmdb_id 있는 작품만)
+  useEffect(() => {
+    if (!item.tmdb_id) return;
+    axios.get(`http://localhost:4000/api/user-media/public/${item.tmdb_id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    }).then(res => {
+      setPublicReviews(res.data.data || []);
+      setPublicReviewsLoaded(true);
+    }).catch(() => setPublicReviewsLoaded(true));
+  }, [item.tmdb_id]);
 
   useEffect(() => {
     setTmdbUrl(tmdbUrlCache.current[cacheKey] || null);
@@ -88,7 +105,7 @@ export default function DetailModal({
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave(item, rating, reviewText);
+    await onSave(item, rating, reviewText, isPublic);
     setSaving(false);
     onClose();
   };
@@ -225,6 +242,20 @@ export default function DetailModal({
               placeholder="자유롭게 감상을 적어보세요..."
             />
 
+            {/* 리뷰 공개/비공개 토글 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, marginBottom: 4 }}>
+              <div
+                className={`settings-toggle ${isPublic ? 'on' : ''}`}
+                style={{ width: 36, height: 20 }}
+                onClick={() => setIsPublic(v => !v)}
+              >
+                <div className="settings-toggle-knob" style={{ width: 14, height: 14, top: 3, left: isPublic ? 19 : 3 }} />
+              </div>
+              <span style={{ fontSize: 12, color: '#888' }}>
+                {isPublic ? '리뷰 공개 — 다른 사용자가 볼 수 있습니다' : '리뷰 비공개'}
+              </span>
+            </div>
+
             <div className="mactions">
               <div style={{ display: 'flex', gap: 8 }}>
                 {hasReview && (
@@ -239,6 +270,36 @@ export default function DetailModal({
                 </button>
               </div>
             </div>
+
+            {/* 다른 사람들의 공개 리뷰 */}
+            {publicReviewsLoaded && publicReviews.length > 0 && (
+              <div className="public-reviews-section">
+                <div className="similar-title">다른 사람들의 리뷰</div>
+                {publicReviews.map((r, i) => (
+                  <div key={i} className="public-review-item">
+                    <div className="public-review-header">
+                      <div className="public-review-user">
+                        {r.avatar_url ? (
+                          <img src={r.avatar_url} alt={r.name} className="public-review-avatar" />
+                        ) : (
+                          <div className="public-review-avatar-ph">👤</div>
+                        )}
+                        <span className="public-review-name">{r.username || r.name}</span>
+                      </div>
+                      {r.rating > 0 && (
+                        <span className="public-review-stars">{'★'.repeat(r.rating)}</span>
+                      )}
+                    </div>
+                    {r.review_text && (
+                      <div className="public-review-text">{r.review_text}</div>
+                    )}
+                    {r.review_date && (
+                      <div className="public-review-date">{r.review_date}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* 비슷한 작품 추천 (tmdb_id 있는 작품만) */}
             {item.tmdb_id > 0 && onAdd && (

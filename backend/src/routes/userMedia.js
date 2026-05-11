@@ -124,23 +124,25 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   const {
     title, year, director, cast_info, poster_url,
-    type, rating, review_text, review_date, set_watched_at,
+    type, rating, review_text, review_date, set_watched_at, is_public,
   } = req.body;
   try {
     const result = await pool.query(
       `UPDATE user_media SET
          title=$1, year=$2, director=$3, cast_info=$4, poster_url=$5,
          type=$6, rating=$7, review_text=$8, review_date=$9,
+         is_public=$10,
          watched_at = CASE
-           WHEN $10 AND ($7::int > 0 OR $8::text <> '') THEN NOW()
-           WHEN $10 AND $7::int = 0 AND $8::text = ''   THEN NULL
+           WHEN $11 AND ($7::int > 0 OR $8::text <> '') THEN NOW()
+           WHEN $11 AND $7::int = 0 AND $8::text = ''   THEN NULL
            ELSE watched_at
          END
-       WHERE id=$11 AND user_id=$12
+       WHERE id=$12 AND user_id=$13
        RETURNING *`,
       [
         title, year, director || '', cast_info || '', poster_url || '',
         type || 'movie', rating || 0, review_text || '', review_date || '',
+        is_public === true,
         set_watched_at === true,
         req.params.id, req.user.id,
       ]
@@ -170,6 +172,33 @@ router.patch('/:id/poster', auth, async (req, res) => {
       return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
     }
     res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/user-media/public/:tmdbId
+ * 특정 TMDB 작품의 공개 리뷰 목록 (다른 사람들의 리뷰)
+ * 별점 또는 리뷰가 있고 is_public=true인 항목만 반환
+ */
+router.get('/public/:tmdbId', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT
+         um.rating, um.review_text, um.review_date,
+         u.username, u.avatar_url, u.name
+       FROM user_media um
+       JOIN users u ON u.id = um.user_id
+       WHERE um.tmdb_id = $1
+         AND um.is_public = true
+         AND (um.rating > 0 OR um.review_text <> '')
+         AND u.is_profile_public = true
+       ORDER BY um.review_date DESC
+       LIMIT 10`,
+      [req.params.tmdbId]
+    );
+    res.json({ success: true, data: rows });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -52,13 +52,13 @@ export function useMediaList(user) {
   }, [user?.id]);
 
   /** 별점/리뷰 저장 */
-  const handleSave = async (item, rating, reviewText) => {
+  const handleSave = async (item, rating, reviewText, isPublic = false) => {
     const date = rating > 0 || reviewText ? new Date().toLocaleDateString('ko-KR') : '';
     const updated = await updateMediaItem(item.id, {
       title: item.title, year: item.year, director: item.director,
       cast_info: item.cast_info, poster_url: item.poster_url,
       type: item.type, rating, review_text: reviewText, review_date: date,
-      set_watched_at: true,
+      set_watched_at: true, is_public: isPublic,
     });
     setItems(prev => prev.map(i => i.id === updated.id ? updated : i));
   };

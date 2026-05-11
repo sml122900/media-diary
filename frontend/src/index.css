@@ -458,6 +458,21 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   font-size: 9px; padding: 1px 5px; border-radius: 3px; background: #f0f0ee; color: #888;
 }
 
+/* ── 다른 사람들의 공개 리뷰 ── */
+.public-reviews-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0ee; }
+.public-review-item {
+  padding: 12px 0; border-bottom: 1px solid #f0f0ee;
+}
+.public-review-item:last-child { border-bottom: none; }
+.public-review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.public-review-user { display: flex; align-items: center; gap: 8px; }
+.public-review-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.public-review-avatar-ph { width: 24px; height: 24px; border-radius: 50%; background: #f0f0ee; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.public-review-name { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+.public-review-stars { font-size: 14px; color: #f0a500; }
+.public-review-text { font-size: 13px; color: #444; line-height: 1.6; margin-bottom: 4px; }
+.public-review-date { font-size: 11px; color: #bbb; }
+
 /* ── 비슷한 작품 추천 섹션 ── */
 .similar-section {
   margin-top: 20px; padding-top: 16px;
@@ -631,6 +646,11 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .daily-rec-card.skeleton { background: #222; }
   .daily-rec-poster, .daily-rec-genre-tag { background: #2a2a2a; }
   .daily-rec-item-title { color: #e8e8e8; }
+  .public-reviews-section { border-color: #2e2e2e; }
+  .public-review-item { border-color: #2e2e2e; }
+  .public-review-name { color: #e8e8e8; }
+  .public-review-text { color: #aaa; }
+  .public-review-avatar-ph { background: #2a2a2a; }
   .similar-section { border-color: #2e2e2e; }
   .similar-poster, .similar-genre-tag { background: #2a2a2a; }
   .similar-card-title { color: #e8e8e8; }

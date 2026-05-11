@@ -171,19 +171,16 @@
 
 ### 4.2 리뷰 공개/비공개
 
-- [ ] **user_media 테이블 확장**
-  - `is_public` BOOLEAN DEFAULT false 컬럼 추가
-  - 기존 데이터는 모두 false (사용자 동의 전까지 비공개)
+- [x] **user_media 테이블 확장**
+  - `is_public` BOOLEAN DEFAULT false 컬럼 (4.1 마이그레이션에서 선행 추가)
 
-- [ ] **리뷰 작성 UI 수정**
+- [x] **리뷰 작성 UI 수정**
   - DetailModal에 공개/비공개 토글 스위치
-  - 기본값: 비공개
-  - 공개 시 "이 리뷰는 다른 사람에게 보입니다" 안내
+  - 기본값: 비공개, 저장 시 is_public 함께 전달
 
-- [ ] **공개 리뷰 노출**
-  - 작품 상세 모달에 "다른 사람들의 리뷰" 섹션
-  - 공개로 설정된 리뷰만 표시
-  - 별점과 리뷰 작성자(username) 함께 노출
+- [x] **공개 리뷰 노출**
+  - GET /api/user-media/public/:tmdbId — is_public+is_profile_public 모두 true인 리뷰
+  - DetailModal "다른 사람들의 리뷰" 섹션 (아바타, username, 별점, 내용)
 
 ### 4.3 베스트 리스트
 
@@ -384,6 +381,13 @@
 - App.jsx: /settings, /u/:username 라우트 추가
 - 홈 헤더에 "설정" 링크 추가
 - CSS: settings-*, profile-* 클래스 (다크모드 포함)
+
+### 2026-05-11 (Phase 4.2 완료)
+- PUT /api/user-media/:id: is_public 파라미터 추가 (파라미터 인덱스 조정)
+- GET /api/user-media/public/:tmdbId: is_public+is_profile_public 조건 공개 리뷰 조회
+- DetailModal: is_public 토글 스위치 + handleSave에 is_public 전달
+- "다른 사람들의 리뷰" 섹션 — 아바타, username, 별점, 내용
+- CSS: public-review-* 클래스 (다크모드 포함)
 
 <!-- 새 작업은 이 아래에 추가 -->
 
