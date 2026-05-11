@@ -4,7 +4,7 @@
  * 탭/그리드/필터/홈위젯/모달 통합 — 상세 로직은 hooks/components로 분리
  */
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import MediaCard from '../components/MediaCard';
@@ -47,6 +47,19 @@ export default function HomePage() {
   const [csvImportOpen, setCsvImportOpen] = useState(false);
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
   const [screenshotOpen, setScreenshotOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // 메뉴 외부 클릭 시 닫기
+  useEffect(() => {
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   // ── 필터 상태 ──────────────────────────────────────────────────────────────
   const [filterOpen, setFilterOpen] = useState(false);
@@ -197,21 +210,69 @@ export default function HomePage() {
             <option value="rated">별점 높은순</option>
             <option value="reviewed">감상 있는 것</option>
           </select>
-          <button className="btn" onClick={() => setAiSearchOpen(true)} title="AI 자연어 검색">✨ AI 검색</button>
-          <button className="btn" onClick={() => setScreenshotOpen(true)} title="스크린샷으로 가져오기">📸 스크린샷</button>
           <button className="btn btn-primary" onClick={() => setAddModalOpen(true)}>+ 추가</button>
-          <div className="mdb-user">
-            <Link to="/stats" className="btn">통계</Link>
-            <Link to="/reports" className="btn">리포트</Link>
-            <Link to="/feed" className="btn">피드</Link>
-            <Link to="/watchlists" className="btn">같이보기</Link>
-            <Link to="/lists" className="btn">리스트</Link>
-            <Link to="/settings" className="btn">설정</Link>
-            <button className="btn" onClick={handleCsvExport} title="CSV 내보내기">내보내기</button>
-            <button className="btn" onClick={() => setCsvImportOpen(true)} title="CSV 가져오기">가져오기</button>
-            <span className="mdb-greeting">안녕하세요 <strong>{user?.name}</strong>님</span>
-            <button className="btn" onClick={toggleTheme}>{theme === 'dark' ? '라이트' : '다크'}</button>
-            <button className="btn" onClick={handleLogout}>로그아웃</button>
+
+          {/* ── 드롭다운 메뉴 ── */}
+          <div className="menu-wrap" ref={menuRef}>
+            <button
+              className={`btn menu-toggle ${menuOpen ? 'btn-primary' : ''}`}
+              onClick={() => setMenuOpen(v => !v)}
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
+            >
+              ≡ 메뉴
+            </button>
+
+            {menuOpen && (
+              <div className="menu-dropdown" role="menu">
+                {/* 사용자 정보 */}
+                <div className="menu-user">
+                  <strong>{user?.name}</strong>
+                  <span className="menu-username">
+                    {/* username은 settings에서 확인 */}
+                  </span>
+                </div>
+
+                <div className="menu-divider" />
+
+                {/* 탐색 */}
+                <div className="menu-section-title">탐색</div>
+                <Link to="/stats" className="menu-item" onClick={closeMenu}>통계</Link>
+                <Link to="/reports" className="menu-item" onClick={closeMenu}>리포트</Link>
+                <Link to="/feed" className="menu-item" onClick={closeMenu}>피드</Link>
+                <Link to="/watchlists" className="menu-item" onClick={closeMenu}>같이보기</Link>
+                <Link to="/lists" className="menu-item" onClick={closeMenu}>리스트</Link>
+
+                <div className="menu-divider" />
+
+                {/* 도구 */}
+                <div className="menu-section-title">도구</div>
+                <button className="menu-item" onClick={() => { setAiSearchOpen(true); closeMenu(); }}>
+                  ✨ AI 검색
+                </button>
+                <button className="menu-item" onClick={() => { setScreenshotOpen(true); closeMenu(); }}>
+                  📸 스크린샷
+                </button>
+                <button className="menu-item" onClick={() => { handleCsvExport(); closeMenu(); }}>
+                  CSV 내보내기
+                </button>
+                <button className="menu-item" onClick={() => { setCsvImportOpen(true); closeMenu(); }}>
+                  CSV 가져오기
+                </button>
+
+                <div className="menu-divider" />
+
+                {/* 계정 */}
+                <div className="menu-section-title">계정</div>
+                <button className="menu-item" onClick={() => { toggleTheme(); closeMenu(); }}>
+                  {theme === 'dark' ? '라이트 모드' : '다크 모드'}
+                </button>
+                <Link to="/settings" className="menu-item" onClick={closeMenu}>설정</Link>
+                <button className="menu-item menu-item-danger" onClick={handleLogout}>
+                  로그아웃
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
