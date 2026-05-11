@@ -326,6 +326,50 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 /* 활동 캘린더 */
 .calendar-wrap { overflow-x: auto; padding-bottom: 4px; }
 
+/* ── 비슷한 작품 추천 섹션 ── */
+.similar-section {
+  margin-top: 20px; padding-top: 16px;
+  border-top: 1px solid #f0f0ee;
+}
+.similar-title {
+  font-size: 12px; font-weight: 600; color: #999;
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;
+}
+.similar-scroll {
+  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px;
+  scrollbar-width: thin; scrollbar-color: #ddd transparent;
+}
+.similar-scroll::-webkit-scrollbar { height: 4px; }
+.similar-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+.similar-card {
+  flex-shrink: 0; width: 88px; display: flex; flex-direction: column; gap: 4px;
+}
+.similar-poster {
+  width: 88px; aspect-ratio: 2/3; border-radius: 8px; overflow: hidden;
+  background: #f0f0ee; display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.similar-poster img {
+  width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;
+}
+.similar-card-title {
+  font-size: 11px; font-weight: 600; color: #1a1a1a; line-height: 1.3;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.similar-card-year { font-size: 10px; color: #aaa; }
+.similar-card-genres { display: flex; flex-wrap: wrap; gap: 3px; }
+.similar-genre-tag {
+  font-size: 9px; padding: 1px 5px; border-radius: 3px;
+  background: #f0f0ee; color: #888;
+}
+.similar-add-btn {
+  font-size: 11px; padding: 4px 0; border-radius: 6px; border: 1px solid #ddd;
+  background: #fff; color: #1a1a1a; cursor: pointer; font-weight: 500;
+  transition: all .15s; width: 100%; text-align: center;
+}
+.similar-add-btn:hover:not(:disabled) { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.similar-add-btn.added { background: #e8f5e9; border-color: #a5d6a7; color: #2e7d32; cursor: default; }
+
 /* ── 모바일 반응형 ── */
 @media (max-width: 600px) {
   /* 그리드: 2열 */
@@ -428,6 +472,12 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .recent-card-title { color: #e8e8e8; }
   .picker-item:hover { border-color: #e8e8e8; }
   .picker-item-title { color: #666; }
+  .similar-section { border-color: #2e2e2e; }
+  .similar-poster, .similar-genre-tag { background: #2a2a2a; }
+  .similar-card-title { color: #e8e8e8; }
+  .similar-genre-tag { color: #666; }
+  .similar-add-btn { background: #1c1c1c; border-color: #2e2e2e; color: #e8e8e8; }
+  .similar-add-btn:hover:not(:disabled) { background: #e8e8e8; color: #111; border-color: #e8e8e8; }
   .summary-card { background: #1c1c1c; border-color: #2e2e2e; }
   .summary-value { color: #e8e8e8; }
   .chart-card { background: #1c1c1c; border-color: #2e2e2e; }

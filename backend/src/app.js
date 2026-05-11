@@ -6,6 +6,7 @@ const authRouter = require('./routes/auth');
 const userMediaRouter = require('./routes/userMedia');
 const tmdbRouter = require('./routes/tmdb');
 const meRouter = require('./routes/me');
+const recommendRouter = require('./routes/recommend');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,6 +18,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/user-media', userMediaRouter);
 app.use('/api/tmdb', tmdbRouter);
 app.use('/api/me', meRouter);
+app.use('/api/recommend', recommendRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -66,6 +68,17 @@ async function initDB() {
       avg_rating  FLOAT    DEFAULT 0,
       total_count INTEGER  DEFAULT 0,
       updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // TMDB 추천 캐시 테이블 (Phase 3.2, 24h TTL)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS recommendations (
+      tmdb_id    INTEGER      NOT NULL,
+      tmdb_type  VARCHAR(10)  NOT NULL,
+      results    JSONB        DEFAULT '[]',
+      created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (tmdb_id, tmdb_type)
     )
   `);
   console.log('Database tables ready');

@@ -57,20 +57,20 @@
 
 ### 3.2 "비슷한 작품" 추천
 
-- [ ] **백엔드 API: GET /api/recommend/similar/:mediaId**
+- [x] **백엔드 API: GET /api/recommend/similar/:mediaId**
   - 1단계: TMDB `/movie/{id}/recommendations` 호출
   - 2단계: 결과를 사용자 취향 프로필과 매칭해 재정렬
   - 3단계: 이미 본 작품 필터링
   - 결과 5-8개 반환
 
-- [ ] **프론트엔드 통합**
+- [x] **프론트엔드 통합**
   - DetailModal 하단에 "이 작품을 좋아하셨다면" 섹션
   - 가로 스크롤 카드 리스트
   - 카드 클릭 시 해당 작품을 내 목록에 추가하는 빠른 버튼
 
-- [ ] **캐싱 전략**
+- [x] **캐싱 전략**
   - 같은 mediaId에 대한 추천은 1일 캐시
-  - recommendations 테이블에 저장 (`media_id`, `recommended_ids` jsonb, `created_at`)
+  - recommendations 테이블에 저장 (`tmdb_id`, `tmdb_type`, `results` jsonb, `created_at`)
 
 ### 3.3 "오늘의 추천" 위젯
 
@@ -323,6 +323,18 @@
 - `backend/src/routes/me.js` 신설 — `GET /api/me/taste-profile`
 - `userMedia.js` — POST/PUT/DELETE 후 `setImmediate`로 백그라운드 갱신 트리거
 - `CLAUDE.md` — ROADMAP 연동 섹션 추가
+
+### 2026-05-11 (Phase 3.2 완료)
+- `recommendations` 캐시 테이블 신설 (PRIMARY KEY: tmdb_id + tmdb_type, 24h TTL)
+- `backend/src/routes/recommend.js` 신설 — `GET /api/recommend/similar/:mediaId`
+  - TMDB 추천 → genre_id 매핑 → 취향 프로필 장르 가중치로 점수화 → 시청 이력 필터 → 상위 8개
+  - 장르 매핑 테이블 프로세스 메모리 캐시 (genreMemo)
+- `frontend/src/api/recommend.js` 신설
+- `frontend/src/components/SimilarRecommendations.jsx` 신설
+  - DetailModal 하단 "이 작품을 좋아하셨다면" 가로 스크롤 섹션
+  - 카드당 "+ 추가" 버튼 (중복 시 "추가됨" 표시)
+- DetailModal: `onAdd`, `existingItems` prop 추가, SimilarRecommendations 삽입
+- CSS: `.similar-*` 클래스 추가 (라이트/다크 모두)
 
 <!-- 새 작업은 이 아래에 추가 -->
 
