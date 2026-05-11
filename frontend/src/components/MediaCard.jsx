@@ -21,6 +21,10 @@ export default function MediaCard({ item, posterUrl, onClick }) {
         )}
         <span className="poster-ph">🎬</span>
         {hasReview && <div className="badge-dot" />}
+        {/* 재시청 배지 (Phase 5.4) */}
+        {item.rewatch_count > 1 && (
+          <div className="rewatch-badge">🔁 {item.rewatch_count}회</div>
+        )}
       </div>
       <div className="card-body">
         <div className="card-title">{item.title}</div>

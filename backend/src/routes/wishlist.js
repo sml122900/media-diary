@@ -87,12 +87,12 @@ router.post('/:id/watched', auth, async (req, res) => {
     if (!wRows[0]) return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
     const w = wRows[0];
 
-    // user_media에 삽입 (이미 있으면 업데이트)
+    // user_media에 삽입 (rewatch_count=1 기준, 이미 있으면 업데이트)
     const { rows: mRows } = await pool.query(
       `INSERT INTO user_media
-         (user_id, type, title, year, tmdb_id, poster_url, rating, review_text, watched_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())
-       ON CONFLICT (user_id, title, year) DO UPDATE
+         (user_id, type, title, year, tmdb_id, poster_url, rating, review_text, watched_at, rewatch_count)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW(),1)
+       ON CONFLICT (user_id, title, year, rewatch_count) DO UPDATE
          SET rating = EXCLUDED.rating,
              review_text = EXCLUDED.review_text,
              watched_at = NOW(),

@@ -150,16 +150,17 @@ router.get('/:year', auth, async (req, res) => {
   }
 
   try {
-    // 캐시 조회
+    // 캐시 조회 — age_seconds를 DB에서 계산해 timezone 불일치 방지
     const { rows: cached } = await pool.query(
-      'SELECT data, generated_at FROM year_in_review_cache WHERE user_id = $1 AND year = $2',
+      `SELECT data, EXTRACT(EPOCH FROM (NOW() - generated_at)) AS age_seconds
+       FROM year_in_review_cache WHERE user_id = $1 AND year = $2`,
       [req.user.id, year]
     );
 
     const isCurrentYear = year === new Date().getFullYear();
 
     if (cached[0]) {
-      const ageHours = (Date.now() - new Date(cached[0].generated_at)) / 3_600_000;
+      const ageHours = cached[0].age_seconds / 3600;
       // 끝난 연도는 영구 캐시, 진행 중 연도는 1시간 캐시
       if (!isCurrentYear || ageHours < 1) {
         return res.json({ success: true, data: cached[0].data, cached: true });
