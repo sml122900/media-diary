@@ -184,23 +184,19 @@
 
 ### 4.3 베스트 리스트
 
-- [ ] **lists 테이블 신설**
+- [x] **lists 테이블 신설**
   - 컬럼: `id`, `user_id`, `title`, `description`, `is_public`, `created_at`
-  - 예: "내 인생 영화 10편", "2025년 베스트"
 
-- [ ] **list_items 테이블 신설**
-  - 컬럼: `id`, `list_id`, `media_id`, `position`, `comment`
-  - 순서 유지를 위한 position
+- [x] **list_items 테이블 신설**
+  - 컬럼: `id`, `list_id`, `media_id`, `position`, `comment`, UNIQUE(list_id, media_id)
 
-- [ ] **리스트 관리 페이지**
-  - `/lists` 내 리스트 목록
-  - `/lists/:id` 리스트 편집
-  - 작품 추가/삭제/순서 변경 (드래그 앤 드롭)
-  - 각 항목에 코멘트 추가 가능
+- [x] **리스트 관리 페이지**
+  - `/lists` 단일 페이지 (생성+편집 인라인)
+  - 작품 추가(내 목록 검색), 제거, 순서 변경(↑↓), 공개/비공개 토글
+  - 내 리스트 카드 클릭 시 편집 패널 펼침
 
-- [ ] **공개 리스트 페이지**
-  - `/lists/:id/view` (공개 보기)
-  - 프로필에서 만든 리스트 표시
+- [x] **공개 리스트 API**
+  - GET /api/lists/public/:username — 특정 유저의 공개 리스트
 
 ### 4.4 친구 시스템
 
@@ -388,6 +384,15 @@
 - DetailModal: is_public 토글 스위치 + handleSave에 is_public 전달
 - "다른 사람들의 리뷰" 섹션 — 아바타, username, 별점, 내용
 - CSS: public-review-* 클래스 (다크모드 포함)
+
+### 2026-05-11 (Phase 4.3 완료)
+- lists, list_items 테이블 신설
+- CRUD: GET/POST /api/lists, GET/PATCH/DELETE /api/lists/:id
+- 항목 관리: POST/DELETE/PATCH /api/lists/:id/items
+- GET /api/lists/public/:username — 공개 리스트 조회
+- ListsPage.jsx: /lists 단일 페이지 (생성+편집 인라인, 순서 변경 ↑↓)
+- 홈 헤더에 "리스트" 링크 추가
+- CSS: list-create-form, list-item-row, list-item-pos
 
 <!-- 새 작업은 이 아래에 추가 -->
 

@@ -14,6 +14,7 @@ import StatsPage from './pages/StatsPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import PublicProfilePage from './pages/PublicProfilePage';
+import ListsPage from './pages/ListsPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -71,6 +72,14 @@ function App() {
           element={
             <PrivateRoute>
               <SettingsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lists"
+          element={
+            <PrivateRoute>
+              <ListsPage />
             </PrivateRoute>
           }
         />

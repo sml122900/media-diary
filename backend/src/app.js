@@ -11,6 +11,7 @@ const searchRouter = require('./routes/search');
 const reportsRouter = require('./routes/reports');
 const importScreenshotRouter = require('./routes/importScreenshot');
 const profileRouter = require('./routes/profile');
+const listsRouter = require('./routes/lists');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -27,6 +28,7 @@ app.use('/api/search', searchRouter);
 app.use('/api/me/reports', reportsRouter);
 app.use('/api/import/screenshot', importScreenshotRouter);
 app.use('/api/profile', profileRouter);
+app.use('/api/lists', listsRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -92,6 +94,28 @@ async function initDB() {
 
   // 리뷰 공개/비공개 컬럼 (Phase 4.2, 선행 마이그레이션)
   await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT false`);
+
+  // 베스트 리스트 테이블 (Phase 4.3)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS lists (
+      id          SERIAL    PRIMARY KEY,
+      user_id     INTEGER   NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      title       VARCHAR(200) NOT NULL,
+      description TEXT      DEFAULT '',
+      is_public   BOOLEAN   DEFAULT false,
+      created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS list_items (
+      id       SERIAL  PRIMARY KEY,
+      list_id  INTEGER NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
+      media_id INTEGER NOT NULL REFERENCES user_media(id) ON DELETE CASCADE,
+      position INTEGER DEFAULT 0,
+      comment  TEXT    DEFAULT '',
+      UNIQUE(list_id, media_id)
+    )
+  `);
 
   // 취향 프로필 테이블 (Phase 3.1)
   await pool.query(`
