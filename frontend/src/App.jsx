@@ -15,6 +15,8 @@ import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import ListsPage from './pages/ListsPage';
+import FeedPage from './pages/FeedPage';
+import ComparePage from './pages/ComparePage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -80,6 +82,22 @@ function App() {
           element={
             <PrivateRoute>
               <ListsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/feed"
+          element={
+            <PrivateRoute>
+              <FeedPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/compare/:userId"
+          element={
+            <PrivateRoute>
+              <ComparePage />
             </PrivateRoute>
           }
         />

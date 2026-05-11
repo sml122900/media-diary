@@ -54,13 +54,19 @@ export default function DetailModal({
   // anime/drama는 tv 타입으로 조회
   const tmdbType = item.type === 'movie' ? 'movie' : 'tv';
 
-  // 다른 사람들의 공개 리뷰 로드 (tmdb_id 있는 작품만)
+  // 친구 활동 상태
+  const [friendsActivity, setFriendsActivity] = useState(null);
+
+  // 다른 사람들의 공개 리뷰 + 친구 활동 로드
   useEffect(() => {
     if (!item.tmdb_id) return;
-    axios.get(`http://localhost:4000/api/user-media/public/${item.tmdb_id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    }).then(res => {
-      setPublicReviews(res.data.data || []);
+    const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+    Promise.all([
+      axios.get(`http://localhost:4000/api/user-media/public/${item.tmdb_id}`, { headers: auth }),
+      axios.get(`http://localhost:4000/api/media/${item.tmdb_id}/friends-activity`, { headers: auth }),
+    ]).then(([pubRes, friendRes]) => {
+      setPublicReviews(pubRes.data.data || []);
+      setFriendsActivity(friendRes.data.data);
       setPublicReviewsLoaded(true);
     }).catch(() => setPublicReviewsLoaded(true));
   }, [item.tmdb_id]);
@@ -219,6 +225,21 @@ export default function DetailModal({
               <div className="mcast">{item.cast_info ? '출연: ' + item.cast_info : ''}</div>
               {AWARDS[awardKey] && <div><span className="award">🏆 {AWARDS[awardKey]}</span></div>}
               <TmdbInfoPanel detail={tmdbDetail} />
+
+              {/* 친구 활동 (팔로잉 중 이 작품을 본 사람) */}
+              {friendsActivity && friendsActivity.count > 0 && (
+                <div style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+                  <span style={{ fontWeight: 600 }}>친구 {friendsActivity.count}명</span>이 봤어요
+                  {friendsActivity.avg_rating && ` · 평균 ★${friendsActivity.avg_rating}`}
+                  <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
+                    {friendsActivity.friends.slice(0, 5).map((f, i) => (
+                      <span key={i} style={{ fontSize: 11, padding: '1px 6px', background: '#f0f0ee', borderRadius: 10, color: '#555' }}>
+                        {f.username || f.name} {f.rating > 0 ? '★'.repeat(f.rating) : ''}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

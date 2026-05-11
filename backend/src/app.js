@@ -12,6 +12,7 @@ const reportsRouter = require('./routes/reports');
 const importScreenshotRouter = require('./routes/importScreenshot');
 const profileRouter = require('./routes/profile');
 const listsRouter = require('./routes/lists');
+const socialRouter = require('./routes/social');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -29,6 +30,8 @@ app.use('/api/me/reports', reportsRouter);
 app.use('/api/import/screenshot', importScreenshotRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/lists', listsRouter);
+// social.js는 여러 경로 처리 (follow, feed, compare, search/users, media/friends)
+app.use('/api', socialRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -94,6 +97,16 @@ async function initDB() {
 
   // 리뷰 공개/비공개 컬럼 (Phase 4.2, 선행 마이그레이션)
   await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT false`);
+
+  // 친구(팔로우) 테이블 (Phase 4.4)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS follows (
+      follower_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      following_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (follower_id, following_id)
+    )
+  `);
 
   // 베스트 리스트 테이블 (Phase 4.3)
   await pool.query(`

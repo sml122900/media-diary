@@ -200,51 +200,28 @@
 
 ### 4.4 친구 시스템
 
-- [ ] **follows 테이블 신설**
-  - 컬럼: `follower_id`, `following_id`, `created_at`
-  - PRIMARY KEY (follower_id, following_id)
+- [x] **follows 테이블 신설** (PRIMARY KEY follower_id+following_id)
 
-- [ ] **팔로우 API**
-  - `POST /api/follow/:userId`
-  - `DELETE /api/follow/:userId`
-  - `GET /api/me/following`
-  - `GET /api/me/followers`
+- [x] **팔로우 API**
+  - POST/DELETE /api/follow/:userId, GET /api/me/following, GET /api/me/followers
 
-- [ ] **사용자 검색**
-  - `/search/users?q=` API
-  - username 또는 name으로 검색
-  - 결과에 팔로우 버튼
+- [x] **사용자 검색**
+  - GET /api/search/users?q= — username+name ILIKE, 팔로우 여부 포함
 
-- [ ] **활동 피드**
-  - `/feed` 라우트
-  - 팔로잉한 사용자들의 최근 감상 기록
-  - 시간순 정렬
-  - 인피니티 스크롤
+- [x] **활동 피드**
+  - GET /api/feed?page= — is_public+watched_at 조건, 20개 페이지네이션
+  - FeedPage.jsx: 피드/검색/팔로잉 3탭, "더 보기" 버튼
 
 ### 4.5 공통 작품 비교
 
-- [ ] **공통 작품 API**
-  - `GET /api/compare/:userId`
-  - 두 사용자 모두 본 작품 추출
-  - 별점 차이 큰 순으로 정렬
-  - 양쪽 별점, 양쪽 리뷰 (공개일 경우) 함께 반환
-
-- [ ] **비교 페이지**
-  - `/compare/:userId` 라우트
-  - 친구 프로필에서 "비교하기" 버튼으로 진입
-  - 별점 차이를 시각화 (양쪽 막대)
-  - "당신이 더 좋아한 작품" / "친구가 더 좋아한 작품" 섹션
+- [x] **공통 작품 API** — GET /api/compare/:userId (tmdb_id 기준, 별점 차이 내림차순)
+- [x] **비교 페이지** — /compare/:userId (ComparePage.jsx, 요약 통계 + 목록)
 
 ### 4.6 작품별 친구 활동
 
-- [ ] **작품 모달에 친구 통계 표시**
-  - "이 작품을 본 친구 N명" 표시
-  - 친구들의 평균 별점
-  - 친구 아바타 그리드
-
-- [ ] **API: GET /api/media/:id/friends-activity**
-  - 친구 범위에서 해당 작품 감상 기록 집계
-  - 친구 username, 별점, 리뷰 (공개일 경우)
+- [x] **작품 모달에 친구 통계 표시**
+  - GET /api/media/:tmdbId/friends-activity — 팔로잉 중 본 친구 목록+평균별점
+  - DetailModal minfo에 "친구 N명이 봤어요 · 평균 ★" 인라인 표시
 
 ### 4.7 같이 볼 영화 리스트
 
@@ -393,6 +370,20 @@
 - ListsPage.jsx: /lists 단일 페이지 (생성+편집 인라인, 순서 변경 ↑↓)
 - 홈 헤더에 "리스트" 링크 추가
 - CSS: list-create-form, list-item-row, list-item-pos
+
+### 2026-05-11 (Phase 4.4~4.6 완료)
+- follows 테이블 신설 (PK: follower_id+following_id)
+- backend/src/routes/social.js: 팔로우/피드/검색/비교/친구활동 통합
+  - POST/DELETE /api/follow/:userId
+  - GET /api/me/following, /api/me/followers
+  - GET /api/search/users?q=
+  - GET /api/feed?page= (is_public + watched_at + 팔로잉 조건)
+  - GET /api/compare/:userId (tmdb_id 기준 공통 작품)
+  - GET /api/media/:tmdbId/friends-activity
+- FeedPage.jsx: 피드/검색/팔로잉 3탭, 사용자 검색+팔로우/언팔로우
+- ComparePage.jsx: 공통 작품 별점 비교 시각화
+- DetailModal: 친구 활동 인라인 표시 (친구 N명, 평균 별점)
+- CSS: feed-item, user-search-row, compare-row (다크모드 포함)
 
 <!-- 새 작업은 이 아래에 추가 -->
 
