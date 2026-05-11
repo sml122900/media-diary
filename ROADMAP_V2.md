@@ -65,10 +65,11 @@
 ### ✅ 5.2 위시리스트 (Watchlist) — 완료 (2026-05-12)
 
 - [x] `wishlist` 테이블 신설 (user_id, type, title, year, tmdb_id, poster_url, priority, note)
-- [x] CRUD API — `GET/POST /api/wishlist`, `PATCH/DELETE /api/wishlist/:id`
-- [x] `POST /api/wishlist/:id/watched` — user_media로 이동 후 위시리스트 삭제
+- [x] CRUD API — `GET/POST /api/me/watchlist`, `PATCH/DELETE /api/me/watchlist/:id`
+- [x] `POST /api/me/watchlist/:id/watched` — user_media로 이동 후 위시리스트 삭제
 - [x] WishlistPage.jsx — TMDB 검색, 우선순위 별 (★1-3), 봤어요! 미니 폼
 - [x] `/wishlist` PrivateRoute 등록, 드롭다운 메뉴 "나중에 보기" 링크 추가
+- [x] API 경로 `/api/wishlist` → `/api/me/watchlist` 통일 (2026-05-12 감사 수정)
 
 ---
 
@@ -76,6 +77,7 @@
 
 - [x] `GET /api/me/watch-stats?period=year|month|all` — 총 시간, 타입별, 편당 평균, TOP 3
 - [x] 통계 페이지 상단 시청 시간 카드 (기간 탭 전환, 위트 있는 비교 문구)
+- [x] 홈 위젯 "이번 달 N편 / N시간", "올해 N편 / N시간" 형식으로 확장 (2026-05-12 감사 수정)
 
 ---
 

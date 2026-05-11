@@ -142,12 +142,23 @@ export default function HomePage() {
   }, [items, tab]);
 
   // ── 홈 위젯 (watched_at 기반) ─────────────────────────────────────────────
+  const RUNTIME_EST = { movie: 110, drama: 60, anime: 24 };
+
+  // 분 → 간결한 시간 문자열 (60분 미만: "N분", 이상: "Nh Nm")
+  const formatMins = (m) => {
+    if (m <= 0) return null;
+    if (m < 60) return `${m}분`;
+    const h = Math.floor(m / 60);
+    const rem = m % 60;
+    return rem > 0 ? `${h}시간 ${rem}분` : `${h}시간`;
+  };
+
   const widgetData = useMemo(() => {
     const now = new Date();
     const yr = now.getFullYear();
     const mo = now.getMonth();
     const watched = items.filter(i => i.watched_at);
-    const thisMonth = watched.filter(i => {
+    const thisMonthItems = watched.filter(i => {
       const d = new Date(i.watched_at);
       return d.getFullYear() === yr && d.getMonth() === mo;
     });
@@ -155,11 +166,23 @@ export default function HomePage() {
       const d = new Date(i.watched_at);
       return d.getFullYear() === yr - 1 && d.getMonth() === mo;
     });
-    const thisYear = watched.filter(i => new Date(i.watched_at).getFullYear() === yr);
+    const thisYearItems = watched.filter(i => new Date(i.watched_at).getFullYear() === yr);
     const recent = [...watched].sort((a, b) => new Date(b.watched_at) - new Date(a.watched_at)).slice(0, 5);
-    const trend = thisMonth.length > lastYearSameMonth.length ? '↑'
-      : thisMonth.length < lastYearSameMonth.length ? '↓' : null;
-    return { thisMonth: thisMonth.length, thisYear: thisYear.length, trend, lastYear: lastYearSameMonth.length, recent };
+    const trend = thisMonthItems.length > lastYearSameMonth.length ? '↑'
+      : thisMonthItems.length < lastYearSameMonth.length ? '↓' : null;
+
+    // 시청 시간 합산 (runtime_minutes 없으면 타입별 추정값 사용)
+    const sumMins = (arr) => arr.reduce((s, i) => s + (i.runtime_minutes || RUNTIME_EST[i.type] || 90), 0);
+
+    return {
+      thisMonth: thisMonthItems.length,
+      thisYear: thisYearItems.length,
+      monthMins: sumMins(thisMonthItems),
+      yearMins: sumMins(thisYearItems),
+      trend,
+      lastYear: lastYearSameMonth.length,
+      recent,
+    };
   }, [items]);
 
   // ── 핸들러 ────────────────────────────────────────────────────────────────
@@ -386,13 +409,19 @@ export default function HomePage() {
             {widgetData.trend && <span className={`widget-trend ${widgetData.trend === '↑' ? 'up' : 'down'}`}>{widgetData.trend}</span>}
           </div>
           <div className="widget-label">이번 달 감상</div>
-          {widgetData.lastYear > 0 && (
+          {formatMins(widgetData.monthMins) && (
+            <div className="widget-sub">{formatMins(widgetData.monthMins)}</div>
+          )}
+          {widgetData.lastYear > 0 && !widgetData.monthMins && (
             <div className="widget-sub">작년 동월 {widgetData.lastYear}편</div>
           )}
         </div>
         <div className="widget-card">
           <div className="widget-value">{widgetData.thisYear}</div>
           <div className="widget-label">올해 감상</div>
+          {formatMins(widgetData.yearMins) && (
+            <div className="widget-sub">{formatMins(widgetData.yearMins)}</div>
+          )}
         </div>
         <div className="widget-card">
           <div className="widget-value">{items.filter(i => i.rating > 0 || i.review_text).length}</div>

@@ -8,6 +8,10 @@ const router = express.Router();
 const pool = require('../db');
 const auth = require('../middleware/auth');
 const { calculateTasteProfile, updateTasteProfile } = require('../services/tasteProfile');
+const wishlistRouter = require('./wishlist');
+
+// 개인 위시리스트를 /api/me/watchlist 경로로 마운트 (Phase 5.2)
+router.use('/watchlist', wishlistRouter);
 
 /**
  * GET /api/me/taste-profile

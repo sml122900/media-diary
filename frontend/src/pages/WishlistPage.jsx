@@ -11,7 +11,7 @@ import { searchTmdb } from '../api/tmdb';
 import { IMG_BASE } from '../utils/constants';
 import { useTheme } from '../hooks/useTheme';
 
-const BASE = 'http://localhost:4000/api';
+const BASE = 'http://localhost:4000/api/me';
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
 const TYPE_LABEL = { movie: '영화', anime: '애니메이션', drama: '드라마' };
@@ -91,7 +91,7 @@ export default function WishlistPage() {
   // 위시리스트 로드
   const loadWishlist = useCallback(async () => {
     try {
-      const res = await axios.get(`${BASE}/wishlist`, { headers: headers() });
+      const res = await axios.get(`${BASE}/watchlist`, { headers: headers() });
       setItems(res.data.data || []);
     } catch { /* 에러 무시 */ }
     setLoading(false);
@@ -118,7 +118,7 @@ export default function WishlistPage() {
     const year = parseInt((r.release_date || r.first_air_date || '').slice(0, 4)) || 0;
     const type = searchType === 'movie' ? 'movie' : 'drama';
     try {
-      await axios.post(`${BASE}/wishlist`, {
+      await axios.post(`${BASE}/watchlist`, {
         type, title, year, tmdb_id: r.id,
         poster_url: r.poster_path ? IMG_BASE + r.poster_path : '',
       }, { headers: headers() });
@@ -130,12 +130,12 @@ export default function WishlistPage() {
   // 우선순위 변경
   const handlePriority = async (id, priority) => {
     setItems(prev => prev.map(i => i.id === id ? { ...i, priority } : i));
-    await axios.patch(`${BASE}/wishlist/${id}`, { priority }, { headers: headers() });
+    await axios.patch(`${BASE}/watchlist/${id}`, { priority }, { headers: headers() });
   };
 
   // 노트 저장
   const handleSaveNote = async (id) => {
-    await axios.patch(`${BASE}/wishlist/${id}`, { note: editNote }, { headers: headers() });
+    await axios.patch(`${BASE}/watchlist/${id}`, { note: editNote }, { headers: headers() });
     setItems(prev => prev.map(i => i.id === id ? { ...i, note: editNote } : i));
     setEditNoteId(null);
   };
@@ -143,13 +143,13 @@ export default function WishlistPage() {
   // 삭제
   const handleDelete = async (id) => {
     if (!window.confirm('위시리스트에서 제거할까요?')) return;
-    await axios.delete(`${BASE}/wishlist/${id}`, { headers: headers() });
+    await axios.delete(`${BASE}/watchlist/${id}`, { headers: headers() });
     setItems(prev => prev.filter(i => i.id !== id));
   };
 
   // 시청 완료 처리
   const handleWatched = async (id, rating) => {
-    await axios.post(`${BASE}/wishlist/${id}/watched`, { rating }, { headers: headers() });
+    await axios.post(`${BASE}/watchlist/${id}/watched`, { rating }, { headers: headers() });
     setItems(prev => prev.filter(i => i.id !== id));
     setWatchedFormId(null);
   };
