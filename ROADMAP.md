@@ -127,21 +127,19 @@
 
 ### 3.6 OTT 시청 기록 이미지 인식
 
-- [ ] **파일 업로드 인프라**
+- [x] **파일 업로드 인프라**
   - `multer` 패키지 설치
   - `POST /api/import/screenshot` 엔드포인트
-  - 이미지 크기 제한 (5MB)
-  - 임시 폴더에 저장 후 처리 완료 시 삭제
+  - 이미지 크기 5MB 제한, 처리 완료 후 임시 파일 삭제
 
-- [ ] **Claude Vision API 연동**
-  - 업로드된 이미지를 Claude Vision API에 전달
-  - 프롬프트: "이 이미지에서 영화/드라마/애니메이션 제목을 모두 추출해주세요. JSON 배열로 반환."
-  - 추출 결과 파싱
+- [x] **Claude Vision API 연동**
+  - Claude Haiku Vision으로 이미지 분석 → 작품명 JSON 배열 추출
+  - 추출 실패 시 빈 배열 + 안내 메시지
 
-- [ ] **추출 결과 검토 UI**
-  - 추출된 작품들을 TMDB 검색하여 카드로 표시
-  - 사용자가 체크박스로 선택 → 일괄 추가
-  - 매칭 실패 항목은 별도 표시
+- [x] **추출 결과 검토 UI**
+  - ScreenshotImportModal.jsx: 이미지 미리보기 + 작품 카드 목록
+  - 체크박스 선택 → 일괄 추가, 이미 있는 작품은 "이미 있음" 표시
+  - 홈 헤더에 "📸 스크린샷" 버튼 추가
 
 ---
 
@@ -366,6 +364,17 @@
 - App.jsx `/reports` PrivateRoute 추가
 - HomePage 헤더에 "리포트" 링크 추가
 - CSS: `.report-*` 클래스 (다크모드 포함)
+
+### 2026-05-11 (Phase 3.6 완료)
+- `multer` 설치, `backend/src/routes/importScreenshot.js` 신설
+  - POST /api/import/screenshot — 5MB 이미지 → Claude Vision → TMDB 검색
+  - 처리 완료 후 uploads/ 임시 파일 삭제
+- `ScreenshotImportModal.jsx` 신설
+  - 클릭-업로드 드롭존, 이미지 미리보기
+  - "작품 인식 시작" → 체크박스 목록 → 선택 추가
+- 홈 헤더에 "📸 스크린샷" 버튼 추가
+
+**Phase 3 (AI 추천 시스템) 전체 완료** ✅
 
 <!-- 새 작업은 이 아래에 추가 -->
 

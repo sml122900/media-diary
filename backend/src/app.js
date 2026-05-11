@@ -9,6 +9,7 @@ const meRouter = require('./routes/me');
 const recommendRouter = require('./routes/recommend');
 const searchRouter = require('./routes/search');
 const reportsRouter = require('./routes/reports');
+const importScreenshotRouter = require('./routes/importScreenshot');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -23,6 +24,7 @@ app.use('/api/me', meRouter);
 app.use('/api/recommend', recommendRouter);
 app.use('/api/search', searchRouter);
 app.use('/api/me/reports', reportsRouter);
+app.use('/api/import/screenshot', importScreenshotRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });

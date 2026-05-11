@@ -326,6 +326,14 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 /* 활동 캘린더 */
 .calendar-wrap { overflow-x: auto; padding-bottom: 4px; }
 
+/* ── 스크린샷 업로드 ── */
+.screenshot-drop-zone {
+  border: 2px dashed #ddd; border-radius: 12px; padding: 20px;
+  cursor: pointer; text-align: center; transition: border-color .15s;
+  min-height: 120px; display: flex; align-items: center; justify-content: center;
+}
+.screenshot-drop-zone:hover { border-color: #888; }
+
 /* ── 월간 리포트 페이지 ── */
 .report-gen-bar {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;

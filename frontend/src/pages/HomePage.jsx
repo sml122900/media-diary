@@ -13,6 +13,7 @@ import AddModal from '../components/AddModal';
 import CsvImportModal from '../components/CsvImportModal';
 import DailyRecommendations from '../components/DailyRecommendations';
 import AiSearchModal from '../components/AiSearchModal';
+import ScreenshotImportModal from '../components/ScreenshotImportModal';
 import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
 import { useTheme } from '../hooks/useTheme';
@@ -45,6 +46,7 @@ export default function HomePage() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [csvImportOpen, setCsvImportOpen] = useState(false);
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
+  const [screenshotOpen, setScreenshotOpen] = useState(false);
 
   // ── 필터 상태 ──────────────────────────────────────────────────────────────
   const [filterOpen, setFilterOpen] = useState(false);
@@ -196,6 +198,7 @@ export default function HomePage() {
             <option value="reviewed">감상 있는 것</option>
           </select>
           <button className="btn" onClick={() => setAiSearchOpen(true)} title="AI 자연어 검색">✨ AI 검색</button>
+          <button className="btn" onClick={() => setScreenshotOpen(true)} title="스크린샷으로 가져오기">📸 스크린샷</button>
           <button className="btn btn-primary" onClick={() => setAddModalOpen(true)}>+ 추가</button>
           <div className="mdb-user">
             <Link to="/stats" className="btn">통계</Link>
@@ -419,6 +422,14 @@ export default function HomePage() {
           onClose={() => setAiSearchOpen(false)}
           onAdd={handleAdd}
           existingItems={items}
+        />
+      )}
+
+      {/* ── 스크린샷 가져오기 모달 ── */}
+      {screenshotOpen && (
+        <ScreenshotImportModal
+          onClose={() => setScreenshotOpen(false)}
+          onAdd={handleAdd}
         />
       )}
 
