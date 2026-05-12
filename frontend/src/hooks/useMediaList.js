@@ -6,42 +6,25 @@
 import { useState, useEffect } from 'react';
 import {
   fetchUserMedia,
-  bulkSaveMedia,
   saveMediaItem,
   updateMediaItem,
   deleteMediaItem,
   updatePosterItem,
 } from '../api/userMedia';
-import { DEFAULT_MOVIE, DEFAULT_ANIME, DEFAULT_DRAMA } from '../data/defaultMedia';
 
 /**
  * @param {object|null} user - 로그인한 유저 (Zustand authStore)
- * @returns {{ items, setItems, loading, seedingMsg, handlers }}
+ * @returns {{ items, setItems, loading, handlers }}
  */
 export function useMediaList(user) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [seedingMsg, setSeedingMsg] = useState('');
 
-  // 데이터 로드 및 첫 방문 시 기본 데이터 시딩
   useEffect(() => {
     const doLoad = async () => {
       setLoading(true);
-      const seedKey = `media_diary_seeded_${user?.id}`;
       try {
-        let data = await fetchUserMedia();
-        if (!localStorage.getItem(seedKey)) {
-          setSeedingMsg('처음 방문이시네요! 기본 작품 목록을 불러오는 중...');
-          const allDefaults = [
-            ...DEFAULT_MOVIE.map(m => ({ ...m, type: 'movie' })),
-            ...DEFAULT_ANIME.map(m => ({ ...m, type: 'anime' })),
-            ...DEFAULT_DRAMA.map(m => ({ ...m, type: 'drama' })),
-          ];
-          await bulkSaveMedia(allDefaults);
-          localStorage.setItem(seedKey, '1');
-          data = await fetchUserMedia();
-          setSeedingMsg('');
-        }
+        const data = await fetchUserMedia();
         setItems(data);
       } catch (err) {
         console.error('데이터 로드 실패:', err);
@@ -123,7 +106,7 @@ export function useMediaList(user) {
 
   return {
     items, setItems,
-    loading, seedingMsg,
+    loading,
     handleSave,
     handleDeleteReview,
     handleDeleteItem,

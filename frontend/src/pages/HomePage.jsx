@@ -26,7 +26,7 @@ export default function HomePage() {
 
   // 미디어 데이터 + CRUD 훅
   const {
-    items, loading, seedingMsg,
+    items, loading,
     handleSave, handleDeleteReview, handleDeleteItem,
     handleEditItem, handleAdd, handleUpdatePoster, reloadItems,
   } = useMediaList(user);
@@ -226,7 +226,7 @@ export default function HomePage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: 12, color: '#888' }}>
         <div style={{ fontSize: 32 }}>📽️</div>
-        <div style={{ fontSize: 15 }}>{seedingMsg || '불러오는 중...'}</div>
+        <div style={{ fontSize: 15 }}>불러오는 중...</div>
       </div>
     );
   }
