@@ -62,6 +62,8 @@ export default function DetailModal({
   const [ctxWith, setCtxWith] = useState(item.watched_with || '');
   const [ctxPlace, setCtxPlace] = useState(item.watched_at_place || '');
   const [ctxMood, setCtxMood] = useState(item.mood || '');
+  // 시청 날짜 (빈 문자열이면 백엔드에서 NOW() 사용)
+  const [watchedDate, setWatchedDate] = useState('');
 
   const cacheKey = `${item.title}_${item.year}`;
   // anime/drama는 tv 타입으로 조회
@@ -131,6 +133,7 @@ export default function DetailModal({
       watched_with: ctxWith || null,
       watched_at_place: ctxPlace || null,
       mood: ctxMood || null,
+      watched_at_custom: watchedDate || null,
     });
     setSaving(false);
     onClose();
@@ -364,6 +367,22 @@ export default function DetailModal({
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* 시청 날짜 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14, marginBottom: 4 }}>
+              <span style={{ fontSize: 13, color: '#888', whiteSpace: 'nowrap' }}>시청 날짜</span>
+              <input
+                type="date"
+                value={watchedDate}
+                onChange={e => setWatchedDate(e.target.value)}
+                style={{ flex: 1, padding: '4px 8px', fontSize: 13, border: '1px solid #ddd', borderRadius: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
+              />
+              <button
+                className="btn"
+                style={{ fontSize: 12, whiteSpace: 'nowrap' }}
+                onClick={() => setWatchedDate(new Date().toISOString().slice(0, 10))}
+              >오늘 시청</button>
             </div>
 
             <div className="mactions">

@@ -127,6 +127,7 @@ router.put('/:id', auth, async (req, res) => {
     title, year, director, cast_info, poster_url,
     type, rating, review_text, review_date, set_watched_at, is_public,
     watched_with, watched_at_place, mood, companion_names,
+    watched_at_custom,
   } = req.body;
   try {
     const result = await pool.query(
@@ -135,6 +136,7 @@ router.put('/:id', auth, async (req, res) => {
          type=$6, rating=$7, review_text=$8, review_date=$9,
          is_public=$10,
          watched_at = CASE
+           WHEN $11 AND $18::text IS NOT NULL THEN $18::timestamp
            WHEN $11 AND ($7::int > 0 OR $8::text <> '') THEN NOW()
            WHEN $11 AND $7::int = 0 AND $8::text = ''   THEN NULL
            ELSE watched_at
@@ -153,6 +155,7 @@ router.put('/:id', auth, async (req, res) => {
         req.params.id,
         watched_with ?? null, watched_at_place ?? null, mood ?? null, companion_names ?? null,
         req.user.id,
+        watched_at_custom ?? null,
       ]
     );
     if (!result.rows[0]) {
