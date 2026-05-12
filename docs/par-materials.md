@@ -136,6 +136,45 @@
 
 ---
 
+### 소재 11 — 프론트엔드 API URL 환경변수 이전 (배포 준비)
+
+**Problem (상황/문제)**
+> 프론트엔드 18개 파일에 `http://localhost:4000`이 하드코딩되어 있어 개발·프로덕션 환경 분리가 불가능했다. Vercel + Render 배포 시 코드 수정 없이 URL을 바꿀 방법이 없었다.
+
+**Action (내가 한 것)**
+> `grep -rn "localhost:4000"` 으로 21곳을 전수 발견하고, Vite의 `import.meta.env.VITE_*` 패턴으로 일괄 교체했다. `frontend/.env`에 개발용 URL을 설정하고 Vercel 환경변수에 프로덕션 URL을 주입하는 구조를 만들었다. `fetch` 호출과 `axios` 모두 커버하기 위해 파일별로 직접 치환했다.
+
+**Result (결과)**
+> 18개 파일에서 하드코딩 URL이 완전히 제거됐다. `.env` 파일 한 줄만 바꾸면 환경 전환이 가능하며, Vercel CI/CD에서 빌드 시 자동으로 프로덕션 URL이 주입된다.
+
+---
+
+### 소재 12 — 자동 시딩 제거 (프로덕션 이슈 대응)
+
+**Problem (상황/문제)**
+> 배포 후 신규 가입자가 본인이 추가하지 않은 178건의 미디어 목록을 자동으로 보게 되는 문제가 발생했다. 개발 중 편의를 위해 만든 기능이 실제 서비스에서 비정상 동작을 유발했다.
+
+**Action (내가 한 것)**
+> `localStorage` seedKey 체크, `bulkSaveMedia` 호출, 기본 데이터 import를 `useMediaList.js`에서 전면 제거했다. 관련 state(`seedingMsg`)와 UI 참조도 정리했다. 백엔드 `/bulk` 엔드포인트는 CSV 가져오기에서 계속 사용되므로 유지했다.
+
+**Result (결과)**
+> 신규 가입자는 빈 목록으로 시작한다. 프로덕션 환경과 개발 환경의 동작이 일치하게 됐다.
+
+---
+
+### 소재 13 — 시청 날짜 소급 입력 기능 구현
+
+**Problem (상황/문제)**
+> 별점 저장 시 항상 현재 시각(`NOW()`)으로 `watched_at`이 기록됐다. 과거에 본 작품을 나중에 입력하거나, 특정 날짜를 기억하는 경우 정확한 날짜를 기록할 방법이 없었다.
+
+**Action (내가 한 것)**
+> 저장 버튼 위에 날짜 입력창(`<input type="date">`)과 "오늘 시청" 버튼을 추가했다. 프론트는 `watched_at_custom`을 context에 포함해 전송하고, 백엔드 PUT /:id 쿼리의 CASE 조건에 "custom date가 있으면 우선 사용" 분기를 추가했다. 날짜를 비워두면 기존 동작(NOW() or NULL)을 그대로 유지해 하위 호환성을 보장했다.
+
+**Result (결과)**
+> 과거 감상 날짜를 소급 입력할 수 있게 됐다. 연말 결산·캘린더 통계 등 `watched_at` 기반 기능이 더 정확한 데이터를 사용할 수 있다.
+
+---
+
 ## 키워드 뱅크 (기술 스택 & 성과 표현)
 
 - React, Vite, Zustand, React Router
@@ -163,3 +202,8 @@
 - FAB 플로팅 버튼, 키보드 단축키 (Cmd+K)
 - 시청 컨텍스트 메타데이터 설계 (watched_with, mood 등)
 - 개인 위시리스트 (mark-as-watched 흐름, 우선순위 관리)
+- Vite 환경변수 (`import.meta.env.VITE_*`), 개발/프로덕션 URL 분리
+- 하드코딩 URL 전수 grep → 일괄 환경변수 이전 (18개 파일)
+- 자동 시딩 제거, 프로덕션 이슈 대응, 신규 가입자 UX 개선
+- watched_at 소급 입력, nullable custom date, CASE 우선순위 쿼리
+- Render `npm start` / Vercel CI 배포 환경변수 설계
