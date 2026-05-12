@@ -1,0 +1,780 @@
+{
+  "lists": [
+    {
+      "slug": "dc-dceu",
+      "title": "DC 영화 (DCEU)",
+      "category": "franchise",
+      "description": "DC 익스텐디드 유니버스 전 작품",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 10,
+      "items": [
+        {
+          "tmdb_id": 49521,
+          "tmdb_type": "movie",
+          "title": "맨 오브 스틸",
+          "year": 2013,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 209112,
+          "tmdb_type": "movie",
+          "title": "배트맨 대 슈퍼맨: 저스티스의 시작",
+          "year": 2016,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 297761,
+          "tmdb_type": "movie",
+          "title": "수어사이드 스쿼드",
+          "year": 2016,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 297762,
+          "tmdb_type": "movie",
+          "title": "원더우먼",
+          "year": 2017,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 141052,
+          "tmdb_type": "movie",
+          "title": "저스티스 리그",
+          "year": 2017,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 297802,
+          "tmdb_type": "movie",
+          "title": "아쿠아맨",
+          "year": 2018,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 287947,
+          "tmdb_type": "movie",
+          "title": "샤잠!",
+          "year": 2019,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 464052,
+          "tmdb_type": "movie",
+          "title": "원더우먼 1984",
+          "year": 2020,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 791373,
+          "tmdb_type": "movie",
+          "title": "저스티스 리그: 스나이더 컷",
+          "year": 2021,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 655177,
+          "tmdb_type": "movie",
+          "title": "더 수어사이드 스쿼드",
+          "year": 2021,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 436270,
+          "tmdb_type": "movie",
+          "title": "블랙 아담",
+          "year": 2022,
+          "display_order": 11
+        },
+        {
+          "tmdb_id": 594767,
+          "tmdb_type": "movie",
+          "title": "샤잠! 신들의 분노",
+          "year": 2023,
+          "display_order": 12
+        },
+        {
+          "tmdb_id": 170752,
+          "tmdb_type": "movie",
+          "title": "더 플래시",
+          "year": 2023,
+          "display_order": 13
+        },
+        {
+          "tmdb_id": 572802,
+          "tmdb_type": "movie",
+          "title": "아쿠아맨과 로스트 킹덤",
+          "year": 2023,
+          "display_order": 14
+        }
+      ]
+    },
+    {
+      "slug": "transformers",
+      "title": "트랜스포머 시리즈",
+      "category": "franchise",
+      "description": "마이클 베이 & 트랜스포머 실사 영화 전 시리즈",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 11,
+      "items": [
+        {
+          "tmdb_id": 1858,
+          "tmdb_type": "movie",
+          "title": "트랜스포머",
+          "year": 2007,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 8373,
+          "tmdb_type": "movie",
+          "title": "트랜스포머: 패자의 역습",
+          "year": 2009,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 38356,
+          "tmdb_type": "movie",
+          "title": "트랜스포머 3",
+          "year": 2011,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 91314,
+          "tmdb_type": "movie",
+          "title": "트랜스포머: 사라진 시대",
+          "year": 2014,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 335988,
+          "tmdb_type": "movie",
+          "title": "트랜스포머: 최후의 기사",
+          "year": 2017,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 424783,
+          "tmdb_type": "movie",
+          "title": "범블비",
+          "year": 2018,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 667538,
+          "tmdb_type": "movie",
+          "title": "트랜스포머: 비스트의 서막",
+          "year": 2023,
+          "display_order": 7
+        }
+      ]
+    },
+    {
+      "slug": "mission-impossible",
+      "title": "미션 임파서블 시리즈",
+      "category": "franchise",
+      "description": "톰 크루즈 주연 미션 임파서블 전 시리즈",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 12,
+      "items": [
+        {
+          "tmdb_id": 954,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블",
+          "year": 1996,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 955,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블 2",
+          "year": 2000,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 956,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블 3",
+          "year": 2006,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 56292,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블: 고스트 프로토콜",
+          "year": 2011,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 177677,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블: 로그 네이션",
+          "year": 2015,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 353081,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블: 폴아웃",
+          "year": 2018,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 575264,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블: 데드 레코닝",
+          "year": 2023,
+          "display_order": 7
+        }
+      ]
+    },
+    {
+      "slug": "fast-furious",
+      "title": "분노의 질주 시리즈",
+      "category": "franchise",
+      "description": "분노의 질주 메인 시리즈 전편",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 13,
+      "items": [
+        {
+          "tmdb_id": 9799,
+          "tmdb_type": "movie",
+          "title": "분노의 질주",
+          "year": 2001,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 584,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 2FAST 2FURIOUS",
+          "year": 2003,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 9800,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 도쿄 드리프트",
+          "year": 2006,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 9801,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 더 오리지널",
+          "year": 2009,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 51497,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 더 파이브",
+          "year": 2011,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 82992,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 더 맥시멈",
+          "year": 2013,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 168259,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 더 세븐",
+          "year": 2015,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 337339,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 더 익스트림",
+          "year": 2017,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 384018,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 홉스&쇼",
+          "year": 2019,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 561053,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: F9",
+          "year": 2021,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 385687,
+          "tmdb_type": "movie",
+          "title": "분노의 질주: 라이드 오어 다이",
+          "year": 2023,
+          "display_order": 11
+        }
+      ]
+    },
+    {
+      "slug": "spider-man-all",
+      "title": "스파이더맨 전 시리즈",
+      "category": "franchise",
+      "description": "샘 레이미·어메이징·MCU 스파이더맨 전편 (MCU편 포함)",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 14,
+      "items": [
+        {
+          "tmdb_id": 557,
+          "tmdb_type": "movie",
+          "title": "스파이더맨",
+          "year": 2002,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 558,
+          "tmdb_type": "movie",
+          "title": "스파이더맨 2",
+          "year": 2004,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 559,
+          "tmdb_type": "movie",
+          "title": "스파이더맨 3",
+          "year": 2007,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 38700,
+          "tmdb_type": "movie",
+          "title": "어메이징 스파이더맨",
+          "year": 2012,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 102382,
+          "tmdb_type": "movie",
+          "title": "어메이징 스파이더맨 2",
+          "year": 2014,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 315635,
+          "tmdb_type": "movie",
+          "title": "스파이더맨: 홈커밍",
+          "year": 2017,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 429617,
+          "tmdb_type": "movie",
+          "title": "스파이더맨: 파 프롬 홈",
+          "year": 2019,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 634649,
+          "tmdb_type": "movie",
+          "title": "스파이더맨: 노 웨이 홈",
+          "year": 2021,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 324857,
+          "tmdb_type": "movie",
+          "title": "스파이더맨: 뉴 유니버스",
+          "year": 2018,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 569094,
+          "tmdb_type": "movie",
+          "title": "스파이더맨: 어크로스 더 유니버스",
+          "year": 2023,
+          "display_order": 10
+        }
+      ]
+    },
+    {
+      "slug": "harry-potter",
+      "title": "해리포터 + 신비한 동물사전",
+      "category": "franchise",
+      "description": "마법사 세계관 전 극장 시리즈",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 15,
+      "items": [
+        {
+          "tmdb_id": 671,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 마법사의 돌",
+          "year": 2001,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 672,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 비밀의 방",
+          "year": 2002,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 673,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 아즈카반의 죄수",
+          "year": 2004,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 674,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 불의 잔",
+          "year": 2005,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 675,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 불사조 기사단",
+          "year": 2007,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 767,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 혼혈 왕자",
+          "year": 2009,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 12444,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 죽음의 성물 1부",
+          "year": 2010,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 12445,
+          "tmdb_type": "movie",
+          "title": "해리 포터와 죽음의 성물 2부",
+          "year": 2011,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 259693,
+          "tmdb_type": "movie",
+          "title": "신비한 동물사전",
+          "year": 2016,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 338952,
+          "tmdb_type": "movie",
+          "title": "신비한 동물들과 그린델왈드의 범죄",
+          "year": 2018,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 338953,
+          "tmdb_type": "movie",
+          "title": "신비한 동물들과 덤블도어의 비밀",
+          "year": 2022,
+          "display_order": 11
+        }
+      ]
+    },
+    {
+      "slug": "lotr-hobbit",
+      "title": "반지의 제왕 + 호빗",
+      "category": "franchise",
+      "description": "피터 잭슨 감독의 중간계 6부작 전편",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 16,
+      "items": [
+        {
+          "tmdb_id": 120,
+          "tmdb_type": "movie",
+          "title": "반지의 제왕: 반지 원정대",
+          "year": 2001,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 121,
+          "tmdb_type": "movie",
+          "title": "반지의 제왕: 두 개의 탑",
+          "year": 2002,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 122,
+          "tmdb_type": "movie",
+          "title": "반지의 제왕: 왕의 귀환",
+          "year": 2003,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 49051,
+          "tmdb_type": "movie",
+          "title": "호빗: 뜻밖의 여정",
+          "year": 2012,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 57158,
+          "tmdb_type": "movie",
+          "title": "호빗: 스마우그의 폐허",
+          "year": 2013,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 122917,
+          "tmdb_type": "movie",
+          "title": "호빗: 다섯 군대 전투",
+          "year": 2014,
+          "display_order": 6
+        }
+      ]
+    },
+    {
+      "slug": "star-wars",
+      "title": "스타워즈",
+      "category": "franchise",
+      "description": "스타워즈 메인 에피소드 + 스핀오프",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 17,
+      "items": [
+        {
+          "tmdb_id": 11,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 새로운 희망",
+          "year": 1977,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 1891,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 제국의 역습",
+          "year": 1980,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 1892,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 제다이의 귀환",
+          "year": 1983,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 1893,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 보이지 않는 위험",
+          "year": 1999,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 1894,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 클론의 습격",
+          "year": 2002,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 1895,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 시스의 복수",
+          "year": 2005,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 140607,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 깨어난 포스",
+          "year": 2015,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 330459,
+          "tmdb_type": "movie",
+          "title": "로그 원: 스타워즈 스토리",
+          "year": 2016,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 181808,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 라스트 제다이",
+          "year": 2017,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 348350,
+          "tmdb_type": "movie",
+          "title": "한 솔로: 스타워즈 스토리",
+          "year": 2018,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 181812,
+          "tmdb_type": "movie",
+          "title": "스타워즈: 라이즈 오브 스카이워커",
+          "year": 2019,
+          "display_order": 11
+        }
+      ]
+    },
+    {
+      "slug": "james-bond",
+      "title": "007 제임스 본드",
+      "category": "franchise",
+      "description": "다니엘 크레이그 시대 007 시리즈 (5편)",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 18,
+      "items": [
+        {
+          "tmdb_id": 36557,
+          "tmdb_type": "movie",
+          "title": "007 카지노 로얄",
+          "year": 2006,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 10764,
+          "tmdb_type": "movie",
+          "title": "007 퀀텀 오브 솔러스",
+          "year": 2008,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 37724,
+          "tmdb_type": "movie",
+          "title": "007 스카이폴",
+          "year": 2012,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 206647,
+          "tmdb_type": "movie",
+          "title": "007 스펙터",
+          "year": 2015,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 370172,
+          "tmdb_type": "movie",
+          "title": "007 노 타임 투 다이",
+          "year": 2021,
+          "display_order": 5
+        }
+      ]
+    },
+    {
+      "slug": "john-wick",
+      "title": "존 윅 시리즈",
+      "category": "franchise",
+      "description": "키아누 리브스 주연 존 윅 4부작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 19,
+      "items": [
+        {
+          "tmdb_id": 245891,
+          "tmdb_type": "movie",
+          "title": "존 윅",
+          "year": 2014,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 324552,
+          "tmdb_type": "movie",
+          "title": "존 윅 2",
+          "year": 2017,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 458156,
+          "tmdb_type": "movie",
+          "title": "존 윅 3: 파라벨룸",
+          "year": 2019,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 603692,
+          "tmdb_type": "movie",
+          "title": "존 윅 4",
+          "year": 2023,
+          "display_order": 4
+        }
+      ]
+    },
+    {
+      "slug": "dune",
+      "title": "듄 시리즈",
+      "category": "franchise",
+      "description": "드니 빌뇌브 감독 듄 시리즈",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 20,
+      "items": [
+        {
+          "tmdb_id": 438631,
+          "tmdb_type": "movie",
+          "title": "듄",
+          "year": 2021,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 693134,
+          "tmdb_type": "movie",
+          "title": "듄: 파트 2",
+          "year": 2024,
+          "display_order": 2
+        }
+      ]
+    },
+    {
+      "slug": "matrix",
+      "title": "매트릭스 시리즈",
+      "category": "franchise",
+      "description": "워쇼스키 자매 매트릭스 4부작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 21,
+      "items": [
+        {
+          "tmdb_id": 603,
+          "tmdb_type": "movie",
+          "title": "매트릭스",
+          "year": 1999,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 604,
+          "tmdb_type": "movie",
+          "title": "매트릭스 2: 리로디드",
+          "year": 2003,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 605,
+          "tmdb_type": "movie",
+          "title": "매트릭스 3: 레볼루션",
+          "year": 2003,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 624860,
+          "tmdb_type": "movie",
+          "title": "매트릭스: 리저렉션",
+          "year": 2021,
+          "display_order": 4
+        }
+      ]
+    }
+  ]
+}

@@ -520,3 +520,99 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
 - **AI 채팅 UI** — 메신저 스타일 (좌우 정렬, 말풍선)
 - **온보딩 마법사** — 풀스크린 5단계 (기존 페이지와 분리)
 - **체크박스 그리드** — 큐레이션용 (포스터 + 체크 토글)
+
+---
+
+# 미디어 다이어리 — Phase 7 로드맵 (큐레이션 확장)
+
+> 작성일: 2026-05-13
+> Phase 6의 큐레이션 12개를 ~50개로 확장하고, 인물 자유 검색 기능 추가
+
+---
+
+## 🎯 이 Phase의 본질
+
+**"내가 본 작품을 시리즈·감독·장르·배우 어떤 각도로든 찾을 수 있게"**
+
+---
+
+## Stage 7.1 — 큐레이션 카테고리 확장 (12개 → ~50개)
+
+### 추가할 JSON 파일
+
+- [ ] `franchises-extended.json` — DC, 트랜스포머, MI, 분노의질주, 스파이더맨전체, 해리포터+신비한동물, 반지의제왕+호빗, 스타워즈, 007, 존윅, 듄, 매트릭스
+- [ ] `korean-directors-extended.json` — 홍상수, 이창동, 류승완, 김지운, 나홍진
+- [ ] `foreign-directors-extended.json` — 스필버그, 스코세이지, 타란티노, 코엔형제, 핀처, 리들리스콧, 샤젤, 웨스앤더슨, 카메론, 피터잭슨
+- [ ] `boxoffice-extended.json` — 한국 1000만 관객, 글로벌 흥행 TOP 50
+- [ ] `awards-extended.json` — 베니스 황금사자상, 청룡영화상, 백상예술대상 영화
+- [ ] `genre.json` — SF 명작, 호러/스릴러, 액션 블록버스터, 코미디 명작
+- [ ] `anime-extended.json` — 신카이 마코토, 호소다 마모루, 디즈니 클래식+르네상스
+- [ ] `drama-extended.json` — 미국 드라마 명작(HBO/AMC), 넷플릭스 한국 오리지널
+
+### 작업 항목
+
+- [x] JSON 파일 8개 작성 완료 (총 50개 리스트, 573개 아이템)
+- [x] `fill-tmdb-ids.js` 재실행 → 87개 매칭
+- [x] `fetch-curation-posters.js` 재실행 → 314개 포스터
+- [x] `seed-curation.js` 재실행 → DB 삽입 완료
+
+---
+
+## Stage 7.2 — 감독/배우 자유 검색 (즉각 가치)
+
+- [x] **GET /api/curation/person/search?q={이름}**
+  - TMDB /search/person → 인물 목록 반환 (이름, 사진, 대표작)
+
+- [x] **GET /api/curation/person/:tmdbId/works?type=director|actor**
+  - TMDB movie_credits + tv_credits 조회
+  - 감독: job=Director 필터 / 배우: cast 전체
+  - 포스터 있는 항목 우선 + 인기도순, already_added 마킹
+
+- [x] **프론트엔드 PersonSearch 섹션 (RestorePage)**
+  - 디바운스 300ms 검색 → 인물 드롭다운 (프로필 사진, 부서, 대표작)
+  - 인물 선택 → 감독/배우 토글 → 작품 포스터 그리드
+  - bulk-add 연동, 추가 완료 후 already_added 인라인 업데이트
+
+---
+
+## Stage 7.3 — 큐레이션 페이지 UX 개선
+
+- [x] **2단계 아코디언 구조 (RestorePage 전면 개편)**
+  - 상위: 🎬 영화 / 📺 드라마 / 🎌 애니메이션 (색상 헤더)
+  - 하위: 시리즈·한국감독·해외감독·박스오피스·시상식·장르
+  - 상위 클릭 → 하위 펼침/접힘 (기본: 열림)
+
+- [x] **큐레이션 이름 필터 검색창**
+  - 텍스트 입력 → 해당 이름 포함 리스트만 표시
+  - 필터 시 자동으로 해당 super group 펼침
+
+---
+
+## 📝 진행 로그
+
+### 2026-05-13 — Stage 7.1 + 7.2 + 7.3 완료
+
+**Stage 7.1 — 큐레이션 확장 (12 → 50개)**
+- JSON 파일 8개 추가: franchises-extended, korean-directors-extended, foreign-directors-extended, genre, anime-extended, drama-extended, awards-extended
+- fill-tmdb-ids.js 실행 → 87개 자동 매칭
+- seed-curation.js 실행 → 50개 리스트, 573개 아이템 DB 삽입
+- fetch-curation-posters.js → 314개 포스터 수집
+
+**Stage 7.2 — 감독/배우 자유 검색**
+- `GET /api/curation/person/search?q=` → TMDB 인물 검색
+- `GET /api/curation/person/:id/works?type=director|actor` → 크레딧 조회, already_added 마킹
+- RestorePage에 PersonSearch 섹션 (디바운스 검색, 인물 카드, 작품 그리드, bulk-add)
+
+**Stage 7.3 — UX 개선 (2단계 아코디언)**
+- RestorePage 전면 재작성
+- SUPER_GROUPS 정의: 🎬영화 / 📺드라마 / 🎌애니메이션
+- 하위: 시리즈·한국감독·해외감독·박스오피스·시상식·장르별 / 한국드라마·해외드라마 / 애니메이션
+- 큐레이션 이름 필터 검색창 추가
+
+<!-- Phase 7 작업은 이 아래에 추가 -->
+
+---
+
+## 🎯 현재 시작점
+
+**Stage 7.2 → Stage 7.3 → Stage 7.1 순서로 진행**

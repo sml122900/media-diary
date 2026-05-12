@@ -1,0 +1,194 @@
+{
+  "lists": [
+    {
+      "slug": "venice-golden-lion",
+      "title": "베니스 황금사자상 수상작 (최근 15년)",
+      "category": "awards",
+      "description": "2009~2024년 베니스 국제영화제 황금사자상(Golden Lion) 수상작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 5,
+      "items": [
+        {
+          "tmdb_id": 32084,
+          "tmdb_type": "movie",
+          "title": "레바논 (Lebanon)",
+          "year": 2009,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 0,
+          "tmdb_type": "movie",
+          "title": "에브리웨어 (Somewhere)",
+          "year": 2010,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 77560,
+          "tmdb_type": "movie",
+          "title": "파우스트 (Faust)",
+          "year": 2011,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 123377,
+          "tmdb_type": "movie",
+          "title": "피에타",
+          "year": 2012,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 0,
+          "tmdb_type": "movie",
+          "title": "사크라멘토 (Sacro GRA)",
+          "year": 2013,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 273248,
+          "tmdb_type": "movie",
+          "title": "버드맨",
+          "year": 2014,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 0,
+          "tmdb_type": "movie",
+          "title": "포르 산체스 (From Afar)",
+          "year": 2015,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 399055,
+          "tmdb_type": "movie",
+          "title": "셰이프 오브 워터",
+          "year": 2017,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 490132,
+          "tmdb_type": "movie",
+          "title": "로마 (Roma)",
+          "year": 2018,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 475557,
+          "tmdb_type": "movie",
+          "title": "조커",
+          "year": 2019,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 748783,
+          "tmdb_type": "movie",
+          "title": "노매드랜드",
+          "year": 2020,
+          "display_order": 11
+        },
+        {
+          "tmdb_id": 0,
+          "tmdb_type": "movie",
+          "title": "배드럭 뱅잉",
+          "year": 2021,
+          "display_order": 12
+        },
+        {
+          "tmdb_id": 744594,
+          "tmdb_type": "movie",
+          "title": "화이트 노이즈",
+          "year": 2022,
+          "display_order": 13
+        },
+        {
+          "tmdb_id": 0,
+          "tmdb_type": "movie",
+          "title": "푸어 씽스",
+          "year": 2023,
+          "display_order": 14
+        }
+      ]
+    },
+    {
+      "slug": "cheongnyong-best-picture",
+      "title": "청룡영화상 작품상 (최근 10년)",
+      "category": "awards",
+      "description": "2014~2023년 청룡영화상 작품상 수상작",
+      "region": "kr",
+      "media_type": "movie",
+      "display_order": 6,
+      "items": [
+        {
+          "tmdb_id": 242452,
+          "tmdb_type": "movie",
+          "title": "변호인",
+          "year": 2013,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 282631,
+          "tmdb_type": "movie",
+          "title": "명량",
+          "year": 2014,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 291549,
+          "tmdb_type": "movie",
+          "title": "암살",
+          "year": 2015,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 396535,
+          "tmdb_type": "movie",
+          "title": "부산행",
+          "year": 2016,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 437068,
+          "tmdb_type": "movie",
+          "title": "택시운전사",
+          "year": 2017,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 437103,
+          "tmdb_type": "movie",
+          "title": "1987",
+          "year": 2017,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 496243,
+          "tmdb_type": "movie",
+          "title": "기생충",
+          "year": 2019,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 607844,
+          "tmdb_type": "movie",
+          "title": "모가디슈",
+          "year": 2021,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 619803,
+          "tmdb_type": "movie",
+          "title": "범죄도시 2",
+          "year": 2022,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 919207,
+          "tmdb_type": "movie",
+          "title": "서울의 봄",
+          "year": 2023,
+          "display_order": 10
+        }
+      ]
+    }
+  ]
+}

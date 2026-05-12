@@ -1,0 +1,180 @@
+{
+  "lists": [
+    {
+      "slug": "us-dramas-hbo-amc",
+      "title": "미국 드라마 명작 (HBO·AMC)",
+      "category": "drama",
+      "description": "미국 프리미엄 드라마의 역사를 바꾼 명작들",
+      "region": "global",
+      "media_type": "drama",
+      "display_order": 3,
+      "items": [
+        {
+          "tmdb_id": 4613,
+          "tmdb_type": "tv",
+          "title": "밴드 오브 브라더스",
+          "year": 2001,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 1438,
+          "tmdb_type": "tv",
+          "title": "더 와이어",
+          "year": 2002,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 1398,
+          "tmdb_type": "tv",
+          "title": "소프라노스",
+          "year": 1999,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 1396,
+          "tmdb_type": "tv",
+          "title": "브레이킹 배드",
+          "year": 2008,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 1399,
+          "tmdb_type": "tv",
+          "title": "왕좌의 게임",
+          "year": 2011,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 1104,
+          "tmdb_type": "tv",
+          "title": "매드맨",
+          "year": 2007,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 46648,
+          "tmdb_type": "tv",
+          "title": "트루 디텍티브",
+          "year": 2014,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 63351,
+          "tmdb_type": "tv",
+          "title": "웨스트월드",
+          "year": 2016,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 87108,
+          "tmdb_type": "tv",
+          "title": "체르노빌",
+          "year": 2019,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 63174,
+          "tmdb_type": "tv",
+          "title": "석세션",
+          "year": 2018,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 100088,
+          "tmdb_type": "tv",
+          "title": "더 라스트 오브 어스",
+          "year": 2023,
+          "display_order": 11
+        },
+        {
+          "tmdb_id": 94997,
+          "tmdb_type": "tv",
+          "title": "하우스 오브 드래곤",
+          "year": 2022,
+          "display_order": 12
+        }
+      ]
+    },
+    {
+      "slug": "netflix-kr-original",
+      "title": "넷플릭스 한국 오리지널",
+      "category": "drama",
+      "description": "넷플릭스 한국 오리지널 화제작 선정",
+      "region": "kr",
+      "media_type": "drama",
+      "display_order": 4,
+      "items": [
+        {
+          "tmdb_id": 74199,
+          "tmdb_type": "tv",
+          "title": "킹덤",
+          "year": 2019,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 93405,
+          "tmdb_type": "tv",
+          "title": "오징어 게임",
+          "year": 2021,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 120885,
+          "tmdb_type": "tv",
+          "title": "지금 우리 학교는",
+          "year": 2022,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 136283,
+          "tmdb_type": "tv",
+          "title": "더 글로리",
+          "year": 2022,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 207280,
+          "tmdb_type": "tv",
+          "title": "마스크걸",
+          "year": 2023,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 110534,
+          "tmdb_type": "tv",
+          "title": "D.P.",
+          "year": 2021,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 112836,
+          "tmdb_type": "tv",
+          "title": "종이의 집: 공동경제구역",
+          "year": 2022,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 97970,
+          "tmdb_type": "tv",
+          "title": "수리남",
+          "year": 2022,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 135238,
+          "tmdb_type": "tv",
+          "title": "경성크리처",
+          "year": 2023,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 206686,
+          "tmdb_type": "tv",
+          "title": "닭강정",
+          "year": 2024,
+          "display_order": 10
+        }
+      ]
+    }
+  ]
+}

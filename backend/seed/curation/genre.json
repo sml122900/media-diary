@@ -1,0 +1,356 @@
+{
+  "lists": [
+    {
+      "slug": "sf-classics",
+      "title": "SF 명작",
+      "category": "genre",
+      "description": "인류의 상상력을 넓힌 SF 영화 명작 선정",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 1,
+      "items": [
+        {
+          "tmdb_id": 62,
+          "tmdb_type": "movie",
+          "title": "2001: 스페이스 오디세이",
+          "year": 1968,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 348,
+          "tmdb_type": "movie",
+          "title": "에일리언",
+          "year": 1979,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 78,
+          "tmdb_type": "movie",
+          "title": "블레이드 러너",
+          "year": 1982,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 601,
+          "tmdb_type": "movie",
+          "title": "E.T.",
+          "year": 1982,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 280,
+          "tmdb_type": "movie",
+          "title": "터미네이터 2",
+          "year": 1991,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 603,
+          "tmdb_type": "movie",
+          "title": "매트릭스",
+          "year": 1999,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 686,
+          "tmdb_type": "movie",
+          "title": "콘택트",
+          "year": 1997,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 38,
+          "tmdb_type": "movie",
+          "title": "이터널 선샤인",
+          "year": 2004,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 27205,
+          "tmdb_type": "movie",
+          "title": "인셉션",
+          "year": 2010,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 157336,
+          "tmdb_type": "movie",
+          "title": "인터스텔라",
+          "year": 2014,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 264660,
+          "tmdb_type": "movie",
+          "title": "엑스 마키나",
+          "year": 2014,
+          "display_order": 11
+        },
+        {
+          "tmdb_id": 286217,
+          "tmdb_type": "movie",
+          "title": "마션",
+          "year": 2015,
+          "display_order": 12
+        },
+        {
+          "tmdb_id": 438631,
+          "tmdb_type": "movie",
+          "title": "듄",
+          "year": 2021,
+          "display_order": 13
+        },
+        {
+          "tmdb_id": 872585,
+          "tmdb_type": "movie",
+          "title": "오펜하이머",
+          "year": 2023,
+          "display_order": 14
+        }
+      ]
+    },
+    {
+      "slug": "horror-thriller",
+      "title": "호러 / 스릴러 명작",
+      "category": "genre",
+      "description": "장르 역사를 바꾼 호러·스릴러 영화 명작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 2,
+      "items": [
+        {
+          "tmdb_id": 539,
+          "tmdb_type": "movie",
+          "title": "사이코",
+          "year": 1960,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 694,
+          "tmdb_type": "movie",
+          "title": "샤이닝",
+          "year": 1980,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 274,
+          "tmdb_type": "movie",
+          "title": "양들의 침묵",
+          "year": 1991,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 807,
+          "tmdb_type": "movie",
+          "title": "세븐",
+          "year": 1995,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 745,
+          "tmdb_type": "movie",
+          "title": "식스 센스",
+          "year": 1999,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 550,
+          "tmdb_type": "movie",
+          "title": "파이트 클럽",
+          "year": 1999,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 4552,
+          "tmdb_type": "movie",
+          "title": "장화, 홍련",
+          "year": 2003,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 293670,
+          "tmdb_type": "movie",
+          "title": "곡성",
+          "year": 2016,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 419430,
+          "tmdb_type": "movie",
+          "title": "겟 아웃",
+          "year": 2017,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 496243,
+          "tmdb_type": "movie",
+          "title": "기생충",
+          "year": 2019,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 530385,
+          "tmdb_type": "movie",
+          "title": "미드소마",
+          "year": 2019,
+          "display_order": 11
+        }
+      ]
+    },
+    {
+      "slug": "action-blockbuster",
+      "title": "액션 블록버스터",
+      "category": "genre",
+      "description": "극장에서 반드시 봐야 할 액션 블록버스터 명작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 3,
+      "items": [
+        {
+          "tmdb_id": 562,
+          "tmdb_type": "movie",
+          "title": "다이 하드",
+          "year": 1988,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 280,
+          "tmdb_type": "movie",
+          "title": "터미네이터 2",
+          "year": 1991,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 9260,
+          "tmdb_type": "movie",
+          "title": "트루 라이즈",
+          "year": 1994,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 603,
+          "tmdb_type": "movie",
+          "title": "매트릭스",
+          "year": 1999,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 98,
+          "tmdb_type": "movie",
+          "title": "글래디에이터",
+          "year": 2000,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 155,
+          "tmdb_type": "movie",
+          "title": "다크 나이트",
+          "year": 2008,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 24428,
+          "tmdb_type": "movie",
+          "title": "어벤져스",
+          "year": 2012,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 27205,
+          "tmdb_type": "movie",
+          "title": "인셉션",
+          "year": 2010,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 353081,
+          "tmdb_type": "movie",
+          "title": "미션 임파서블: 폴아웃",
+          "year": 2018,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 299534,
+          "tmdb_type": "movie",
+          "title": "어벤져스: 엔드게임",
+          "year": 2019,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 361743,
+          "tmdb_type": "movie",
+          "title": "탑건: 매버릭",
+          "year": 2022,
+          "display_order": 11
+        }
+      ]
+    },
+    {
+      "slug": "comedy-classics",
+      "title": "코미디 명작",
+      "category": "genre",
+      "description": "한국·해외 코미디 영화 명작 선정",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 4,
+      "items": [
+        {
+          "tmdb_id": 771,
+          "tmdb_type": "movie",
+          "title": "나 홀로 집에",
+          "year": 1990,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 45035,
+          "tmdb_type": "movie",
+          "title": "왕의 남자",
+          "year": 2005,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 18384,
+          "tmdb_type": "movie",
+          "title": "과속스캔들",
+          "year": 2008,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 77117,
+          "tmdb_type": "movie",
+          "title": "써니",
+          "year": 2011,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 158445,
+          "tmdb_type": "movie",
+          "title": "7번방의 선물",
+          "year": 2013,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 293167,
+          "tmdb_type": "movie",
+          "title": "인턴",
+          "year": 2015,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 567646,
+          "tmdb_type": "movie",
+          "title": "극한직업",
+          "year": 2019,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 545611,
+          "tmdb_type": "movie",
+          "title": "에브리씽 에브리웨어 올 앳 원스",
+          "year": 2022,
+          "display_order": 8
+        }
+      ]
+    }
+  ]
+}

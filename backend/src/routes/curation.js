@@ -185,4 +185,110 @@ router.post('/bulk-add', auth, async (req, res) => {
   res.json({ success: true, data: { added, skipped } });
 });
 
+// ─── Phase 7.2: 감독/배우 자유 검색 ────────────────────────────────────────
+
+/**
+ * GET /api/curation/person/search?q={이름}
+ * TMDB 인물 검색 — 이름, 프로필 사진, 대표작 반환
+ */
+router.get('/person/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q?.trim()) {
+    return res.status(400).json({ success: false, message: '검색어를 입력하세요.' });
+  }
+  try {
+    const qs = new URLSearchParams({ query: q.trim(), language: 'ko-KR', api_key: TMDB_KEY });
+    const response = await fetch(`${TMDB_BASE}/search/person?${qs}`);
+    const data = await response.json();
+
+    const results = (data.results || []).slice(0, 8).map(p => ({
+      id: p.id,
+      name: p.name,
+      profile_path: p.profile_path || null,
+      known_for_department: p.known_for_department || '',
+      // 대표작 최대 3편 (제목만)
+      known_for: (p.known_for || []).slice(0, 3).map(w => w.title || w.name).filter(Boolean),
+    }));
+
+    res.json({ success: true, data: results });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * GET /api/curation/person/:tmdbId/works?type=director|actor
+ * 특정 인물의 감독 또는 출연 작품 목록 (인기도순, already_added 마킹)
+ */
+router.get('/person/:tmdbId/works', auth, async (req, res) => {
+  const { tmdbId } = req.params;
+  const { type = 'director' } = req.query;
+
+  try {
+    // TMDB 영화 + TV 크레딧 병렬 조회
+    const [movieRes, tvRes] = await Promise.all([
+      fetch(`${TMDB_BASE}/person/${tmdbId}/movie_credits?api_key=${TMDB_KEY}&language=ko-KR`),
+      fetch(`${TMDB_BASE}/person/${tmdbId}/tv_credits?api_key=${TMDB_KEY}&language=ko-KR`),
+    ]);
+    const [movieData, tvData] = await Promise.all([movieRes.json(), tvRes.json()]);
+
+    let works = [];
+
+    if (type === 'director') {
+      // 감독 작품: crew에서 job=Director 필터
+      const movieDirected = (movieData.crew || []).filter(c => c.job === 'Director');
+      const tvDirected   = (tvData.crew   || []).filter(c => c.job === 'Director');
+      works = [
+        ...movieDirected.map(w => ({ ...w, tmdb_type: 'movie', media_type: 'movie' })),
+        ...tvDirected.map(w   => ({ ...w, tmdb_type: 'tv',    media_type: 'drama' })),
+      ];
+    } else {
+      // 배우 작품: cast 전체 (movie + tv)
+      works = [
+        ...(movieData.cast || []).map(w => ({ ...w, tmdb_type: 'movie', media_type: 'movie' })),
+        ...(tvData.cast    || []).map(w => ({ ...w, tmdb_type: 'tv',    media_type: 'drama' })),
+      ];
+    }
+
+    // 중복 제거 (tmdb_id + tmdb_type 기준)
+    const seen = new Set();
+    works = works.filter(w => {
+      const key = `${w.id}-${w.tmdb_type}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    // 포스터 있는 작품 우선, 그 다음 인기도순
+    works.sort((a, b) => {
+      if (a.poster_path && !b.poster_path) return -1;
+      if (!a.poster_path && b.poster_path) return 1;
+      return (b.popularity || 0) - (a.popularity || 0);
+    });
+
+    works = works.slice(0, 60);
+
+    // 사용자가 이미 추가한 tmdb_id 집합
+    const { rows: added } = await pool.query(
+      'SELECT tmdb_id FROM user_media WHERE user_id = $1 AND tmdb_id > 0',
+      [req.user.id]
+    );
+    const addedSet = new Set(added.map(r => r.tmdb_id));
+
+    const result = works.map(w => ({
+      tmdb_id:       w.id,
+      tmdb_type:     w.tmdb_type,
+      title:         w.title || w.name,
+      year:          parseInt((w.release_date || w.first_air_date || '').slice(0, 4)) || 0,
+      poster_path:   w.poster_path || null,
+      media_type:    w.media_type,
+      already_added: addedSet.has(w.id),
+    }));
+
+    res.json({ success: true, data: result });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

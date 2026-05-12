@@ -1,0 +1,674 @@
+{
+  "lists": [
+    {
+      "slug": "steven-spielberg",
+      "title": "스티븐 스필버그 감독 작품",
+      "category": "director",
+      "description": "할리우드 최고의 흥행·예술 감독 스필버그 주요 필모그래피",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 3,
+      "items": [
+        {
+          "tmdb_id": 578,
+          "tmdb_type": "movie",
+          "title": "죠스",
+          "year": 1975,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 85,
+          "tmdb_type": "movie",
+          "title": "레이더스",
+          "year": 1981,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 601,
+          "tmdb_type": "movie",
+          "title": "E.T.",
+          "year": 1982,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 89,
+          "tmdb_type": "movie",
+          "title": "인디아나 존스: 최후의 성전",
+          "year": 1989,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 329,
+          "tmdb_type": "movie",
+          "title": "쥬라기 공원",
+          "year": 1993,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 424,
+          "tmdb_type": "movie",
+          "title": "쉰들러 리스트",
+          "year": 1993,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 857,
+          "tmdb_type": "movie",
+          "title": "라이언 일병 구하기",
+          "year": 1998,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 5765,
+          "tmdb_type": "movie",
+          "title": "캐치 미 이프 유 캔",
+          "year": 2002,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 9522,
+          "tmdb_type": "movie",
+          "title": "뮌헨",
+          "year": 2005,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 96721,
+          "tmdb_type": "movie",
+          "title": "링컨",
+          "year": 2012,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 333339,
+          "tmdb_type": "movie",
+          "title": "레디 플레이어 원",
+          "year": 2018,
+          "display_order": 11
+        }
+      ]
+    },
+    {
+      "slug": "martin-scorsese",
+      "title": "마틴 스코세이지 감독 작품",
+      "category": "director",
+      "description": "미국 영화의 거장 마틴 스코세이지 주요 필모그래피",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 4,
+      "items": [
+        {
+          "tmdb_id": 103,
+          "tmdb_type": "movie",
+          "title": "택시 드라이버",
+          "year": 1976,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 1373,
+          "tmdb_type": "movie",
+          "title": "성난 황소",
+          "year": 1980,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 769,
+          "tmdb_type": "movie",
+          "title": "좋은 친구들",
+          "year": 1990,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 524,
+          "tmdb_type": "movie",
+          "title": "카지노",
+          "year": 1995,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 11324,
+          "tmdb_type": "movie",
+          "title": "셔터 아일랜드",
+          "year": 2010,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 83666,
+          "tmdb_type": "movie",
+          "title": "휴고",
+          "year": 2011,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 106646,
+          "tmdb_type": "movie",
+          "title": "더 울프 오브 월 스트리트",
+          "year": 2013,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 398978,
+          "tmdb_type": "movie",
+          "title": "아이리쉬맨",
+          "year": 2019,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 466420,
+          "tmdb_type": "movie",
+          "title": "킬러스 오브 더 플라워 문",
+          "year": 2023,
+          "display_order": 9
+        }
+      ]
+    },
+    {
+      "slug": "quentin-tarantino",
+      "title": "쿠엔틴 타란티노 감독 작품",
+      "category": "director",
+      "description": "팝 컬처·폭력 미학의 대가 타란티노 전 필모그래피",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 5,
+      "items": [
+        {
+          "tmdb_id": 500,
+          "tmdb_type": "movie",
+          "title": "저수지의 개들",
+          "year": 1992,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 680,
+          "tmdb_type": "movie",
+          "title": "펄프 픽션",
+          "year": 1994,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 2397,
+          "tmdb_type": "movie",
+          "title": "재키 브라운",
+          "year": 1997,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 24,
+          "tmdb_type": "movie",
+          "title": "킬 빌 1",
+          "year": 2003,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 393,
+          "tmdb_type": "movie",
+          "title": "킬 빌 2",
+          "year": 2004,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 16869,
+          "tmdb_type": "movie",
+          "title": "바스터즈: 거친 녀석들",
+          "year": 2009,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 68718,
+          "tmdb_type": "movie",
+          "title": "장고: 분노의 추적자",
+          "year": 2012,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 273248,
+          "tmdb_type": "movie",
+          "title": "헤이트풀 8",
+          "year": 2015,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 466272,
+          "tmdb_type": "movie",
+          "title": "원스 어폰 어 타임 인 할리우드",
+          "year": 2019,
+          "display_order": 9
+        }
+      ]
+    },
+    {
+      "slug": "coen-brothers",
+      "title": "코엔 형제 감독 작품",
+      "category": "director",
+      "description": "조엘·에단 코엔 감독 주요 필모그래피",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 6,
+      "items": [
+        {
+          "tmdb_id": 275,
+          "tmdb_type": "movie",
+          "title": "파고",
+          "year": 1996,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 115,
+          "tmdb_type": "movie",
+          "title": "위대한 레보스키",
+          "year": 1998,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 16154,
+          "tmdb_type": "movie",
+          "title": "오 형제여 어디 있는가?",
+          "year": 2000,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 6977,
+          "tmdb_type": "movie",
+          "title": "노인을 위한 나라는 없다",
+          "year": 2007,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 12618,
+          "tmdb_type": "movie",
+          "title": "번 애프터 리딩",
+          "year": 2008,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 45243,
+          "tmdb_type": "movie",
+          "title": "트루 그릿",
+          "year": 2010,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 142012,
+          "tmdb_type": "movie",
+          "title": "인사이드 르윈 데이비스",
+          "year": 2013,
+          "display_order": 7
+        }
+      ]
+    },
+    {
+      "slug": "david-fincher",
+      "title": "데이비드 핀처 감독 작품",
+      "category": "director",
+      "description": "어둠과 긴장감의 거장 데이비드 핀처 전 작품",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 7,
+      "items": [
+        {
+          "tmdb_id": 807,
+          "tmdb_type": "movie",
+          "title": "세븐",
+          "year": 1995,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 550,
+          "tmdb_type": "movie",
+          "title": "파이트 클럽",
+          "year": 1999,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 10918,
+          "tmdb_type": "movie",
+          "title": "조디악",
+          "year": 2007,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 37799,
+          "tmdb_type": "movie",
+          "title": "소셜 네트워크",
+          "year": 2010,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 65754,
+          "tmdb_type": "movie",
+          "title": "밀레니엄: 여자를 증오한 남자들",
+          "year": 2011,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 210577,
+          "tmdb_type": "movie",
+          "title": "나를 찾아줘",
+          "year": 2014,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 694919,
+          "tmdb_type": "movie",
+          "title": "맨크",
+          "year": 2020,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 938008,
+          "tmdb_type": "movie",
+          "title": "더 킬러",
+          "year": 2023,
+          "display_order": 8
+        }
+      ]
+    },
+    {
+      "slug": "ridley-scott",
+      "title": "리들리 스콧 감독 작품",
+      "category": "director",
+      "description": "에일리언·블레이드 러너·글래디에이터 리들리 스콧 주요 작품",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 8,
+      "items": [
+        {
+          "tmdb_id": 348,
+          "tmdb_type": "movie",
+          "title": "에일리언",
+          "year": 1979,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 78,
+          "tmdb_type": "movie",
+          "title": "블레이드 러너",
+          "year": 1982,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 98,
+          "tmdb_type": "movie",
+          "title": "글래디에이터",
+          "year": 2000,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 1007,
+          "tmdb_type": "movie",
+          "title": "블랙 호크 다운",
+          "year": 2001,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 1542,
+          "tmdb_type": "movie",
+          "title": "킹덤 오브 헤븐",
+          "year": 2005,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 286217,
+          "tmdb_type": "movie",
+          "title": "마션",
+          "year": 2015,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 522437,
+          "tmdb_type": "movie",
+          "title": "라스트 듀얼",
+          "year": 2021,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 753342,
+          "tmdb_type": "movie",
+          "title": "나폴레옹",
+          "year": 2023,
+          "display_order": 8
+        }
+      ]
+    },
+    {
+      "slug": "damien-chazelle",
+      "title": "데이미언 셔젤 감독 작품",
+      "category": "director",
+      "description": "라라랜드·위플래쉬 데이미언 셔젤 전 작품",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 9,
+      "items": [
+        {
+          "tmdb_id": 244786,
+          "tmdb_type": "movie",
+          "title": "위플래쉬",
+          "year": 2014,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 313369,
+          "tmdb_type": "movie",
+          "title": "라라랜드",
+          "year": 2016,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 399379,
+          "tmdb_type": "movie",
+          "title": "퍼스트 맨",
+          "year": 2018,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 615904,
+          "tmdb_type": "movie",
+          "title": "바빌론",
+          "year": 2022,
+          "display_order": 4
+        }
+      ]
+    },
+    {
+      "slug": "wes-anderson",
+      "title": "웨스 앤더슨 감독 작품",
+      "category": "director",
+      "description": "독특한 색감과 대칭 구도의 웨스 앤더슨 주요 필모그래피",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 10,
+      "items": [
+        {
+          "tmdb_id": 9587,
+          "tmdb_type": "movie",
+          "title": "로열 테넌바움",
+          "year": 2001,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 14,
+          "tmdb_type": "movie",
+          "title": "스티브 지소와의 해저생활",
+          "year": 2004,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 11328,
+          "tmdb_type": "movie",
+          "title": "다즐링 주식회사",
+          "year": 2007,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 10090,
+          "tmdb_type": "movie",
+          "title": "판타스틱 Mr. 폭스",
+          "year": 2009,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 72279,
+          "tmdb_type": "movie",
+          "title": "문라이즈 킹덤",
+          "year": 2012,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 120467,
+          "tmdb_type": "movie",
+          "title": "그랜드 부다페스트 호텔",
+          "year": 2014,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 399174,
+          "tmdb_type": "movie",
+          "title": "개들의 섬",
+          "year": 2018,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 542178,
+          "tmdb_type": "movie",
+          "title": "더 프렌치 디스패치",
+          "year": 2021,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 0,
+          "tmdb_type": "movie",
+          "title": "애스테로이드 시티",
+          "year": 2023,
+          "display_order": 9
+        }
+      ]
+    },
+    {
+      "slug": "james-cameron",
+      "title": "제임스 카메론 감독 작품",
+      "category": "director",
+      "description": "터미네이터·타이타닉·아바타의 제임스 카메론 전 작품",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 11,
+      "items": [
+        {
+          "tmdb_id": 218,
+          "tmdb_type": "movie",
+          "title": "터미네이터",
+          "year": 1984,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 679,
+          "tmdb_type": "movie",
+          "title": "에일리언 2",
+          "year": 1986,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 280,
+          "tmdb_type": "movie",
+          "title": "터미네이터 2",
+          "year": 1991,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 9260,
+          "tmdb_type": "movie",
+          "title": "트루 라이즈",
+          "year": 1994,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 597,
+          "tmdb_type": "movie",
+          "title": "타이타닉",
+          "year": 1997,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 19995,
+          "tmdb_type": "movie",
+          "title": "아바타",
+          "year": 2009,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 76600,
+          "tmdb_type": "movie",
+          "title": "아바타: 물의 길",
+          "year": 2022,
+          "display_order": 7
+        }
+      ]
+    },
+    {
+      "slug": "peter-jackson",
+      "title": "피터 잭슨 감독 작품",
+      "category": "director",
+      "description": "반지의 제왕·호빗의 피터 잭슨 주요 필모그래피",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 12,
+      "items": [
+        {
+          "tmdb_id": 0,
+          "tmdb_type": "movie",
+          "title": "천국의 피조물",
+          "year": 1994,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 120,
+          "tmdb_type": "movie",
+          "title": "반지의 제왕: 반지 원정대",
+          "year": 2001,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 121,
+          "tmdb_type": "movie",
+          "title": "반지의 제왕: 두 개의 탑",
+          "year": 2002,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 122,
+          "tmdb_type": "movie",
+          "title": "반지의 제왕: 왕의 귀환",
+          "year": 2003,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 9603,
+          "tmdb_type": "movie",
+          "title": "킹콩",
+          "year": 2005,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 49051,
+          "tmdb_type": "movie",
+          "title": "호빗: 뜻밖의 여정",
+          "year": 2012,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 57158,
+          "tmdb_type": "movie",
+          "title": "호빗: 스마우그의 폐허",
+          "year": 2013,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 122917,
+          "tmdb_type": "movie",
+          "title": "호빗: 다섯 군대 전투",
+          "year": 2014,
+          "display_order": 8
+        }
+      ]
+    }
+  ]
+}
