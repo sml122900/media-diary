@@ -227,6 +227,45 @@
 
 ---
 
+### 소재 18 — 큐레이션 2단계 계층 UX (DB 컬럼 추가 없이 계층 분류)
+
+**Problem (상황/문제)**
+> 큐레이션 리스트가 12개에서 50개로 늘어나면서 flat 목록으로는 원하는 리스트를 찾기 어려워졌다. DB에 계층 컬럼을 추가하면 기존 시드 데이터와 마이그레이션 부담이 발생했다.
+
+**Action (내가 한 것)**
+> DB 변경 없이 프론트엔드에서 `SUPER_GROUPS` 상수를 정의하고, 각 서브그룹의 filter 함수가 기존 `category + region + media_type` 3개 필드 조합으로 리스트를 분류하도록 설계했다. 2단계 아코디언으로 최상위(영화/드라마/애니)를 열면 서브그룹(한국감독/해외감독/장르별 등)이 펼쳐지는 구조를 구현했다. 이 과정에서 `baeksang-drama-winners`가 kr-drama와 awards-drama 양쪽에 중복 표시되는 버그를 발견해 filter 조건에 `&& l.category !== 'awards'`를 추가해 수정했다.
+
+**Result (결과)**
+> DB 마이그레이션 없이 50개 리스트를 3개 최상위 + 8개 서브그룹으로 정리했다. 필터 검색바와 결합해 원하는 리스트를 빠르게 찾을 수 있다.
+
+---
+
+### 소재 19 — TMDB 인물 검색 기반 작품 탐색 (Promise.all 병렬 처리)
+
+**Problem (상황/문제)**
+> 고정된 큐레이션 외 "이 감독 작품 다 봤나?", "이 배우 출연작 뭐가 있나?" 같은 수요를 충족할 방법이 없었다. 감독 credits와 배우 credits는 TMDB의 별개 엔드포인트에서 제공된다.
+
+**Action (내가 한 것)**
+> `/person/:tmdbId/works?type=director|actor` 엔드포인트를 설계하고, `Promise.all([movieCredits, tvCredits])`로 영화/TV 크레딧을 병렬 조회했다. 감독은 crew에서 job: 'Director', 배우는 cast 필터링으로 분리했다. 포스터 있는 작품 우선 정렬, already_added 마킹, tmdb_id 기준 중복 제거를 포함했다. Express에서 `/person/search`가 `/person/:tmdbId`로 오인되는 라우트 충돌을 리터럴 경로 우선 등록으로 해결했다.
+
+**Result (결과)**
+> 봉준호 검색 → 19개 감독 작품, 송강호 검색 → 49개 출연작이 already_added 상태와 함께 즉시 표시된다. 300ms 디바운스 PersonSearch 컴포넌트로 타이핑 중 실시간 인물 드롭다운이 나타난다.
+
+---
+
+### 소재 20 — 50개 리스트 / 573개 아이템 데이터 감사 프로세스
+
+**Problem (상황/문제)**
+> Phase 7 구현 후 DB에 50개 리스트 / 573개 아이템이 존재하지만, TMDB ID가 0으로 잘못 저장된 항목이 있으면 포스터도 없고 bulk-add도 의미 없는 "빈 껍데기" 데이터가 된다.
+
+**Action (내가 한 것)**
+> Node.js DB 쿼리로 리스트 수, 아이템 수, tmdb_id = 0 항목, 포스터 NULL 항목을 체계적으로 집계했다. 미매칭 5개를 식별하고 TMDB API를 직접 호출해 올바른 ID를 확인한 뒤 DB UPDATE + JSON 파일 수정을 동시에 진행했다. (Somewhere=39210, Asteroid City=747188, Heavenly Creatures=1024, Right Now Wrong Then=354275, Sacro GRA=216790)
+
+**Result (결과)**
+> TMDB 미매칭 5개 → 0개. 포스터 없는 18개는 TMDB 원본이 없는 정상 케이스로 확인했다. DB와 JSON 소스 파일이 동기화된 상태로 유지돼 재시딩 시에도 동일한 결과를 보장한다.
+
+---
+
 ## 키워드 뱅크 (기술 스택 & 성과 표현)
 
 - React, Vite, Zustand, React Router
@@ -272,3 +311,12 @@
 - Letterboxd CSV 내장 파서 (따옴표 필드, 헤더 인덱스, Rating 변환)
 - life_period 메타데이터 설계 (COALESCE 부분 업데이트, 자유 텍스트)
 - 시청 시기 그룹 통계 (GROUP BY + json_agg, 가로 포스터 스크롤)
+- 2단계 아코디언 UX (SUPER_GROUPS 계층 정의, filter 함수 기반 분류)
+- category+region+media_type 3-key 계층 분류 (DB 컬럼 추가 없음)
+- TMDB person credits (movie_credits + tv_credits, Promise.all 병렬)
+- 감독/배우 크레딧 필터링 (crew job:'Director' vs cast)
+- Express 라우트 순서 (리터럴 경로 우선 등록으로 충돌 방지)
+- 시드 데이터 감사 (tmdb_id=0 항목 식별, DB + JSON 동기화)
+- 데이터 파이프라인 멱등성 (ON CONFLICT UPDATE, fill → seed 재실행 가능)
+- 300ms 디바운스 인물 검색 (PersonSearch, 프로필 드롭다운)
+- 큐레이션 필터 검색바 (리스트 이름 실시간 필터링)
