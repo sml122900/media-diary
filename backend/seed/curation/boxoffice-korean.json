@@ -1,0 +1,225 @@
+{
+  "lists": [
+    {
+      "slug": "korean-boxoffice-top30",
+      "title": "한국 박스오피스 역대 TOP 30",
+      "category": "boxoffice",
+      "description": "영화진흥위원회(KOFIC) 기준 역대 한국 박스오피스 TOP 30 (관객 수 기준)",
+      "region": "kr",
+      "media_type": "movie",
+      "display_order": 1,
+      "items": [
+        {
+          "tmdb_id": 282631,
+          "tmdb_type": "movie",
+          "title": "명량",
+          "year": 2014,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 567646,
+          "tmdb_type": "movie",
+          "title": "극한직업",
+          "year": 2019,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 397567,
+          "tmdb_type": "movie",
+          "title": "신과함께-죄와 벌",
+          "year": 2017,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 313108,
+          "tmdb_type": "movie",
+          "title": "국제시장",
+          "year": 2014,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 299534,
+          "tmdb_type": "movie",
+          "title": "어벤져스: 엔드게임",
+          "year": 2019,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 330457,
+          "tmdb_type": "movie",
+          "title": "겨울왕국 2",
+          "year": 2019,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 346646,
+          "tmdb_type": "movie",
+          "title": "베테랑",
+          "year": 2015,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 19995,
+          "tmdb_type": "movie",
+          "title": "아바타",
+          "year": 2009,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 124157,
+          "tmdb_type": "movie",
+          "title": "도둑들",
+          "year": 2012,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 4955,
+          "tmdb_type": "movie",
+          "title": "괴물",
+          "year": 2006,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 158445,
+          "tmdb_type": "movie",
+          "title": "7번방의 선물",
+          "year": 2013,
+          "display_order": 11
+        },
+        {
+          "tmdb_id": 291549,
+          "tmdb_type": "movie",
+          "title": "암살",
+          "year": 2015,
+          "display_order": 12
+        },
+        {
+          "tmdb_id": 619803,
+          "tmdb_type": "movie",
+          "title": "범죄도시 2",
+          "year": 2022,
+          "display_order": 13
+        },
+        {
+          "tmdb_id": 133200,
+          "tmdb_type": "movie",
+          "title": "광해, 왕이 된 남자",
+          "year": 2012,
+          "display_order": 14
+        },
+        {
+          "tmdb_id": 45035,
+          "tmdb_type": "movie",
+          "title": "왕의 남자",
+          "year": 2005,
+          "display_order": 15
+        },
+        {
+          "tmdb_id": 518068,
+          "tmdb_type": "movie",
+          "title": "신과함께-인과 연",
+          "year": 2018,
+          "display_order": 16
+        },
+        {
+          "tmdb_id": 420817,
+          "tmdb_type": "movie",
+          "title": "알라딘",
+          "year": 2019,
+          "display_order": 17
+        },
+        {
+          "tmdb_id": 242452,
+          "tmdb_type": "movie",
+          "title": "변호인",
+          "year": 2013,
+          "display_order": 18
+        },
+        {
+          "tmdb_id": 955555,
+          "tmdb_type": "movie",
+          "title": "범죄도시 3",
+          "year": 2023,
+          "display_order": 19
+        },
+        {
+          "tmdb_id": 1017163,
+          "tmdb_type": "movie",
+          "title": "범죄도시 4",
+          "year": 2024,
+          "display_order": 20
+        },
+        {
+          "tmdb_id": 76600,
+          "tmdb_type": "movie",
+          "title": "아바타: 물의 길",
+          "year": 2022,
+          "display_order": 21
+        },
+        {
+          "tmdb_id": 396535,
+          "tmdb_type": "movie",
+          "title": "부산행",
+          "year": 2016,
+          "display_order": 22
+        },
+        {
+          "tmdb_id": 11658,
+          "tmdb_type": "movie",
+          "title": "태극기 휘날리며",
+          "year": 2004,
+          "display_order": 23
+        },
+        {
+          "tmdb_id": 157336,
+          "tmdb_type": "movie",
+          "title": "인터스텔라",
+          "year": 2014,
+          "display_order": 24
+        },
+        {
+          "tmdb_id": 33196,
+          "tmdb_type": "movie",
+          "title": "해운대",
+          "year": 2009,
+          "display_order": 25
+        },
+        {
+          "tmdb_id": 496243,
+          "tmdb_type": "movie",
+          "title": "기생충",
+          "year": 2019,
+          "display_order": 26
+        },
+        {
+          "tmdb_id": 572164,
+          "tmdb_type": "movie",
+          "title": "엑시트",
+          "year": 2019,
+          "display_order": 27
+        },
+        {
+          "tmdb_id": 634649,
+          "tmdb_type": "movie",
+          "title": "스파이더맨: 노 웨이 홈",
+          "year": 2021,
+          "display_order": 28
+        },
+        {
+          "tmdb_id": 361743,
+          "tmdb_type": "movie",
+          "title": "탑건: 매버릭",
+          "year": 2022,
+          "display_order": 29
+        },
+        {
+          "tmdb_id": 479718,
+          "tmdb_type": "movie",
+          "title": "범죄도시",
+          "year": 2017,
+          "display_order": 30
+        }
+      ]
+    }
+  ]
+}

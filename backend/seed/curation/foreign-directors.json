@@ -1,0 +1,27 @@
+{
+  "lists": [
+    {
+      "slug": "christopher-nolan",
+      "title": "크리스토퍼 놀란 감독 작품",
+      "category": "director",
+      "description": "아카데미 감독상 수상 크리스토퍼 놀란 전 필모그래피",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 1,
+      "items": [
+        { "tmdb_id": 11677,  "tmdb_type": "movie", "title": "팔로잉",                      "year": 1998, "display_order": 1  },
+        { "tmdb_id": 77,     "tmdb_type": "movie", "title": "메멘토",                      "year": 2000, "display_order": 2  },
+        { "tmdb_id": 6972,   "tmdb_type": "movie", "title": "인썸니아",                    "year": 2002, "display_order": 3  },
+        { "tmdb_id": 272,    "tmdb_type": "movie", "title": "배트맨 비긴즈",               "year": 2005, "display_order": 4  },
+        { "tmdb_id": 1267,   "tmdb_type": "movie", "title": "프레스티지",                  "year": 2006, "display_order": 5  },
+        { "tmdb_id": 155,    "tmdb_type": "movie", "title": "다크 나이트",                 "year": 2008, "display_order": 6  },
+        { "tmdb_id": 27205,  "tmdb_type": "movie", "title": "인셉션",                      "year": 2010, "display_order": 7  },
+        { "tmdb_id": 49026,  "tmdb_type": "movie", "title": "다크 나이트 라이즈",           "year": 2012, "display_order": 8  },
+        { "tmdb_id": 157336, "tmdb_type": "movie", "title": "인터스텔라",                  "year": 2014, "display_order": 9  },
+        { "tmdb_id": 374720, "tmdb_type": "movie", "title": "덩케르크",                    "year": 2017, "display_order": 10 },
+        { "tmdb_id": 577922, "tmdb_type": "movie", "title": "테넷",                        "year": 2020, "display_order": 11 },
+        { "tmdb_id": 872585, "tmdb_type": "movie", "title": "오펜하이머",                  "year": 2023, "display_order": 12 }
+      ]
+    }
+  ]
+}

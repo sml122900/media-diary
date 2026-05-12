@@ -20,6 +20,8 @@ import ComparePage from './pages/ComparePage';
 import WatchlistsPage from './pages/WatchlistsPage';
 import YearInReviewPage from './pages/YearInReviewPage';
 import WishlistPage from './pages/WishlistPage';
+import RestorePage from './pages/RestorePage';
+import CurationListPage from './pages/CurationListPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -125,6 +127,22 @@ function App() {
           element={
             <PrivateRoute>
               <YearInReviewPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/restore"
+          element={
+            <PrivateRoute>
+              <RestorePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/restore/:slug"
+          element={
+            <PrivateRoute>
+              <CurationListPage />
             </PrivateRoute>
           }
         />

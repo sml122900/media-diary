@@ -1,0 +1,278 @@
+{
+  "lists": [
+    {
+      "slug": "korean-drama-ratings-top",
+      "title": "한국 드라마 역대 시청률 TOP",
+      "category": "drama",
+      "description": "공중파·케이블·OTT 통합 한국 역대 화제 드라마 (시청률 및 OTT 화제성 기준)",
+      "region": "kr",
+      "media_type": "drama",
+      "display_order": 1,
+      "items": [
+        {
+          "tmdb_id": 71168,
+          "tmdb_type": "tv",
+          "title": "사랑이 뭐길래",
+          "year": 1991,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 14527,
+          "tmdb_type": "tv",
+          "title": "모래시계",
+          "year": 1995,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 36842,
+          "tmdb_type": "tv",
+          "title": "첫사랑",
+          "year": 1996,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 5717,
+          "tmdb_type": "tv",
+          "title": "허준",
+          "year": 1999,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 12539,
+          "tmdb_type": "tv",
+          "title": "겨울연가",
+          "year": 2002,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 92669,
+          "tmdb_type": "tv",
+          "title": "야인시대",
+          "year": 2002,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 333,
+          "tmdb_type": "tv",
+          "title": "대장금",
+          "year": 2003,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 5381,
+          "tmdb_type": "tv",
+          "title": "내 이름은 김삼순",
+          "year": 2005,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 4734,
+          "tmdb_type": "tv",
+          "title": "주몽",
+          "year": 2006,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 66423,
+          "tmdb_type": "tv",
+          "title": "응답하라 1988",
+          "year": 2015,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 67375,
+          "tmdb_type": "tv",
+          "title": "태양의 후예",
+          "year": 2016,
+          "display_order": 11
+        },
+        {
+          "tmdb_id": 70483,
+          "tmdb_type": "tv",
+          "title": "도깨비",
+          "year": 2016,
+          "display_order": 12
+        },
+        {
+          "tmdb_id": 84327,
+          "tmdb_type": "tv",
+          "title": "스카이캐슬",
+          "year": 2018,
+          "display_order": 13
+        },
+        {
+          "tmdb_id": 76662,
+          "tmdb_type": "tv",
+          "title": "나의 아저씨",
+          "year": 2018,
+          "display_order": 14
+        },
+        {
+          "tmdb_id": 94796,
+          "tmdb_type": "tv",
+          "title": "사랑의 불시착",
+          "year": 2019,
+          "display_order": 15
+        },
+        {
+          "tmdb_id": 100088,
+          "tmdb_type": "tv",
+          "title": "이태원 클라쓰",
+          "year": 2020,
+          "display_order": 16
+        },
+        {
+          "tmdb_id": 93405,
+          "tmdb_type": "tv",
+          "title": "오징어 게임",
+          "year": 2021,
+          "display_order": 17
+        },
+        {
+          "tmdb_id": 120936,
+          "tmdb_type": "tv",
+          "title": "빈센조",
+          "year": 2021,
+          "display_order": 18
+        },
+        {
+          "tmdb_id": 128883,
+          "tmdb_type": "tv",
+          "title": "갯마을 차차차",
+          "year": 2021,
+          "display_order": 19
+        },
+        {
+          "tmdb_id": 197067,
+          "tmdb_type": "tv",
+          "title": "이상한 변호사 우영우",
+          "year": 2022,
+          "display_order": 20
+        },
+        {
+          "tmdb_id": 153496,
+          "tmdb_type": "tv",
+          "title": "재벌집 막내아들",
+          "year": 2022,
+          "display_order": 21
+        },
+        {
+          "tmdb_id": 136283,
+          "tmdb_type": "tv",
+          "title": "더 글로리",
+          "year": 2022,
+          "display_order": 22
+        },
+        {
+          "tmdb_id": 199521,
+          "tmdb_type": "tv",
+          "title": "무빙",
+          "year": 2023,
+          "display_order": 23
+        },
+        {
+          "tmdb_id": 230923,
+          "tmdb_type": "tv",
+          "title": "선재 업고 튀어",
+          "year": 2024,
+          "display_order": 24
+        },
+        {
+          "tmdb_id": 215720,
+          "tmdb_type": "tv",
+          "title": "눈물의 여왕",
+          "year": 2024,
+          "display_order": 25
+        }
+      ]
+    },
+    {
+      "slug": "baeksang-drama-winners",
+      "title": "백상예술대상 드라마 수상작",
+      "category": "awards",
+      "description": "백상예술대상 TV 부문 대상·최우수작품상 수상작 (최근 10년)",
+      "region": "kr",
+      "media_type": "drama",
+      "display_order": 2,
+      "items": [
+        {
+          "tmdb_id": 61678,
+          "tmdb_type": "tv",
+          "title": "미생",
+          "year": 2014,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 66423,
+          "tmdb_type": "tv",
+          "title": "응답하라 1988",
+          "year": 2015,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 67375,
+          "tmdb_type": "tv",
+          "title": "태양의 후예",
+          "year": 2016,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 70626,
+          "tmdb_type": "tv",
+          "title": "비밀의 숲",
+          "year": 2017,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 76662,
+          "tmdb_type": "tv",
+          "title": "나의 아저씨",
+          "year": 2018,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 84327,
+          "tmdb_type": "tv",
+          "title": "스카이캐슬",
+          "year": 2018,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 94796,
+          "tmdb_type": "tv",
+          "title": "사랑의 불시착",
+          "year": 2019,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 93405,
+          "tmdb_type": "tv",
+          "title": "오징어 게임",
+          "year": 2021,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 197067,
+          "tmdb_type": "tv",
+          "title": "이상한 변호사 우영우",
+          "year": 2022,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 136283,
+          "tmdb_type": "tv",
+          "title": "더 글로리",
+          "year": 2022,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 215720,
+          "tmdb_type": "tv",
+          "title": "눈물의 여왕",
+          "year": 2024,
+          "display_order": 11
+        }
+      ]
+    }
+  ]
+}

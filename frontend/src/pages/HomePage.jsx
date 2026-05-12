@@ -288,6 +288,8 @@ export default function HomePage() {
                 <Link to="/wishlist" className="menu-item" onClick={closeMenu}>나중에 보기</Link>
                 <Link to="/watchlists" className="menu-item" onClick={closeMenu}>같이보기</Link>
                 <Link to="/lists" className="menu-item" onClick={closeMenu}>리스트</Link>
+                {/* 과거 기록 복원 (Phase 6.1) */}
+                <Link to="/restore" className="menu-item" onClick={closeMenu}>📚 과거 기록 복원</Link>
 
                 <div className="menu-divider" />
 

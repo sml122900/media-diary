@@ -1,0 +1,183 @@
+{
+  "lists": [
+    {
+      "slug": "anime-classics-adult",
+      "title": "일본 애니메이션 명작 (성인)",
+      "category": "anime",
+      "description": "성인 취향의 일본 극장 애니메이션 명작 선정 (SF·드라마·예술성)",
+      "region": "global",
+      "media_type": "anime",
+      "display_order": 1,
+      "items": [
+        {
+          "tmdb_id": 149,
+          "tmdb_type": "movie",
+          "title": "아키라",
+          "year": 1988,
+          "display_order": 1
+        },
+        {
+          "tmdb_id": 2108,
+          "tmdb_type": "movie",
+          "title": "공각기동대",
+          "year": 1995,
+          "display_order": 2
+        },
+        {
+          "tmdb_id": 18491,
+          "tmdb_type": "movie",
+          "title": "신세기 에반게리온 극장판: Air/진심을 너에게",
+          "year": 1997,
+          "display_order": 3
+        },
+        {
+          "tmdb_id": 10437,
+          "tmdb_type": "movie",
+          "title": "퍼펙트 블루",
+          "year": 1997,
+          "display_order": 4
+        },
+        {
+          "tmdb_id": 21629,
+          "tmdb_type": "movie",
+          "title": "천년여배우",
+          "year": 2001,
+          "display_order": 5
+        },
+        {
+          "tmdb_id": 10492,
+          "tmdb_type": "movie",
+          "title": "구름의 저편, 약속의 장소",
+          "year": 2004,
+          "display_order": 6
+        },
+        {
+          "tmdb_id": 14367,
+          "tmdb_type": "movie",
+          "title": "파프리카",
+          "year": 2006,
+          "display_order": 7
+        },
+        {
+          "tmdb_id": 17445,
+          "tmdb_type": "movie",
+          "title": "초속 5센티미터",
+          "year": 2007,
+          "display_order": 8
+        },
+        {
+          "tmdb_id": 22213,
+          "tmdb_type": "movie",
+          "title": "썸머 워즈",
+          "year": 2009,
+          "display_order": 9
+        },
+        {
+          "tmdb_id": 97020,
+          "tmdb_type": "movie",
+          "title": "늑대아이",
+          "year": 2012,
+          "display_order": 10
+        },
+        {
+          "tmdb_id": 169934,
+          "tmdb_type": "movie",
+          "title": "언어의 정원",
+          "year": 2013,
+          "display_order": 11
+        },
+        {
+          "tmdb_id": 212162,
+          "tmdb_type": "movie",
+          "title": "마법소녀 마도카☆마기카 [신편] 반역의 이야기",
+          "year": 2013,
+          "display_order": 12
+        },
+        {
+          "tmdb_id": 372058,
+          "tmdb_type": "movie",
+          "title": "너의 이름은.",
+          "year": 2016,
+          "display_order": 13
+        },
+        {
+          "tmdb_id": 378064,
+          "tmdb_type": "movie",
+          "title": "목소리의 형태",
+          "year": 2016,
+          "display_order": 14
+        },
+        {
+          "tmdb_id": 399106,
+          "tmdb_type": "movie",
+          "title": "이 세상의 한 구석에",
+          "year": 2016,
+          "display_order": 15
+        },
+        {
+          "tmdb_id": 364111,
+          "tmdb_type": "movie",
+          "title": "마음이 외치고 싶어해",
+          "year": 2015,
+          "display_order": 16
+        },
+        {
+          "tmdb_id": 547016,
+          "tmdb_type": "movie",
+          "title": "프로메아",
+          "year": 2019,
+          "display_order": 17
+        },
+        {
+          "tmdb_id": 571362,
+          "tmdb_type": "movie",
+          "title": "날씨의 아이",
+          "year": 2019,
+          "display_order": 18
+        },
+        {
+          "tmdb_id": 283566,
+          "tmdb_type": "movie",
+          "title": "에반게리온: 3.0+1.01 Thrice Upon a Time",
+          "year": 2021,
+          "display_order": 19
+        },
+        {
+          "tmdb_id": 672886,
+          "tmdb_type": "movie",
+          "title": "용과 주근깨 공주",
+          "year": 2021,
+          "display_order": 20
+        },
+        {
+          "tmdb_id": 805984,
+          "tmdb_type": "movie",
+          "title": "극장판 주술회전 0",
+          "year": 2021,
+          "display_order": 21
+        },
+        {
+          "tmdb_id": 985939,
+          "tmdb_type": "movie",
+          "title": "더 퍼스트 슬램덩크",
+          "year": 2022,
+          "display_order": 22
+        },
+        {
+          "tmdb_id": 916224,
+          "tmdb_type": "movie",
+          "title": "스즈메의 문단속",
+          "year": 2022,
+          "display_order": 23
+        },
+        {
+          "tmdb_id": 635302,
+          "tmdb_type": "movie",
+          "title": "극장판 귀멸의 칼날: 무한열차편",
+          "year": 2020,
+          "display_order": 24
+        }
+      ]
+    }
+  ]
+}
