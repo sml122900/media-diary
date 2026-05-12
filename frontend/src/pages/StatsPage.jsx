@@ -125,11 +125,18 @@ export default function StatsPage() {
   const [loading, setLoading] = useState(true);
   const [watchStats, setWatchStats] = useState(null);
   const [statsPeriod, setStatsPeriod] = useState('year');
+  // 시청 시기 태그 그룹 (Phase 6.5.1)
+  const [lifePeriods, setLifePeriods] = useState([]);
 
   useEffect(() => {
     fetchUserMedia()
       .then(data => { setItems(data); setLoading(false); })
       .catch(() => setLoading(false));
+    // 시청 시기 그룹 로드
+    const token = localStorage.getItem('token');
+    fetch(`${import.meta.env.VITE_API_URL}/api/me/life-periods`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(r => r.json()).then(json => { if (json.success) setLifePeriods(json.data); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -318,6 +325,46 @@ export default function StatsPage() {
           <div className="chart-title">감상 활동 (최근 52주)</div>
           <ActivityCalendar items={items} />
         </div>
+
+        {/* 그 시절 — 시청 시기별 그룹 (Phase 6.5.1) */}
+        {lifePeriods.length > 0 && (
+          <div className="chart-card chart-card-wide">
+            <div className="chart-title">그 시절 🕰️</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {lifePeriods.map(group => (
+                <div key={group.life_period}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>
+                    {group.life_period}
+                    <span style={{ fontSize: 12, fontWeight: 400, color: '#888', marginLeft: 6 }}>
+                      {group.count}편
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+                    {(group.works || []).slice(0, 10).map(w => (
+                      <div key={w.id} style={{ flexShrink: 0, width: 60 }}>
+                        <div style={{ width: 60, height: 90, borderRadius: 6, overflow: 'hidden',
+                          background: w.poster_url ? '#000' : '#3949AB', marginBottom: 4 }}>
+                          {w.poster_url
+                            ? <img src={w.poster_url} alt={w.title} loading="lazy"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center',
+                                justifyContent: 'center', padding: 4 }}>
+                                <span style={{ fontSize: 8, color: '#fff', textAlign: 'center', lineHeight: 1.3 }}>{w.title}</span>
+                              </div>
+                          }
+                        </div>
+                        <div style={{ fontSize: 9, color: 'var(--text-secondary)', textAlign: 'center',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {w.title}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

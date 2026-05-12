@@ -8,11 +8,26 @@
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// CSV 업로드용 multer 설정
+const UPLOAD_DIR = path.join(__dirname, '../../uploads');
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+const csvUpload = multer({
+  dest: UPLOAD_DIR,
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ok = file.originalname.toLowerCase().endsWith('.csv') || file.mimetype.includes('csv') || file.mimetype.includes('excel');
+    ok ? cb(null, true) : cb(new Error('CSV 파일만 업로드 가능합니다.'));
+  },
+});
 const TMDB_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 
@@ -325,6 +340,139 @@ router.delete('/chat/history', auth, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─── Letterboxd CSV 가져오기 (Phase 6.5.2) ───────────────────────────────────
+
+/** 간단한 CSV 한 줄 파서 (따옴표 필드 지원) */
+function parseCsvLine(line) {
+  const cols = [];
+  let cur = '';
+  let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { inQ = !inQ; }
+    else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+    else { cur += ch; }
+  }
+  cols.push(cur.trim());
+  return cols;
+}
+
+/**
+ * Letterboxd CSV → 작품 배열 파싱
+ * 형식: Date, Name, Year, Letterboxd URI, Rating, Rewatch, Tags, Watched Date
+ */
+function parseLetterboxdCsv(text) {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(l => l.trim());
+  if (lines.length < 2) return [];
+
+  const header = parseCsvLine(lines[0]).map(h => h.toLowerCase().trim());
+  const nameIdx   = header.findIndex(h => h === 'name');
+  const yearIdx   = header.findIndex(h => h === 'year');
+  const ratingIdx = header.findIndex(h => h === 'rating');
+  const dateIdx   = header.findIndex(h => h === 'watched date' || h === 'date');
+
+  if (nameIdx === -1) return [];
+
+  return lines.slice(1).flatMap(line => {
+    if (!line.trim()) return [];
+    const cols  = parseCsvLine(line);
+    const title = cols[nameIdx]?.replace(/^"|"$/g, '').trim();
+    if (!title) return [];
+
+    const year   = parseInt(cols[yearIdx]) || 0;
+    const lbRate = parseFloat(cols[ratingIdx]) || 0;
+    // Letterboxd 0.5~5.0 → 앱 내 1~5 (반올림)
+    const rating = lbRate > 0 ? Math.min(5, Math.max(1, Math.round(lbRate))) : 0;
+    const watchedDate = cols[dateIdx]?.trim() || null;
+
+    return [{ title, year, rating, watchedDate }];
+  });
+}
+
+/**
+ * POST /api/restore/letterboxd-csv
+ * Letterboxd 내보내기 CSV → TMDB 매칭 → user_media 일괄 추가
+ * multipart: file (csv)
+ */
+router.post('/letterboxd-csv', auth, csvUpload.single('file'), async (req, res) => {
+  const filePath = req.file?.path;
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'CSV 파일을 업로드해주세요.' });
+
+    const text   = fs.readFileSync(filePath, 'utf-8');
+    const parsed = parseLetterboxdCsv(text);
+
+    if (parsed.length === 0) {
+      return res.json({ success: true, data: { added: 0, skipped: 0, failed: 0 },
+        message: 'CSV에서 작품을 찾지 못했습니다. Letterboxd 내보내기 파일인지 확인해주세요.' });
+    }
+
+    // 미리보기 모드 (preview=1이면 DB 저장 없이 파싱 결과만 반환)
+    if (req.query.preview === '1') {
+      return res.json({ success: true, data: { preview: parsed.slice(0, 20), total: parsed.length } });
+    }
+
+    // 사용자 기존 목록 (중복 체크)
+    const { rows: existing } = await pool.query(
+      'SELECT tmdb_id, title FROM user_media WHERE user_id = $1',
+      [req.user.id]
+    );
+    const existingTmdbIds = new Set(existing.map(r => r.tmdb_id).filter(id => id > 0));
+    const existingTitles  = new Set(existing.map(r => r.title.toLowerCase()));
+
+    let added = 0, skipped = 0, failed = 0;
+
+    for (const item of parsed) {
+      // TMDB 검색 (영화 우선, 실패 시 TV)
+      let tmdbResult = null;
+      let tmdbType   = 'movie';
+      for (const type of ['movie', 'tv']) {
+        const yearParam = type === 'tv' ? 'first_air_date_year' : 'year';
+        const qs = new URLSearchParams({ query: item.title, language: 'ko-KR', api_key: TMDB_KEY,
+          ...(item.year ? { [yearParam]: item.year } : {}) });
+        try {
+          const r = await fetch(`${TMDB_BASE}/search/${type}?${qs}`);
+          const d = await r.json();
+          if (d.results?.length) { tmdbResult = d.results[0]; tmdbType = type; break; }
+        } catch (_) {}
+      }
+
+      // 중복 체크
+      if (tmdbResult && existingTmdbIds.has(tmdbResult.id)) { skipped++; continue; }
+      if (!tmdbResult && existingTitles.has(item.title.toLowerCase())) { skipped++; continue; }
+
+      try {
+        const tmdbId    = tmdbResult?.id || 0;
+        const title     = tmdbResult?.title || tmdbResult?.name || item.title;
+        const year      = parseInt((tmdbResult?.release_date || tmdbResult?.first_air_date || '').slice(0, 4)) || item.year;
+        const posterUrl = tmdbResult?.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbResult.poster_path}` : '';
+        const mediaType = tmdbType === 'movie' ? 'movie' : 'drama';
+        const watchedAt = item.watchedDate ? `'${item.watchedDate}'::date` : null;
+
+        await pool.query(
+          `INSERT INTO user_media
+             (user_id, type, title, year, tmdb_id, poster_url, rating, rewatch_count, watched_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, 1, ${watchedAt ? `$8::date` : 'NULL'})`,
+          watchedAt
+            ? [req.user.id, mediaType, title, year, tmdbId, posterUrl, item.rating, item.watchedDate]
+            : [req.user.id, mediaType, title, year, tmdbId, posterUrl, item.rating]
+        );
+        if (tmdbId) existingTmdbIds.add(tmdbId);
+        existingTitles.add(title.toLowerCase());
+        added++;
+      } catch (_) {
+        failed++;
+      }
+    }
+
+    res.json({ success: true, data: { added, skipped, failed, total: parsed.length } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  } finally {
+    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 });
 

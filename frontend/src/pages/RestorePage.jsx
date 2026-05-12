@@ -4,7 +4,7 @@
  * 카테고리별 큐레이션 리스트 카드 표시
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api/curation`;
@@ -59,6 +59,83 @@ function ListCard({ list, onClick }) {
         작품 보기 →
       </div>
     </button>
+  );
+}
+
+/** Letterboxd CSV 업로드 섹션 */
+function LetterboxdSection() {
+  const fileRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setResult(null);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch(`${BASE.replace('/curation', '/restore')}/letterboxd-csv`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        body: formData,
+      });
+      const json = await res.json();
+      if (json.success) setResult(json.data);
+      else setError(json.message);
+    } catch (e) {
+      setError('업로드 오류: ' + e.message);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
+  return (
+    <div style={{ marginTop: 32, padding: '20px', border: '1px solid var(--border-color, #e0e0e0)',
+      borderRadius: 14, background: 'var(--card-bg, #fff)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+        <span style={{ fontSize: 24 }}>🎞️</span>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary, #111)' }}>
+            Letterboxd CSV 가져오기
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary, #888)' }}>
+            Letterboxd → 설정 → 데이터 내보내기 → watched.csv
+          </div>
+        </div>
+      </div>
+
+      {result && (
+        <div style={{ padding: '10px 14px', background: '#e8f5e9', borderRadius: 8, marginBottom: 10,
+          fontSize: 13, color: '#2e7d32' }}>
+          ✓ {result.added}편 추가
+          {result.skipped > 0 && ` · ${result.skipped}편 중복 스킵`}
+          {result.failed > 0 && ` · ${result.failed}편 실패`}
+          {' '}(총 {result.total}편 파싱)
+        </div>
+      )}
+      {error && (
+        <div style={{ padding: '8px 12px', background: '#fce4ec', borderRadius: 8, marginBottom: 10,
+          fontSize: 13, color: '#c62828' }}>{error}</div>
+      )}
+
+      <button
+        onClick={() => fileRef.current?.click()}
+        disabled={uploading}
+        style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, border: 'none',
+          borderRadius: 8, cursor: uploading ? 'not-allowed' : 'pointer',
+          background: uploading ? '#ccc' : '#37474F', color: '#fff' }}
+      >
+        {uploading ? '가져오는 중...' : '📂 CSV 파일 선택'}
+      </button>
+      <input ref={fileRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleUpload} />
+    </div>
   );
 }
 
@@ -161,6 +238,9 @@ export default function RestorePage() {
           </section>
         );
       })}
+
+      {/* Letterboxd CSV 가져오기 */}
+      <LetterboxdSection />
     </div>
   );
 }

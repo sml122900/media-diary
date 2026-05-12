@@ -163,4 +163,30 @@ router.get('/watch-stats', auth, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/me/life-periods
+ * 시청 시기(life_period)별 작품 그룹 조회 (Phase 6.5.1)
+ */
+router.get('/life-periods', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT life_period, COUNT(*) AS count,
+              json_agg(json_build_object(
+                'id', id, 'title', title, 'year', year,
+                'type', type, 'poster_url', poster_url, 'rating', rating
+              ) ORDER BY watched_at DESC NULLS LAST) AS works
+       FROM user_media
+       WHERE user_id = $1
+         AND life_period IS NOT NULL
+         AND life_period <> ''
+       GROUP BY life_period
+       ORDER BY MAX(created_at) DESC`,
+      [req.user.id]
+    );
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

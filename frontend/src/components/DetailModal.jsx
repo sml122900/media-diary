@@ -64,6 +64,8 @@ export default function DetailModal({
   const [ctxMood, setCtxMood] = useState(item.mood || '');
   // 시청 날짜 (빈 문자열이면 백엔드에서 NOW() 사용)
   const [watchedDate, setWatchedDate] = useState('');
+  // 시청 시기 태그 (Phase 6.5.1)
+  const [lifePeriod, setLifePeriod] = useState(item.life_period || '');
 
   const cacheKey = `${item.title}_${item.year}`;
   // anime/drama는 tv 타입으로 조회
@@ -134,6 +136,7 @@ export default function DetailModal({
       watched_at_place: ctxPlace || null,
       mood: ctxMood || null,
       watched_at_custom: watchedDate || null,
+      life_period: lifePeriod || null,
     });
     setSaving(false);
     onClose();
@@ -367,6 +370,31 @@ export default function DetailModal({
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* 시청 시기 태그 (Phase 6.5.1) */}
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>
+                그 시절 — 언제 봤어요? <span style={{ color: '#bbb' }}>(선택)</span>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+                {['어린 시절', '학창 시절', '군대에서', '대학 시절', '직장 다닐 때'].map(v => (
+                  <button key={v}
+                    onClick={() => setLifePeriod(lifePeriod === v ? '' : v)}
+                    style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, cursor: 'pointer',
+                      border: `1px solid ${lifePeriod === v ? '#1a1a1a' : '#ddd'}`,
+                      background: lifePeriod === v ? '#1a1a1a' : 'transparent',
+                      color: lifePeriod === v ? '#fff' : 'inherit' }}
+                  >{v}</button>
+                ))}
+              </div>
+              <input
+                value={lifePeriod}
+                onChange={e => setLifePeriod(e.target.value)}
+                placeholder="또는 직접 입력 (예: 2010년대 초, 코로나 때)"
+                style={{ width: '100%', padding: '5px 8px', fontSize: 12, border: '1px solid #ddd',
+                  borderRadius: 6, background: 'transparent', color: 'inherit', fontFamily: 'inherit', boxSizing: 'border-box' }}
+              />
             </div>
 
             {/* 시청 날짜 */}

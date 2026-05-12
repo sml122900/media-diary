@@ -325,26 +325,31 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
 
 ### 6.5.1 시청 시기 태그
 
-- [ ] **`user_media.life_period` 컬럼 추가**
-  - 자유 텍스트 (예: "고등학생 때", "군대에서", "2010년대 초")
-  - 옵셔널
+- [x] **`user_media.life_period` 컬럼 추가** (Supabase SQL 실행)
+  - TEXT DEFAULT NULL, 옵셔널
 
-- [ ] **DetailModal에 입력 필드 추가**
-  - 시청 시기 자유 입력
-  - 추천 칩 (어린 시절, 학창 시절, 군대, 직장 등)
+- [x] **DetailModal에 입력 필드 추가**
+  - 추천 칩 5개: 어린 시절 / 학창 시절 / 군대에서 / 대학 시절 / 직장 다닐 때
+  - 자유 텍스트 입력 병행
+  - PUT /api/user-media/:id에 life_period ($19) 추가
 
-- [ ] **통계 페이지에 "그 시절" 그룹핑**
-  - life_period별 작품 그룹 표시
+- [x] **GET /api/me/life-periods** (me.js)
+  - life_period 별 작품 그룹 + 포스터 반환
 
-### 6.5.2 Letterboxd CSV 가져오기 (선택)
+- [x] **통계 페이지 "그 시절 🕰️" 섹션**
+  - life_period 그룹별 가로 스크롤 포스터 리스트
 
-- [ ] **POST /api/restore/letterboxd-csv**
-  - CSV 파일 업로드
-  - Letterboxd 포맷 파싱
-  - TMDB 매칭 후 일괄 추가
+### 6.5.2 Letterboxd CSV 가져오기
 
-- [ ] **파일 업로드 UI**
-  - /restore 페이지에 "Letterboxd CSV 가져오기" 옵션
+- [x] **POST /api/restore/letterboxd-csv** (restore.js)
+  - multer CSV 업로드, 내장 파서 (외부 라이브러리 없음)
+  - Letterboxd 형식 파싱: Name, Year, Rating, Watched Date
+  - 영화/TV TMDB 매칭, 중복 체크, 일괄 삽입
+  - Rating: Letterboxd 0.5~5.0 → 앱 1~5 변환
+
+- [x] **파일 업로드 UI (RestorePage)**
+  - Letterboxd 섹션 카드 + CSV 파일 선택 버튼
+  - 결과 표시: N편 추가 / M편 중복 스킵 / K편 실패
 
 ### 사용자 확인 체크리스트
 
@@ -437,6 +442,19 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
   - Step 5: 완료 (총 추가 수 + 홈 이동)
 - RegisterPage: 가입 후 /onboarding 리다이렉트
 - HomePage 메뉴: "🔄 온보딩 다시 하기" 링크
+
+### 2026-05-13 — Stage 6.5 부가 기능 완료
+
+**완료 항목:**
+- DB: `user_media.life_period TEXT DEFAULT NULL` 컬럼 추가
+- 백엔드:
+  - `userMedia.js` PUT: life_period → $19 (COALESCE 패턴)
+  - `me.js`: GET /api/me/life-periods (life_period별 작품 그룹)
+  - `restore.js`: POST /api/restore/letterboxd-csv (내장 CSV 파서, TMDB 매칭, 일괄 삽입)
+- 프론트엔드:
+  - `DetailModal.jsx`: 추천 칩 5개 + 자유 텍스트 "그 시절" 입력 필드
+  - `StatsPage.jsx`: "그 시절 🕰️" 섹션 (life_period 그룹별 가로 포스터 스크롤)
+  - `RestorePage.jsx`: Letterboxd CSV 업로드 섹션 (결과: N편 추가/중복/실패)
 
 <!-- 새 작업은 이 아래에 추가 -->
 
