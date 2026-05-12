@@ -10,7 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
 
-const BASE = 'http://localhost:4000/api';
+const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
 // YYYY-MM → "2026년 5월" 형식 변환

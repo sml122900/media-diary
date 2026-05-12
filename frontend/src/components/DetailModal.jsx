@@ -12,6 +12,8 @@ import SimilarRecommendations from './SimilarRecommendations';
 import { fetchTmdbDetail, searchTmdbPoster } from '../api/tmdb';
 import { AWARDS } from '../utils/constants';
 
+const BASE = `${import.meta.env.VITE_API_URL}/api`;
+
 /**
  * @param {{
  *   item: object,
@@ -73,9 +75,9 @@ export default function DetailModal({
     if (!item.tmdb_id) return;
     const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
     Promise.all([
-      axios.get(`http://localhost:4000/api/user-media/public/${item.tmdb_id}`, { headers: auth }),
-      axios.get(`http://localhost:4000/api/media/${item.tmdb_id}/friends-activity`, { headers: auth }),
-      axios.get(`http://localhost:4000/api/user-media/history/${item.tmdb_id}`, { headers: auth }),
+      axios.get(`${BASE}/user-media/public/${item.tmdb_id}`, { headers: auth }),
+      axios.get(`${BASE}/media/${item.tmdb_id}/friends-activity`, { headers: auth }),
+      axios.get(`${BASE}/user-media/history/${item.tmdb_id}`, { headers: auth }),
     ]).then(([pubRes, friendRes, histRes]) => {
       setPublicReviews(pubRes.data.data || []);
       setFriendsActivity(friendRes.data.data);
@@ -139,7 +141,7 @@ export default function DetailModal({
     try {
       const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
       await axios.post(
-        `http://localhost:4000/api/user-media/${item.id}/rewatch`,
+        `${BASE}/user-media/${item.id}/rewatch`,
         { rating: rewatchRating, review_text: rewatchNote },
         { headers: auth }
       );
@@ -148,7 +150,7 @@ export default function DetailModal({
       setRewatchNote('');
       // 이력 새로고침
       const histRes = await axios.get(
-        `http://localhost:4000/api/user-media/history/${item.tmdb_id}`,
+        `${BASE}/user-media/history/${item.tmdb_id}`,
         { headers: auth }
       );
       setRewatchHistory(histRes.data.data || []);

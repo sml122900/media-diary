@@ -134,7 +134,7 @@ export default function StatsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:4000/api/me/watch-stats?period=${statsPeriod}`, {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/me/watch-stats?period=${statsPeriod}`, {
       headers: { Authorization: `Bearer ${token}` },
     }).then(res => setWatchStats(res.data.data)).catch(() => {});
   }, [statsPeriod]);

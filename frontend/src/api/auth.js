@@ -7,7 +7,7 @@ import axios from 'axios';
 
 // Axios 인스턴스 생성 - 백엔드 기본 URL 설정
 const api = axios.create({
-  baseURL: 'http://localhost:4000',
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 /**

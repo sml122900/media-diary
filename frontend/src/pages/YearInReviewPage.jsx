@@ -10,7 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recha
 import axios from 'axios';
 import html2canvas from 'html2canvas';
 
-const BASE = 'http://localhost:4000/api';
+const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
 // 슬라이드별 배경 색상 (어두운 시네마틱 팔레트)

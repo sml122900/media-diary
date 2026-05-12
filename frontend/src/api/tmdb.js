@@ -6,7 +6,7 @@
 
 import { IMG_BASE } from '../utils/constants';
 
-const PROXY = 'http://localhost:4000/api/tmdb';
+const PROXY = `${import.meta.env.VITE_API_URL}/api/tmdb`;
 
 /** 백엔드 TMDB 프록시 호출 */
 async function tmdbGet(path, params = {}) {
