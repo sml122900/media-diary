@@ -32,9 +32,9 @@ function RegisterPage() {
     setLoading(true);
     try {
       const { token, user } = await register(name, email, password);
-      // 회원가입 성공 후 자동 로그인
+      // 회원가입 성공 후 자동 로그인 → 온보딩으로 이동
       storeLogin(user, token);
-      navigate('/');
+      navigate('/onboarding');
     } catch (err) {
       setError(err.response?.data?.error || '회원가입에 실패했습니다.');
     } finally {

@@ -23,6 +23,7 @@ import WishlistPage from './pages/WishlistPage';
 import RestorePage from './pages/RestorePage';
 import CurationListPage from './pages/CurationListPage';
 import MemoryChatPage from './pages/MemoryChatPage';
+import OnboardingPage from './pages/OnboardingPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -128,6 +129,14 @@ function App() {
           element={
             <PrivateRoute>
               <YearInReviewPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/onboarding"
+          element={
+            <PrivateRoute>
+              <OnboardingPage />
             </PrivateRoute>
           }
         />

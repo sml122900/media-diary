@@ -272,43 +272,41 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
 
 ### 데이터베이스
 
-- [ ] **`users` 테이블 확장**
-  - `onboarding_completed BOOLEAN DEFAULT false` 컬럼 추가
-  - `onboarding_step INTEGER DEFAULT 0` (어디까지 진행했는지)
+- [x] **`users` 테이블 확장**
+  - `onboarding_completed BOOLEAN DEFAULT false` 컬럼 추가 완료
+  - `onboarding_step INTEGER DEFAULT 0` 컬럼 추가 완료
 
 ### 백엔드 API
 
-- [ ] **POST /api/onboarding/skip**
-  - 온보딩 건너뛰기
-  - onboarding_completed = true
+- [x] **POST /api/onboarding/complete** (skip 포함)
+  - onboarding_completed = true, onboarding_step = 5
 
-- [ ] **POST /api/onboarding/complete**
-  - 온보딩 완료 처리
+- [x] **POST /api/onboarding/step**
+  - 진행 단계 저장 (새로고침 복원용)
 
-- [ ] **GET /api/onboarding/status**
-  - 현재 단계 조회
+- [x] **GET /api/onboarding/status**
+  - onboarding_completed, onboarding_step, media_count 반환
 
 ### 프론트엔드
 
-- [ ] **OnboardingFlow 컴포넌트**
-  - 5단계 마법사:
-    1. 환영 — "이미 본 작품 100편을 15분 안에 정리해드릴게요"
-    2. 큐레이션 체크 — 인기 카테고리 5개만 (마블, 봉준호, 박스오피스, 지브리, 한국드라마)
-    3. AI 대화 (선택) — "더 추가할 게 있나요?"
-    4. 스크린샷 업로드 (선택) — "OTT 기록 있으시면 올려주세요"
-    5. 완료 — "X편 추가됐어요. 환영합니다"
+- [x] **OnboardingPage.jsx** (/onboarding)
+  - 5단계 마법사 + 상단 진행 바
+  - Step 1: 환영 — 3가지 기능 미리보기 카드
+  - Step 2: 큐레이션 체크 — 5개 리스트 아코디언, 포스터 체크박스 그리드, curation/bulk-add 호출
+  - Step 3: AI 대화 — 4개 예시 프롬프트 버튼 → /restore/chat으로 이동
+  - Step 4: 스크린샷 — ScreenshotImportModal 임베드
+  - Step 5: 완료 — 추가 총 수 표시 + 홈으로 이동
 
-- [ ] **각 단계 건너뛰기 가능**
-  - 모든 단계에 "건너뛰기" 버튼
-  - 강제하지 않음
+- [x] **각 단계 건너뛰기**
+  - 우상단 "건너뛰고 바로 시작" (전체 스킵)
+  - 하단 "다음 단계 →" (단계별 스킵)
+  - "← 이전" 버튼 (step > 1)
 
-- [ ] **신규 가입 후 자동 진입**
-  - 회원가입 성공 시 /onboarding으로 리다이렉트
-  - `onboarding_completed = false`인 경우 자동 진입
+- [x] **신규 가입 후 자동 진입**
+  - RegisterPage: navigate('/') → navigate('/onboarding')
 
-- [ ] **기존 사용자도 진입 가능**
-  - 메뉴에 "복원 모드 시작" 추가
-  - 처음부터 다시 진행
+- [x] **기존 사용자도 진입 가능**
+  - HomePage 메뉴 → "🔄 온보딩 다시 하기" 링크
 
 ### 사용자 확인 체크리스트
 
@@ -425,6 +423,20 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
   - OTT/극장 종류 드롭다운 (9종)
   - 신뢰도 배지 (높음/보통/낮음)
   - 낮은 신뢰도 항목 → InlineSearch 컴포넌트로 수동 교체
+
+### 2026-05-13 — Stage 6.4 복원 모드 통합 (온보딩) 완료
+
+**완료 항목:**
+- DB: `users.onboarding_completed`, `users.onboarding_step` 컬럼 추가
+- 백엔드 `onboarding.js`: GET /status, POST /step, POST /complete
+- 프론트엔드 `OnboardingPage.jsx` (/onboarding) — 5단계 마법사
+  - Step 1: 환영 + 3기능 미리보기
+  - Step 2: CurationStep (5개 리스트 아코디언 + 포스터 체크박스 + bulk-add)
+  - Step 3: AiStep (4개 예시 프롬프트 → /restore/chat 이동)
+  - Step 4: ScreenshotStep (ScreenshotImportModal 임베드)
+  - Step 5: 완료 (총 추가 수 + 홈 이동)
+- RegisterPage: 가입 후 /onboarding 리다이렉트
+- HomePage 메뉴: "🔄 온보딩 다시 하기" 링크
 
 <!-- 새 작업은 이 아래에 추가 -->
 
