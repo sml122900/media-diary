@@ -1,0 +1,331 @@
+/**
+ * @file restore.js
+ * AI 대화형 기억 복원 API (Phase 6.2)
+ * POST /api/restore/chat  — Claude에게 메시지 전송, 작품 제안 수신
+ * GET  /api/restore/chat/history — 대화 히스토리 조회
+ * POST /api/restore/chat/accept  — 제안 작품 일괄 수락(추가)
+ */
+
+const express = require('express');
+const router = express.Router();
+const Anthropic = require('@anthropic-ai/sdk');
+const pool = require('../db');
+const auth = require('../middleware/auth');
+
+const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const TMDB_KEY = process.env.TMDB_API_KEY;
+const TMDB_BASE = 'https://api.themoviedb.org/3';
+
+// 사용자별 일일 대화 한도
+const DAILY_CHAT_LIMIT = 30;
+
+// Claude가 반드시 호출해야 하는 작품 제안 도구 정의
+const SUGGEST_TOOL = {
+  name: 'suggest_works',
+  description: '사용자에게 작품을 추천할 때 반드시 이 도구를 사용하세요. 작품 목록과 메시지를 함께 반환합니다.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      message: {
+        type: 'string',
+        description: '사용자에게 전달할 친근한 한국어 메시지 (작품 소개 포함)',
+      },
+      works: {
+        type: 'array',
+        description: '추천 작품 목록 (5~10개)',
+        items: {
+          type: 'object',
+          properties: {
+            title:          { type: 'string',  description: '한국어 제목 (한국 서비스용)' },
+            original_title: { type: 'string',  description: '원제 (영어/일어 등, TMDB 검색 정확도 향상용)' },
+            year:           { type: 'integer', description: '개봉/방영 연도' },
+            tmdb_type:      { type: 'string',  enum: ['movie', 'tv'], description: 'TMDB 검색 유형' },
+            media_type:     { type: 'string',  enum: ['movie', 'anime', 'drama'], description: '앱 내 분류' },
+            reason:         { type: 'string',  description: '추천 이유 한 줄' },
+          },
+          required: ['title', 'year', 'tmdb_type', 'media_type'],
+        },
+      },
+    },
+    required: ['message', 'works'],
+  },
+};
+
+/**
+ * TMDB 제목+연도 검색 — 첫 번째 결과의 id, poster_path 반환
+ */
+async function searchTmdb(title, year, tmdbType) {
+  const endpoint = tmdbType === 'tv' ? '/search/tv' : '/search/movie';
+  const yearParam = tmdbType === 'tv' ? `&first_air_date_year=${year}` : `&year=${year}`;
+  const query = encodeURIComponent(title);
+
+  try {
+    const res = await fetch(
+      `${TMDB_BASE}${endpoint}?api_key=${TMDB_KEY}&query=${query}${yearParam}&language=ko-KR`
+    );
+    const data = await res.json();
+    if (data.results?.length) {
+      const r = data.results[0];
+      return { tmdb_id: r.id, poster_path: r.poster_path || null };
+    }
+    // 연도 없이 재시도
+    const res2 = await fetch(
+      `${TMDB_BASE}${endpoint}?api_key=${TMDB_KEY}&query=${query}&language=ko-KR`
+    );
+    const data2 = await res2.json();
+    if (data2.results?.length) {
+      const r = data2.results[0];
+      return { tmdb_id: r.id, poster_path: r.poster_path || null };
+    }
+  } catch (_) {}
+  return { tmdb_id: 0, poster_path: null };
+}
+
+/**
+ * 일일 사용량 확인 및 증가
+ * 오늘 처음 호출이면 카운트 리셋
+ * @returns {{ allowed: boolean, remaining: number }}
+ */
+async function checkAndIncrementChatLimit(userId) {
+  const { rows } = await pool.query(
+    'SELECT daily_chat_count, last_chat_reset_at FROM users WHERE id = $1',
+    [userId]
+  );
+  const user = rows[0];
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const lastReset = user.last_chat_reset_at
+    ? new Date(user.last_chat_reset_at).toISOString().slice(0, 10)
+    : null;
+
+  let count = user.daily_chat_count || 0;
+
+  // 날짜가 바뀌었으면 리셋
+  if (lastReset !== today) {
+    count = 0;
+    await pool.query(
+      'UPDATE users SET daily_chat_count = 0, last_chat_reset_at = NOW() WHERE id = $1',
+      [userId]
+    );
+  }
+
+  if (count >= DAILY_CHAT_LIMIT) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  // 카운트 증가
+  await pool.query(
+    'UPDATE users SET daily_chat_count = daily_chat_count + 1 WHERE id = $1',
+    [userId]
+  );
+  return { allowed: true, remaining: DAILY_CHAT_LIMIT - count - 1 };
+}
+
+/**
+ * POST /api/restore/chat
+ * 사용자 메시지 → Claude 호출 → 작품 제안 반환
+ * body: { message: string }
+ */
+router.post('/chat', auth, async (req, res) => {
+  const { message } = req.body;
+  if (!message?.trim()) {
+    return res.status(400).json({ success: false, message: '메시지를 입력해주세요.' });
+  }
+
+  // 일일 한도 확인
+  const limitCheck = await checkAndIncrementChatLimit(req.user.id);
+  if (!limitCheck.allowed) {
+    return res.status(429).json({
+      success: false,
+      message: `오늘 대화 한도(${DAILY_CHAT_LIMIT}회)를 초과했습니다. 내일 다시 시도해주세요.`,
+    });
+  }
+
+  try {
+    // 사용자가 이미 추가한 작품 목록 조회 (중복 방지용)
+    const { rows: existingMedia } = await pool.query(
+      `SELECT title, year, type FROM user_media
+       WHERE user_id = $1 ORDER BY created_at DESC LIMIT 200`,
+      [req.user.id]
+    );
+    const existingList = existingMedia
+      .map(m => `${m.title} (${m.year})`)
+      .join(', ');
+
+    // 최근 대화 히스토리 조회 (최대 10턴 = 20개 메시지)
+    const { rows: historyRows } = await pool.query(
+      `SELECT role, content FROM memory_chats
+       WHERE user_id = $1
+       ORDER BY created_at DESC LIMIT 20`,
+      [req.user.id]
+    );
+    // 시간 역순이므로 뒤집기
+    const history = historyRows.reverse().map(r => ({
+      role: r.role,
+      content: r.content,
+    }));
+
+    // 시스템 프롬프트
+    const systemPrompt = `당신은 사용자가 과거에 본 영화·드라마·애니메이션을 기억해내도록 돕는 친근한 AI입니다.
+
+사용자의 막연한 기억을 구체적인 작품으로 변환하세요.
+
+규칙:
+1. 항상 suggest_works 도구를 호출해 5~10개의 구체적인 작품을 제안하세요.
+2. 제안 작품은 사용자 기억과 관련성이 높은 것들로 선정하세요.
+3. 이미 사용자 목록에 있는 작품은 제안하지 마세요.
+4. 한국 사용자이므로 한국어 제목을 우선 사용하세요.
+5. 연도는 정확하게 기입하세요.
+
+사용자가 이미 목록에 추가한 작품 (제안 제외):
+${existingList || '(없음)'}`;
+
+    // Claude 호출
+    const claudeRes = await claude.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
+      system: systemPrompt,
+      messages: [
+        ...history,
+        { role: 'user', content: message },
+      ],
+      tools: [SUGGEST_TOOL],
+      tool_choice: { type: 'any' }, // 반드시 도구 호출
+    });
+
+    // tool_use 블록 추출
+    const toolUse = claudeRes.content.find(b => b.type === 'tool_use');
+    if (!toolUse) {
+      throw new Error('Claude가 도구를 호출하지 않았습니다.');
+    }
+
+    const { message: aiMessage, works: rawWorks } = toolUse.input;
+
+    // 각 작품을 TMDB에서 검색해 tmdb_id / poster_path 보강
+    const enrichedWorks = await Promise.all(
+      rawWorks.map(async (w) => {
+        // original_title이 있으면 TMDB 검색에 우선 사용
+        const searchTitle = w.original_title || w.title;
+        const { tmdb_id, poster_path } = await searchTmdb(searchTitle, w.year, w.tmdb_type);
+        return {
+          title: w.title,
+          year: w.year,
+          tmdb_type: w.tmdb_type,
+          media_type: w.media_type,
+          reason: w.reason || '',
+          tmdb_id,
+          poster_path,
+        };
+      })
+    );
+
+    // 대화 히스토리 저장
+    await pool.query(
+      `INSERT INTO memory_chats (user_id, role, content) VALUES ($1, 'user', $2)`,
+      [req.user.id, message]
+    );
+    await pool.query(
+      `INSERT INTO memory_chats (user_id, role, content, suggested_works)
+       VALUES ($1, 'assistant', $2, $3::jsonb)`,
+      [req.user.id, aiMessage, JSON.stringify(enrichedWorks)]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        message: aiMessage,
+        works: enrichedWorks,
+        remaining: limitCheck.remaining,
+      },
+    });
+  } catch (err) {
+    console.error('restore/chat 오류:', err.message);
+    res.status(500).json({ success: false, message: '작품 기억 복원 중 오류가 발생했습니다.' });
+  }
+});
+
+/**
+ * GET /api/restore/chat/history
+ * 최근 대화 히스토리 조회 (최대 50건)
+ */
+router.get('/chat/history', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, role, content, suggested_works, created_at
+       FROM memory_chats
+       WHERE user_id = $1
+       ORDER BY created_at ASC
+       LIMIT 100`,
+      [req.user.id]
+    );
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * POST /api/restore/chat/accept
+ * AI 제안 작품 중 선택한 것들을 user_media에 일괄 추가
+ * body: { works: [{ title, year, tmdb_id, tmdb_type, media_type, poster_path }] }
+ */
+router.post('/chat/accept', auth, async (req, res) => {
+  const { works } = req.body;
+  if (!Array.isArray(works) || works.length === 0) {
+    return res.status(400).json({ success: false, message: 'works 배열이 필요합니다.' });
+  }
+
+  let added = 0;
+  let skipped = 0;
+
+  for (const w of works) {
+    // tmdb_id가 있으면 중복 체크, 없으면 제목+연도 중복 체크
+    const { rows: existing } = w.tmdb_id > 0
+      ? await pool.query(
+          'SELECT id FROM user_media WHERE user_id = $1 AND tmdb_id = $2',
+          [req.user.id, w.tmdb_id]
+        )
+      : await pool.query(
+          'SELECT id FROM user_media WHERE user_id = $1 AND title = $2 AND year = $3',
+          [req.user.id, w.title, w.year]
+        );
+
+    if (existing.length > 0) { skipped++; continue; }
+
+    const posterUrl = w.poster_path
+      ? `https://image.tmdb.org/t/p/w500${w.poster_path}`
+      : '';
+
+    try {
+      await pool.query(
+        `INSERT INTO user_media
+           (user_id, type, title, year, tmdb_id, poster_url, rewatch_count)
+         VALUES ($1, $2, $3, $4, $5, $6, 1)`,
+        [req.user.id, w.media_type || 'movie', w.title,
+         w.year || 0, w.tmdb_id || 0, posterUrl]
+      );
+      added++;
+    } catch (err) {
+      console.error('accept insert 실패:', err.message);
+      skipped++;
+    }
+  }
+
+  res.json({ success: true, data: { added, skipped } });
+});
+
+/**
+ * DELETE /api/restore/chat/history
+ * 대화 기록 전체 삭제
+ */
+router.delete('/chat/history', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM memory_chats WHERE user_id = $1', [req.user.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+module.exports = router;

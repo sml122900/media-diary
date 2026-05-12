@@ -109,9 +109,33 @@ export default function RestorePage() {
       <h1 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 4px', color: 'var(--text-primary, #111)' }}>
         📚 과거 기록 복원
       </h1>
-      <p style={{ fontSize: 14, color: 'var(--text-secondary, #666)', margin: '0 0 28px' }}>
-        이미 본 작품들을 빠르게 추가하세요. 카테고리를 선택하면 작품 목록이 열립니다.
+      <p style={{ fontSize: 14, color: 'var(--text-secondary, #666)', margin: '0 0 16px' }}>
+        이미 본 작품들을 빠르게 추가하세요.
       </p>
+
+      {/* AI 채팅 진입 배너 */}
+      <button
+        onClick={() => navigate('/restore/chat')}
+        style={{
+          width: '100%', padding: '16px 20px', marginBottom: 28,
+          background: 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
+          border: 'none', borderRadius: 14, cursor: 'pointer', textAlign: 'left',
+          display: 'flex', alignItems: 'center', gap: 14,
+          boxShadow: '0 4px 16px rgba(21,101,192,.3)',
+        }}
+      >
+        <div style={{ fontSize: 32 }}>🤖</div>
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 16, color: '#fff', marginBottom: 4 }}>
+            AI에게 말해서 작품 찾기
+          </div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,.8)', lineHeight: 1.4 }}>
+            "마블 영화 다 봤어요", "90년대 한국 드라마 좋아했어요"처럼<br />
+            막연하게 말하면 AI가 구체적인 작품을 찾아드립니다.
+          </div>
+        </div>
+        <div style={{ marginLeft: 'auto', color: 'rgba(255,255,255,.7)', fontSize: 18 }}>→</div>
+      </button>
 
       {/* 카테고리별 섹션 */}
       {CATEGORY_ORDER.map(cat => {

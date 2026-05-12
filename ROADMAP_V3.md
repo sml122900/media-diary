@@ -143,14 +143,14 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
 
 ### 사전 준비
 
-- [ ] **Claude API 비용 안내**
-  - 사용자에게 예상 비용 안내 (대화 1회당 약 1-3센트)
-  - 일일 사용량 제한 설정 (사용자별 30회/일)
-  - `users` 테이블에 `daily_chat_count`, `last_chat_reset_at` 컬럼 추가
+- [x] **Claude API 비용 안내**
+  - 사용자에게 예상 비용 안내 완료 (대화 1회당 ~$0.01~0.03)
+  - 일일 한도 30회 구현 (`daily_chat_count`, `last_chat_reset_at`)
+  - `users` 테이블 컬럼 추가 완료 (Supabase SQL)
 
 ### 데이터베이스
 
-- [ ] **`memory_chats` 테이블 신설**
+- [x] **`memory_chats` 테이블 신설**
   ```sql
   CREATE TABLE memory_chats (
     id BIGSERIAL PRIMARY KEY,
@@ -164,52 +164,46 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
 
 ### 백엔드 API
 
-- [ ] **POST /api/restore/chat**
-  - 요청: `{ message: "90년대 SF 영화 좋아했어요" }`
-  - Claude API 호출 (tool use 활용)
-  - Claude가 TMDB 검색 → 후보 작품 추출
-  - 응답: `{ message: "이런 작품들 어때요?", suggestions: [...] }`
+- [x] **POST /api/restore/chat**
+  - Claude Haiku tool use (`suggest_works` 도구 강제 호출)
+  - TMDB 검색으로 tmdb_id / poster_path 보강 후 반환
+  - 사용자 기존 목록 시스템 프롬프트에 포함 (중복 방지)
 
-- [ ] **Claude 시스템 프롬프트 설계**
-  ```
-  당신은 사용자가 평생 본 영화/드라마/애니메이션을 기억해내도록 돕는 도우미입니다.
-  
-  사용자의 막연한 기억을 구체적인 작품 후보로 변환하세요.
-  
-  도구 사용:
-  - search_tmdb: 작품 검색
-  - get_user_existing: 사용자가 이미 추가한 작품 목록 (중복 방지)
-  
-  응답 시 항상 5-10개 정도의 구체적인 작품 후보를 제시하세요.
-  ```
+- [x] **Claude 시스템 프롬프트 설계**
+  - suggest_works 도구 강제 호출 (`tool_choice: any`)
+  - 사용자 기존 목록 포함 → 중복 제안 방지
+  - 일일 30회 한도 + 날짜별 자동 리셋
 
-- [ ] **GET /api/restore/chat/history**
-  - 사용자의 대화 히스토리 (최근 50개)
+- [x] **GET /api/restore/chat/history**
+  - memory_chats 테이블에서 조회 (최근 100건)
 
-- [ ] **POST /api/restore/chat/accept**
-  - 요청: `{ tmdb_ids: [...] }`
-  - 선택한 작품들 일괄 추가
-  - bulk-add API 재사용
+- [x] **POST /api/restore/chat/accept**
+  - 선택한 작품들 user_media 일괄 추가
+  - tmdb_id 또는 제목+연도 중복 체크
+  
+- [x] **DELETE /api/restore/chat/history**
+  - 대화 기록 전체 삭제
 
 ### 프론트엔드
 
-- [ ] **`/restore/chat` 라우트**
-  - 채팅 UI (메신저 스타일)
+- [x] **`/restore/chat` 라우트**
+  - 채팅 UI (메신저 스타일) — MemoryChatPage.jsx
   - 사용자 메시지 우측, AI 메시지 좌측
-  - AI 메시지 안에 작품 카드 그리드 임베드
-  - 각 작품 카드에 체크박스
+  - AI 메시지 안에 포스터 카드 그리드 임베드
+  - 각 카드 클릭으로 체크박스 토글
 
-- [ ] **MemoryChat 컴포넌트**
-  - 메시지 입력창 (하단 고정)
-  - 스트리밍 응답 표시 (선택)
-  - "이 작품들 추가하기" 버튼
+- [x] **MemoryChatPage 컴포넌트**
+  - 하단 고정 입력창 + Enter 전송
+  - 로딩 중 "작품 찾는 중..." 인디케이터
+  - 버블별 독립 추가 버튼 (한 번 추가하면 완료 표시)
+  - 대화 기록 삭제 버튼
 
-- [ ] **추천 시작 질문**
-  - 빈 화면일 때 예시 질문 노출:
-    - "고등학생 때 봤던 영화들이 기억 안 나요"
-    - "마블 영화 다 봤어요"
-    - "픽사 작품 좋아해요"
-    - "90년대 한국 영화 보고 싶어요"
+- [x] **추천 시작 질문 (6개 예시)**
+  - 빈 화면일 때 그리드로 표시
+  - 클릭하면 바로 전송
+
+- [x] **RestorePage AI 채팅 배너**
+  - /restore 상단에 파란 배너 → /restore/chat 진입
 
 ### 사용자 확인 체크리스트
 
@@ -411,6 +405,20 @@ Phase 6는 "과거를 끌어모으는" 도구를 추가합니다.
 - 백엔드 API: `GET /api/curation/lists`, `GET /api/curation/lists/:slug/items`, `POST /api/curation/bulk-add`
 - 프론트엔드: `RestorePage.jsx` (`/restore`), `CurationListPage.jsx` (`/restore/:slug`)
 - HomePage 메뉴에 "📚 과거 기록 복원" 링크 추가
+
+### 2026-05-13 — Stage 6.2 AI 대화형 기억 복원 완료
+
+**완료 항목:**
+- DB: `memory_chats` 테이블, `users.daily_chat_count / last_chat_reset_at` 컬럼 추가
+- 백엔드 `restore.js`: POST /chat, GET /chat/history, POST /chat/accept, DELETE /chat/history
+  - Claude Haiku + `suggest_works` 도구 강제 호출 (`tool_choice: any`)
+  - 도구 결과로 받은 작품 목록을 TMDB로 보강 (tmdb_id, poster_path)
+  - 사용자 기존 목록 시스템 프롬프트 포함 → 중복 제안 방지
+  - 일일 30회 한도 + 자동 리셋
+- 프론트엔드 `MemoryChatPage.jsx` (/restore/chat): 메신저 UI
+  - 포스터 카드 그리드 임베드, 버블별 독립 추가 버튼
+  - 6개 시작 예시 질문 (빈 화면)
+- RestorePage에 AI 채팅 진입 파란 배너 추가
 
 <!-- 새 작업은 이 아래에 추가 -->
 
