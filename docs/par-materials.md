@@ -175,6 +175,58 @@
 
 ---
 
+### 소재 14 — 큐레이션 데이터 자동화 파이프라인 구축
+
+**Problem (상황/문제)**
+> 신규 가입자가 빈 화면에서 과거 기록을 추가하기 매우 어려웠다. 12개 카테고리 247개 작품의 TMDB ID와 포스터 경로를 모두 수동으로 수집하는 것은 불가능했다.
+
+**Action (내가 한 것)**
+> 3단계 자동화 파이프라인을 설계했다: ① `fill-tmdb-ids.js` — JSON에서 tmdb_id: 0 항목을 TMDB Search API로 검색해 자동 매칭 (Rate Limit 준수 260ms 딜레이, 연도 없이 재시도 fallback 포함) ② `fetch-curation-posters.js` — TMDB Detail API로 포스터 경로 수집 ③ `seed-curation.js` — ON CONFLICT UPDATE로 멱등 DB 삽입. 프론트엔드는 `already_added` 소프트 인증 패턴으로 비로그인도 조회 가능하게 했다.
+
+**Result (결과)**
+> 스크립트 1회 실행으로 64개 TMDB ID 자동 매칭, 233개 포스터 수집 완료. 큐레이션 API는 순수 DB 조회로 빠르게 응답. JSON 파일 수정 → 스크립트 재실행으로 언제든 데이터 업데이트 가능한 구조가 됐다.
+
+---
+
+### 소재 15 — Claude API Tool Use로 자연어 기억 복원 시스템
+
+**Problem (상황/문제)**
+> "90년대 SF 영화 좋아했어요"처럼 막연한 기억을 작품 목록으로 변환해야 했다. Claude 텍스트 응답을 정규식·JSON.parse로 파싱하면 구조 실패 시 기능 전체가 무너지는 위험이 있었다.
+
+**Action (내가 한 것)**
+> Claude API의 `tool_choice: { type: "any" }`로 도구 호출을 강제했다. `suggest_works` 도구 스키마에 title, original_title, year, tmdb_type, media_type을 정의해 항상 구조화된 배열을 받도록 했다. 도구 결과를 TMDB API로 보강(tmdb_id, poster_path)한 뒤 memory_chats 테이블에 저장했다. 사용자 기존 목록을 시스템 프롬프트에 포함해 중복 제안을 방지했고, 일일 30회 한도와 날짜별 자동 리셋을 구현했다.
+
+**Result (결과)**
+> 자연어 대화 → 포스터 카드 그리드 → 체크박스 선택 → 일괄 추가 흐름이 완성됐다. tool_choice 강제로 파싱 오류 없이 안정적으로 동작하며, original_title 필드로 TMDB 매칭 정확도도 향상됐다.
+
+---
+
+### 소재 16 — 멀티 스크린샷 인식 강화 (신뢰도 기반 매칭)
+
+**Problem (상황/문제)**
+> 기존 스크린샷 인식은 이미지 1장만 지원하고, OTT 앱 종류 힌트 없이 제목만 추출했다. TMDB 매칭 정확도가 낮았고 실패 항목을 사용자가 수정할 방법이 없었다.
+
+**Action (내가 한 것)**
+> multer를 `upload.single` → `upload.array('images', 10)`으로 변경해 최대 10장 병렬 처리를 지원했다. Claude 프롬프트에 OTT 종류 힌트(넷플릭스·CGV 등 9종)를 삽입하고, 제목만이 아닌 `{title, year, type}` 구조화 JSON을 추출하도록 개선했다. TMDB 검색을 3단계 fallback(연도 포함 → 없음 → 반대 타입)으로 구성하고, `calcConfidence()` 함수로 제목 유사도·연도 일치를 0~1 점수로 계산했다. 낮은 신뢰도 항목에 `InlineSearch` 컴포넌트(실시간 TMDB 검색 + 클릭 교체)를 제공했다.
+
+**Result (결과)**
+> 멀티 업로드로 1회 세션에서 여러 OTT 기록을 처리할 수 있고, 신뢰도 배지(높음/보통/낮음)로 결과 품질을 시각화했다. 실패 항목도 수동 재검색으로 커버 가능해 전반적인 가져오기 성공률이 높아졌다.
+
+---
+
+### 소재 17 — Letterboxd CSV 가져오기 (외부 라이브러리 없는 내장 파서)
+
+**Problem (상황/문제)**
+> Letterboxd 사용자가 자신의 감상 기록(수백~수천 건)을 마이그레이션할 방법이 없었다. csv-parse 등 외부 라이브러리를 추가하면 의존성이 늘어나고, Letterboxd CSV 형식에 특화된 처리가 필요했다.
+
+**Action (내가 한 것)**
+> 따옴표 필드를 지원하는 `parseCsvLine()`, 헤더 인덱스 기반 `parseLetterboxdCsv()` 함수를 20줄로 직접 구현했다. Letterboxd의 0.5~5.0 Rating을 앱 내 1~5로 `Math.round()` 변환하고, Watched Date를 watched_at으로 삽입했다. TMDB 검색(영화 → TV fallback), tmdb_id 기준 중복 체크, 일괄 삽입을 하나의 엔드포인트에서 처리했다.
+
+**Result (결과)**
+> 외부 의존성 없이 Letterboxd watched.csv를 그대로 업로드하면 자동으로 내 목록에 추가된다. 결과 화면에 "N편 추가 / M편 중복 / K편 실패"가 표시되어 가져오기 결과를 명확하게 파악할 수 있다.
+
+---
+
 ## 키워드 뱅크 (기술 스택 & 성과 표현)
 
 - React, Vite, Zustand, React Router
@@ -207,3 +259,16 @@
 - 자동 시딩 제거, 프로덕션 이슈 대응, 신규 가입자 UX 개선
 - watched_at 소급 입력, nullable custom date, CASE 우선순위 쿼리
 - Render `npm start` / Vercel CI 배포 환경변수 설계
+- Claude API tool_choice: any, 강제 도구 호출 패턴
+- Tool Use 스키마 설계 (title, original_title, year, tmdb_type, media_type)
+- 배치 TMDB API 스크립트 (Rate Limit, 재시도 fallback, 멱등 upsert)
+- 큐레이션 데이터 파이프라인 (JSON → fill IDs → fetch posters → seed DB)
+- 멀티 이미지 업로드 (multer array), 병렬 Claude Vision 처리
+- OTT 종류 힌트 기반 Claude 프롬프트 최적화
+- 신뢰도 계산 알고리즘 (제목 유사도 + 연도 일치 → 0~1 점수)
+- InlineSearch 컴포넌트 (실시간 TMDB 재검색, 결과 인라인 교체)
+- 5단계 온보딩 마법사 UX (아코디언, 프로그레스 바, 단계별 건너뛰기)
+- 소프트 인증 패턴 (already_added 마킹, 비로그인 공개 조회)
+- Letterboxd CSV 내장 파서 (따옴표 필드, 헤더 인덱스, Rating 변환)
+- life_period 메타데이터 설계 (COALESCE 부분 업데이트, 자유 텍스트)
+- 시청 시기 그룹 통계 (GROUP BY + json_agg, 가로 포스터 스크롤)
