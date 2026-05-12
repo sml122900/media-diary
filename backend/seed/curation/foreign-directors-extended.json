@@ -535,7 +535,7 @@
           "display_order": 8
         },
         {
-          "tmdb_id": 0,
+          "tmdb_id": 747188,
           "tmdb_type": "movie",
           "title": "애스테로이드 시티",
           "year": 2023,
@@ -613,7 +613,7 @@
       "display_order": 12,
       "items": [
         {
-          "tmdb_id": 0,
+          "tmdb_id": 1024,
           "tmdb_type": "movie",
           "title": "천국의 피조물",
           "year": 1994,

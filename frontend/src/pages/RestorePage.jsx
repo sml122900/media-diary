@@ -31,8 +31,9 @@ const SUPER_GROUPS = [
   {
     id: 'drama', label: '📺 드라마', color: '#00838F',
     subGroups: [
-      { id: 'kr-drama',     label: '한국 드라마',           filter: l => l.media_type === 'drama' && l.region === 'kr' },
-      { id: 'global-drama', label: '해외 드라마',           filter: l => l.media_type === 'drama' && l.region === 'global' },
+      // awards는 awards-drama가 별도 처리하므로 category!='awards' 조건 추가 (중복 방지)
+      { id: 'kr-drama',     label: '한국 드라마',           filter: l => l.media_type === 'drama' && l.region === 'kr'     && l.category !== 'awards' },
+      { id: 'global-drama', label: '해외 드라마',           filter: l => l.media_type === 'drama' && l.region === 'global' && l.category !== 'awards' },
       { id: 'awards-drama', label: '드라마 시상식',         filter: l => l.category === 'awards' && l.media_type === 'drama' },
     ],
   },
