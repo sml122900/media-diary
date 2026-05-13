@@ -64,9 +64,13 @@ export default function DetailModal({
   const [ctxWith, setCtxWith] = useState(item.watched_with || '');
   const [ctxPlace, setCtxPlace] = useState(item.watched_at_place || '');
   const [ctxMood, setCtxMood] = useState(item.mood || '');
-  // 시청 날짜 (빈 문자열이면 백엔드에서 NOW() 사용)
-  const [watchedDate, setWatchedDate] = useState('');
-  // 시청 시기 태그 (Phase 6.5.1)
+  // 시청 날짜 — 기존 watched_at 있으면 YYYY-MM-DD로 초기화
+  const [watchedDate, setWatchedDate] = useState(
+    item.watched_at ? new Date(item.watched_at).toISOString().slice(0, 10) : ''
+  );
+  // "기억이 안 나요" — watched_at 없고 life_period 있으면 true로 초기화
+  const [dateUnknown, setDateUnknown] = useState(!item.watched_at && !!item.life_period);
+  // 시청 시기 자유 텍스트 (기억이 안 나요 클릭 시 노출)
   const [lifePeriod, setLifePeriod] = useState(item.life_period || '');
 
   const cacheKey = `${item.title}_${item.year}`;
@@ -137,7 +141,9 @@ export default function DetailModal({
       watched_with: ctxWith || null,
       watched_at_place: ctxPlace || null,
       mood: ctxMood || null,
-      watched_at_custom: watchedDate || null,
+      // dateUnknown: watched_at 명시적 NULL, 아니면 입력된 날짜 전달
+      clear_watched_at: dateUnknown || false,
+      watched_at_custom: dateUnknown ? null : (watchedDate || null),
       life_period: lifePeriod || null,
     });
     setSaving(false);
@@ -302,7 +308,18 @@ export default function DetailModal({
               <div className="prev-review">
                 <div className="prev-stars">{'★'.repeat(item.rating || 0)}{'☆'.repeat(5 - (item.rating || 0))}</div>
                 {item.review_text || '(메모 없음)'}
-                {item.review_date && <div style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>{item.review_date}</div>}
+                {/* watched_at 있으면 날짜 표시, 없고 life_period 있으면 시기 텍스트 표시 */}
+                {item.watched_at
+                  ? <div style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>
+                      {new Date(item.watched_at).toLocaleDateString('ko-KR')}
+                      {item.life_period && <span style={{ marginLeft: 6, color: '#bbb' }}>· {item.life_period}</span>}
+                    </div>
+                  : item.life_period
+                    ? <div style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>{item.life_period}</div>
+                    : item.review_date
+                      ? <div style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>{item.review_date}</div>
+                      : null
+                }
               </div>
             )}
 
@@ -378,45 +395,52 @@ export default function DetailModal({
               )}
             </div>
 
-            {/* 시청 시기 태그 (Phase 6.5.1) */}
-            <div style={{ marginTop: 12 }}>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>
-                그 시절 — 언제 봤어요? <span style={{ color: '#bbb' }}>(선택)</span>
-              </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-                {['어린 시절', '학창 시절', '군대에서', '대학 시절', '직장 다닐 때'].map(v => (
-                  <button key={v}
-                    onClick={() => setLifePeriod(lifePeriod === v ? '' : v)}
-                    style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, cursor: 'pointer',
-                      border: `1px solid ${lifePeriod === v ? '#1a1a1a' : '#ddd'}`,
-                      background: lifePeriod === v ? '#1a1a1a' : 'transparent',
-                      color: lifePeriod === v ? '#fff' : 'inherit' }}
-                  >{v}</button>
-                ))}
-              </div>
-              <input
-                value={lifePeriod}
-                onChange={e => setLifePeriod(e.target.value)}
-                placeholder="또는 직접 입력 (예: 2010년대 초, 코로나 때)"
-                style={{ width: '100%', padding: '5px 8px', fontSize: 12, border: '1px solid #ddd',
-                  borderRadius: 6, background: 'transparent', color: 'inherit', fontFamily: 'inherit', boxSizing: 'border-box' }}
-              />
-            </div>
+            {/* 시청 날짜 + 기억이 안 나요 (통합 섹션) */}
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>시청 날짜</div>
 
-            {/* 시청 날짜 */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14, marginBottom: 4 }}>
-              <span style={{ fontSize: 13, color: '#888', whiteSpace: 'nowrap' }}>시청 날짜</span>
-              <input
-                type="date"
-                value={watchedDate}
-                onChange={e => setWatchedDate(e.target.value)}
-                style={{ flex: 1, padding: '4px 8px', fontSize: 13, border: '1px solid #ddd', borderRadius: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
-              />
-              <button
-                className="btn"
-                style={{ fontSize: 12, whiteSpace: 'nowrap' }}
-                onClick={() => setWatchedDate(new Date().toISOString().slice(0, 10))}
-              >오늘 시청</button>
+              {!dateUnknown ? (
+                /* 날짜 입력 모드 */
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <input
+                    type="date"
+                    value={watchedDate}
+                    onChange={e => setWatchedDate(e.target.value)}
+                    style={{ flex: 1, padding: '5px 8px', fontSize: 13, border: '1px solid #ddd',
+                      borderRadius: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
+                  />
+                  <button
+                    onClick={() => setWatchedDate(new Date().toISOString().slice(0, 10))}
+                    style={{ fontSize: 12, padding: '5px 10px', background: 'none', border: '1px solid #ddd',
+                      borderRadius: 6, cursor: 'pointer', color: '#555', whiteSpace: 'nowrap' }}
+                  >오늘</button>
+                  <button
+                    onClick={() => { setDateUnknown(true); setWatchedDate(''); }}
+                    style={{ fontSize: 12, padding: '5px 10px', background: 'none', border: '1px solid #ddd',
+                      borderRadius: 6, cursor: 'pointer', color: '#999', whiteSpace: 'nowrap' }}
+                  >기억이 안 나요</button>
+                </div>
+              ) : (
+                /* 기억이 안 나요 모드 — 자유 텍스트 입력 */
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, color: '#999', flex: 1 }}>날짜 미기록</span>
+                    <button
+                      onClick={() => setDateUnknown(false)}
+                      style={{ fontSize: 12, padding: '4px 10px', background: 'none', border: '1px solid #ddd',
+                        borderRadius: 6, cursor: 'pointer', color: '#555', whiteSpace: 'nowrap' }}
+                    >날짜 입력하기</button>
+                  </div>
+                  <input
+                    value={lifePeriod}
+                    onChange={e => setLifePeriod(e.target.value)}
+                    placeholder="정확한 날짜가 기억나지 않는다면 자유롭게 남겨보세요 (예: 고등학생 때, 군대에서, 2010년쯤)"
+                    style={{ width: '100%', padding: '6px 8px', fontSize: 12, border: '1px solid #ddd',
+                      borderRadius: 6, background: 'transparent', color: 'inherit',
+                      fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="mactions">

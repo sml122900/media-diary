@@ -129,6 +129,7 @@ router.put('/:id', auth, async (req, res) => {
     watched_with, watched_at_place, mood, companion_names,
     watched_at_custom,
     life_period,
+    clear_watched_at,
   } = req.body;
   try {
     const result = await pool.query(
@@ -137,6 +138,7 @@ router.put('/:id', auth, async (req, res) => {
          type=$6, rating=$7, review_text=$8, review_date=$9,
          is_public=$10,
          watched_at = CASE
+           WHEN $20 THEN NULL
            WHEN $11 AND $18::text IS NOT NULL THEN $18::timestamp
            WHEN $11 AND ($7::int > 0 OR $8::text <> '') THEN NOW()
            WHEN $11 AND $7::int = 0 AND $8::text = ''   THEN NULL
@@ -146,7 +148,7 @@ router.put('/:id', auth, async (req, res) => {
          watched_at_place  = COALESCE($14, watched_at_place),
          mood              = COALESCE($15, mood),
          companion_names   = COALESCE($16, companion_names),
-         life_period       = COALESCE($19, life_period)
+         life_period       = $19
        WHERE id=$12 AND user_id=$17
        RETURNING *`,
       [
@@ -159,6 +161,7 @@ router.put('/:id', auth, async (req, res) => {
         req.user.id,
         watched_at_custom ?? null,
         life_period || null,
+        clear_watched_at === true,
       ]
     );
     if (!result.rows[0]) {
