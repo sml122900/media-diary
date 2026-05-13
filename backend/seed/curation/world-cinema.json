@@ -1,0 +1,81 @@
+{
+  "lists": [
+    {
+      "slug": "japanese-cinema",
+      "title": "일본 영화 명작",
+      "category": "genre",
+      "description": "구로사와 아키라부터 고레에다 히로카즈까지 일본 영화 걸작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 16,
+      "items": [
+        { "tmdb_id": 11426,  "tmdb_type": "movie", "title": "라쇼몽",                 "year": 1950, "display_order": 1  },
+        { "tmdb_id": 11645,  "tmdb_type": "movie", "title": "7인의 사무라이",          "year": 1954, "display_order": 2  },
+        { "tmdb_id": 10494,  "tmdb_type": "movie", "title": "도쿄 이야기",             "year": 1953, "display_order": 3  },
+        { "tmdb_id": 149,    "tmdb_type": "movie", "title": "아키라",                 "year": 1988, "display_order": 4  },
+        { "tmdb_id": 129,    "tmdb_type": "movie", "title": "센과 치히로의 행방불명",   "year": 2001, "display_order": 5  },
+        { "tmdb_id": 488383, "tmdb_type": "movie", "title": "어느 가족",              "year": 2018, "display_order": 6  },
+        { "tmdb_id": 372058, "tmdb_type": "movie", "title": "너의 이름은.",            "year": 2016, "display_order": 7  },
+        { "tmdb_id": 758866, "tmdb_type": "movie", "title": "드라이브 마이 카",        "year": 2021, "display_order": 8  },
+        { "tmdb_id": 1050035,"tmdb_type": "movie", "title": "괴물",                   "year": 2023, "display_order": 9  },
+        { "tmdb_id": 976893, "tmdb_type": "movie", "title": "퍼펙트 데이즈",          "year": 2023, "display_order": 10 },
+        { "tmdb_id": 8937,   "tmdb_type": "movie", "title": "도쿄 소나타",            "year": 2008, "display_order": 11 }
+      ]
+    },
+    {
+      "slug": "french-cinema",
+      "title": "프랑스 영화 명작",
+      "category": "genre",
+      "description": "누벨바그부터 현대 프랑스 영화의 정수",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 17,
+      "items": [
+        { "tmdb_id": 1930,   "tmdb_type": "movie", "title": "400번의 구타",            "year": 1959, "display_order": 1 },
+        { "tmdb_id": 101,    "tmdb_type": "movie", "title": "레옹",                   "year": 1994, "display_order": 2 },
+        { "tmdb_id": 194,    "tmdb_type": "movie", "title": "아멜리에",               "year": 2001, "display_order": 3 },
+        { "tmdb_id": 152584, "tmdb_type": "movie", "title": "가장 따뜻한 색, 블루",   "year": 2013, "display_order": 4 },
+        { "tmdb_id": 314402, "tmdb_type": "movie", "title": "디판",                   "year": 2015, "display_order": 5 },
+        { "tmdb_id": 531428, "tmdb_type": "movie", "title": "불타는 여인의 초상",     "year": 2019, "display_order": 6 },
+        { "tmdb_id": 832079, "tmdb_type": "movie", "title": "슬픔의 삼각형",          "year": 2022, "display_order": 7 },
+        { "tmdb_id": 915935, "tmdb_type": "movie", "title": "추락의 해부",            "year": 2023, "display_order": 8 }
+      ]
+    },
+    {
+      "slug": "british-cinema",
+      "title": "영국 영화 명작",
+      "category": "genre",
+      "description": "영국 특유의 위트와 계급 의식이 담긴 영화들",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 18,
+      "items": [
+        { "tmdb_id": 627,    "tmdb_type": "movie", "title": "트레인스포팅",           "year": 1996, "display_order": 1 },
+        { "tmdb_id": 45269,  "tmdb_type": "movie", "title": "킹스 스피치",            "year": 2010, "display_order": 2 },
+        { "tmdb_id": 122906, "tmdb_type": "movie", "title": "어바웃 타임",            "year": 2013, "display_order": 3 },
+        { "tmdb_id": 264660, "tmdb_type": "movie", "title": "엑스 마키나",            "year": 2014, "display_order": 4 },
+        { "tmdb_id": 374720, "tmdb_type": "movie", "title": "덩케르크",              "year": 2017, "display_order": 5 },
+        { "tmdb_id": 530915, "tmdb_type": "movie", "title": "1917",                   "year": 2019, "display_order": 6 },
+        { "tmdb_id": 838209, "tmdb_type": "movie", "title": "더 페이버릿",            "year": 2018, "display_order": 7 }
+      ]
+    },
+    {
+      "slug": "hongkong-cinema",
+      "title": "홍콩 영화 명작",
+      "category": "genre",
+      "description": "왕가위·오우삼·두기봉의 홍콩 누아르·무협 황금기",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 19,
+      "items": [
+        { "tmdb_id": 11471,  "tmdb_type": "movie", "title": "영웅본색",               "year": 1986, "display_order": 1 },
+        { "tmdb_id": 11622,  "tmdb_type": "movie", "title": "중경삼림",               "year": 1994, "display_order": 2 },
+        { "tmdb_id": 28732,  "tmdb_type": "movie", "title": "화양연화",               "year": 2000, "display_order": 3 },
+        { "tmdb_id": 10775,  "tmdb_type": "movie", "title": "인파이터널 어페어",       "year": 2002, "display_order": 4 },
+        { "tmdb_id": 9044,   "tmdb_type": "movie", "title": "2046",                   "year": 2004, "display_order": 5 },
+        { "tmdb_id": 40751,  "tmdb_type": "movie", "title": "동사서독",               "year": 1994, "display_order": 6 },
+        { "tmdb_id": 10835,  "tmdb_type": "movie", "title": "더 킬러",               "year": 1989, "display_order": 7 }
+      ]
+    }
+  ]
+}

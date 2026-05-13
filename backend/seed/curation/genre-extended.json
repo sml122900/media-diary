@@ -1,0 +1,164 @@
+{
+  "lists": [
+    {
+      "slug": "noir-films",
+      "title": "누아르 영화 명작",
+      "category": "genre",
+      "description": "범죄·배신·어둠의 미학 — 고전부터 현대 누아르까지",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 5,
+      "items": [
+        { "tmdb_id": 1911,   "tmdb_type": "movie", "title": "이중 배상",              "year": 1944, "display_order": 1  },
+        { "tmdb_id": 280,    "tmdb_type": "movie", "title": "선셋 대로",              "year": 1950, "display_order": 2  },
+        { "tmdb_id": 103,    "tmdb_type": "movie", "title": "택시 드라이버",          "year": 1976, "display_order": 3  },
+        { "tmdb_id": 500,    "tmdb_type": "movie", "title": "저수지의 개들",          "year": 1992, "display_order": 4  },
+        { "tmdb_id": 680,    "tmdb_type": "movie", "title": "펄프 픽션",              "year": 1994, "display_order": 5  },
+        { "tmdb_id": 807,    "tmdb_type": "movie", "title": "세븐",                  "year": 1995, "display_order": 6  },
+        { "tmdb_id": 275,    "tmdb_type": "movie", "title": "파고",                  "year": 1996, "display_order": 7  },
+        { "tmdb_id": 2118,   "tmdb_type": "movie", "title": "LA 컨피덴셜",           "year": 1997, "display_order": 8  },
+        { "tmdb_id": 77,     "tmdb_type": "movie", "title": "메멘토",                "year": 2000, "display_order": 9  },
+        { "tmdb_id": 769,    "tmdb_type": "movie", "title": "좋은 친구들",           "year": 1990, "display_order": 10 },
+        { "tmdb_id": 11344,  "tmdb_type": "movie", "title": "달콤한 인생",           "year": 2005, "display_order": 11 },
+        { "tmdb_id": 1422,   "tmdb_type": "movie", "title": "디파티드",              "year": 2006, "display_order": 12 },
+        { "tmdb_id": 210577, "tmdb_type": "movie", "title": "나를 찾아줘",           "year": 2014, "display_order": 13 }
+      ]
+    },
+    {
+      "slug": "music-films",
+      "title": "음악 영화 명작",
+      "category": "genre",
+      "description": "음악이 영혼을 움직이는 영화들 — 뮤지컬부터 록 다큐까지",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 6,
+      "items": [
+        { "tmdb_id": 105,    "tmdb_type": "movie", "title": "사운드 오브 뮤직",       "year": 1965, "display_order": 1 },
+        { "tmdb_id": 597,    "tmdb_type": "movie", "title": "보헤미안 랩소디",        "year": 2018, "display_order": 2 },
+        { "tmdb_id": 244786, "tmdb_type": "movie", "title": "위플래쉬",              "year": 2014, "display_order": 3 },
+        { "tmdb_id": 313369, "tmdb_type": "movie", "title": "라라랜드",              "year": 2016, "display_order": 4 },
+        { "tmdb_id": 24277,  "tmdb_type": "movie", "title": "원스",                  "year": 2007, "display_order": 5 },
+        { "tmdb_id": 399174, "tmdb_type": "movie", "title": "로켓맨",                "year": 2019, "display_order": 6 },
+        { "tmdb_id": 359940, "tmdb_type": "movie", "title": "그레이티스트 쇼맨",     "year": 2017, "display_order": 7 },
+        { "tmdb_id": 378044, "tmdb_type": "movie", "title": "스타 이즈 본",          "year": 2018, "display_order": 8 },
+        { "tmdb_id": 505062, "tmdb_type": "movie", "title": "어제",                  "year": 2019, "display_order": 9 },
+        { "tmdb_id": 615777, "tmdb_type": "movie", "title": "틱, 틱... 붐!",         "year": 2021, "display_order": 10 }
+      ]
+    },
+    {
+      "slug": "documentary-classics",
+      "title": "다큐멘터리 명작",
+      "category": "genre",
+      "description": "현실을 가장 강렬하게 담은 다큐멘터리 걸작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 7,
+      "items": [
+        { "tmdb_id": 10837,  "tmdb_type": "movie", "title": "마이클 무어의 화씨 9/11", "year": 2004, "display_order": 1 },
+        { "tmdb_id": 241574, "tmdb_type": "movie", "title": "에이미",                 "year": 2015, "display_order": 2 },
+        { "tmdb_id": 254709, "tmdb_type": "movie", "title": "아이카루스",             "year": 2017, "display_order": 3 },
+        { "tmdb_id": 503176, "tmdb_type": "movie", "title": "더 사이렌",             "year": 2019, "display_order": 4 },
+        { "tmdb_id": 397422, "tmdb_type": "movie", "title": "13th",                  "year": 2016, "display_order": 5 },
+        { "tmdb_id": 656690, "tmdb_type": "movie", "title": "더 소셜 딜레마",         "year": 2020, "display_order": 6 },
+        { "tmdb_id": 826175, "tmdb_type": "movie", "title": "섬머 오브 소울",         "year": 2021, "display_order": 7 }
+      ]
+    },
+    {
+      "slug": "sports-films",
+      "title": "스포츠 영화 명작",
+      "category": "genre",
+      "description": "한계를 넘는 인간 드라마 — 스포츠 영화의 정수",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 8,
+      "items": [
+        { "tmdb_id": 1366,   "tmdb_type": "movie", "title": "록키",                   "year": 1976, "display_order": 1 },
+        { "tmdb_id": 1373,   "tmdb_type": "movie", "title": "성난 황소",              "year": 1980, "display_order": 2 },
+        { "tmdb_id": 9443,   "tmdb_type": "movie", "title": "불의 전차",              "year": 1981, "display_order": 3 },
+        { "tmdb_id": 9390,   "tmdb_type": "movie", "title": "제리 맥과이어",          "year": 1996, "display_order": 4 },
+        { "tmdb_id": 70074,  "tmdb_type": "movie", "title": "머니볼",                 "year": 2011, "display_order": 5 },
+        { "tmdb_id": 244786, "tmdb_type": "movie", "title": "위플래쉬",              "year": 2014, "display_order": 6 },
+        { "tmdb_id": 359724, "tmdb_type": "movie", "title": "포드 V 페라리",          "year": 2019, "display_order": 7 },
+        { "tmdb_id": 985939, "tmdb_type": "movie", "title": "더 퍼스트 슬램덩크",    "year": 2022, "display_order": 8 }
+      ]
+    },
+    {
+      "slug": "war-films",
+      "title": "전쟁 영화 명작",
+      "category": "genre",
+      "description": "전쟁의 광기와 인간성 — 반전 명작부터 전투 블록버스터까지",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 9,
+      "items": [
+        { "tmdb_id": 764,    "tmdb_type": "movie", "title": "지옥의 묵시록",          "year": 1979, "display_order": 1 },
+        { "tmdb_id": 600,    "tmdb_type": "movie", "title": "풀 메탈 재킷",           "year": 1987, "display_order": 2 },
+        { "tmdb_id": 424,    "tmdb_type": "movie", "title": "쉰들러 리스트",          "year": 1993, "display_order": 3 },
+        { "tmdb_id": 857,    "tmdb_type": "movie", "title": "라이언 일병 구하기",      "year": 1998, "display_order": 4 },
+        { "tmdb_id": 8741,   "tmdb_type": "movie", "title": "씬 레드 라인",           "year": 1998, "display_order": 5 },
+        { "tmdb_id": 12162,  "tmdb_type": "movie", "title": "허트 로커",              "year": 2009, "display_order": 6 },
+        { "tmdb_id": 374720, "tmdb_type": "movie", "title": "덩케르크",              "year": 2017, "display_order": 7 },
+        { "tmdb_id": 11658,  "tmdb_type": "movie", "title": "태극기 휘날리며",        "year": 2004, "display_order": 8 },
+        { "tmdb_id": 607844, "tmdb_type": "movie", "title": "모가디슈",              "year": 2021, "display_order": 9 }
+      ]
+    },
+    {
+      "slug": "courtroom-social-drama",
+      "title": "법정·사회 드라마",
+      "category": "genre",
+      "description": "사회 부조리와 정의를 다룬 법정·사회파 드라마",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 10,
+      "items": [
+        { "tmdb_id": 4476,   "tmdb_type": "movie", "title": "12인의 성난 사람들",     "year": 1957, "display_order": 1 },
+        { "tmdb_id": 274,    "tmdb_type": "movie", "title": "양들의 침묵",            "year": 1991, "display_order": 2 },
+        { "tmdb_id": 314365, "tmdb_type": "movie", "title": "스포트라이트",           "year": 2015, "display_order": 3 },
+        { "tmdb_id": 392044, "tmdb_type": "movie", "title": "랍스터",                "year": 2015, "display_order": 4 },
+        { "tmdb_id": 76203,  "tmdb_type": "movie", "title": "노예 12년",              "year": 2013, "display_order": 5 },
+        { "tmdb_id": 242452, "tmdb_type": "movie", "title": "변호인",                "year": 2013, "display_order": 6 },
+        { "tmdb_id": 437103, "tmdb_type": "movie", "title": "1987",                  "year": 2017, "display_order": 7 },
+        { "tmdb_id": 664767, "tmdb_type": "movie", "title": "더 트라이얼 오브 더 시카고 7", "year": 2020, "display_order": 8 }
+      ]
+    },
+    {
+      "slug": "coming-of-age",
+      "title": "청춘 영화",
+      "category": "genre",
+      "description": "성장과 방황 — 청춘의 아름다움을 담은 영화들",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 11,
+      "items": [
+        { "tmdb_id": 638,    "tmdb_type": "movie", "title": "스탠 바이 미",            "year": 1986, "display_order": 1 },
+        { "tmdb_id": 1813,   "tmdb_type": "movie", "title": "죽은 시인의 사회",        "year": 1989, "display_order": 2 },
+        { "tmdb_id": 489,    "tmdb_type": "movie", "title": "굿 윌 헌팅",             "year": 1997, "display_order": 3 },
+        { "tmdb_id": 77117,  "tmdb_type": "movie", "title": "써니",                   "year": 2011, "display_order": 4 },
+        { "tmdb_id": 376867, "tmdb_type": "movie", "title": "문라이트",               "year": 2016, "display_order": 5 },
+        { "tmdb_id": 378064, "tmdb_type": "movie", "title": "목소리의 형태",          "year": 2016, "display_order": 6 },
+        { "tmdb_id": 395990, "tmdb_type": "movie", "title": "레이디 버드",            "year": 2017, "display_order": 7 },
+        { "tmdb_id": 522938, "tmdb_type": "movie", "title": "미드나잇 선",            "year": 2018, "display_order": 8 },
+        { "tmdb_id": 558070, "tmdb_type": "movie", "title": "페어웰",                "year": 2019, "display_order": 9 }
+      ]
+    },
+    {
+      "slug": "family-films",
+      "title": "가족 영화",
+      "category": "genre",
+      "description": "가족과 함께 보기 좋은 명작 — 따뜻함과 감동",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 12,
+      "items": [
+        { "tmdb_id": 771,    "tmdb_type": "movie", "title": "나 홀로 집에",            "year": 1990, "display_order": 1 },
+        { "tmdb_id": 8392,   "tmdb_type": "movie", "title": "이웃집 토토로",          "year": 1988, "display_order": 2 },
+        { "tmdb_id": 9806,   "tmdb_type": "movie", "title": "인크레더블",             "year": 2004, "display_order": 3 },
+        { "tmdb_id": 14160,  "tmdb_type": "movie", "title": "업",                     "year": 2009, "display_order": 4 },
+        { "tmdb_id": 109445, "tmdb_type": "movie", "title": "겨울왕국",              "year": 2013, "display_order": 5 },
+        { "tmdb_id": 354912, "tmdb_type": "movie", "title": "코코",                   "year": 2017, "display_order": 6 },
+        { "tmdb_id": 776503, "tmdb_type": "movie", "title": "코다",                   "year": 2021, "display_order": 7 },
+        { "tmdb_id": 976573, "tmdb_type": "movie", "title": "엘리멘탈",              "year": 2023, "display_order": 8 }
+      ]
+    }
+  ]
+}

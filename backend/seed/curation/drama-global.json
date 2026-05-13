@@ -1,0 +1,73 @@
+{
+  "lists": [
+    {
+      "slug": "us-sitcom-classics",
+      "title": "미국 시트콤 명작",
+      "category": "drama",
+      "description": "프렌즈·빅뱅이론·오피스 등 미국 시트콤 역사를 바꾼 명작",
+      "region": "global",
+      "media_type": "drama",
+      "display_order": 5,
+      "items": [
+        { "tmdb_id": 1668,   "tmdb_type": "tv", "title": "프렌즈",                   "year": 1994, "display_order": 1  },
+        { "tmdb_id": 1418,   "tmdb_type": "tv", "title": "빅뱅이론",                 "year": 2007, "display_order": 2  },
+        { "tmdb_id": 2316,   "tmdb_type": "tv", "title": "더 오피스",               "year": 2005, "display_order": 3  },
+        { "tmdb_id": 4556,   "tmdb_type": "tv", "title": "파크스 앤 레크리에이션",   "year": 2009, "display_order": 4  },
+        { "tmdb_id": 1400,   "tmdb_type": "tv", "title": "하우 아이 멧 유어 마더",   "year": 2005, "display_order": 5  },
+        { "tmdb_id": 66732,  "tmdb_type": "tv", "title": "스트레인저 씽스",          "year": 2016, "display_order": 6  },
+        { "tmdb_id": 2710,   "tmdb_type": "tv", "title": "모던 패밀리",              "year": 2009, "display_order": 7  },
+        { "tmdb_id": 1421,   "tmdb_type": "tv", "title": "커뮤니티",                "year": 2009, "display_order": 8  }
+      ]
+    },
+    {
+      "slug": "bbc-british-drama",
+      "title": "영국 드라마 명작 (BBC)",
+      "category": "drama",
+      "description": "BBC·ITV·채널4 영국 명작 드라마",
+      "region": "global",
+      "media_type": "drama",
+      "display_order": 6,
+      "items": [
+        { "tmdb_id": 57243,  "tmdb_type": "tv", "title": "닥터 후",                  "year": 2005, "display_order": 1 },
+        { "tmdb_id": 19885,  "tmdb_type": "tv", "title": "셜록",                     "year": 2010, "display_order": 2 },
+        { "tmdb_id": 61818,  "tmdb_type": "tv", "title": "블랙 미러",                "year": 2011, "display_order": 3 },
+        { "tmdb_id": 65495,  "tmdb_type": "tv", "title": "피키 블라인더스",          "year": 2013, "display_order": 4 },
+        { "tmdb_id": 60574,  "tmdb_type": "tv", "title": "더 크라운",               "year": 2016, "display_order": 5 },
+        { "tmdb_id": 87108,  "tmdb_type": "tv", "title": "체르노빌",                "year": 2019, "display_order": 6 },
+        { "tmdb_id": 71590,  "tmdb_type": "tv", "title": "화이트 로터스",            "year": 2021, "display_order": 7 }
+      ]
+    },
+    {
+      "slug": "chinese-drama",
+      "title": "중국 드라마 화제작",
+      "category": "drama",
+      "description": "전 세계에서 사랑받은 중국 드라마 명작",
+      "region": "global",
+      "media_type": "drama",
+      "display_order": 7,
+      "items": [
+        { "tmdb_id": 92783,  "tmdb_type": "tv", "title": "낭야방",                   "year": 2015, "display_order": 1 },
+        { "tmdb_id": 95842,  "tmdb_type": "tv", "title": "경여년",                   "year": 2019, "display_order": 2 },
+        { "tmdb_id": 123050, "tmdb_type": "tv", "title": "산하표",                   "year": 2021, "display_order": 3 },
+        { "tmdb_id": 220150, "tmdb_type": "tv", "title": "몽화록",                   "year": 2022, "display_order": 4 }
+      ]
+    },
+    {
+      "slug": "japanese-drama",
+      "title": "일본 드라마 명작",
+      "category": "drama",
+      "description": "일본 트렌디 드라마부터 사회파 명작까지",
+      "region": "global",
+      "media_type": "drama",
+      "display_order": 8,
+      "items": [
+        { "tmdb_id": 62644,  "tmdb_type": "tv", "title": "한자와 나오키",             "year": 2013, "display_order": 1 },
+        { "tmdb_id": 44006,  "tmdb_type": "tv", "title": "리갈 하이",               "year": 2012, "display_order": 2 },
+        { "tmdb_id": 71116,  "tmdb_type": "tv", "title": "도망치는 건 부끄럽지만 도움이 된다", "year": 2016, "display_order": 3 },
+        { "tmdb_id": 87257,  "tmdb_type": "tv", "title": "언내추럴",                 "year": 2018, "display_order": 4 },
+        { "tmdb_id": 96080,  "tmdb_type": "tv", "title": "MIU404",                   "year": 2020, "display_order": 5 },
+        { "tmdb_id": 115264, "tmdb_type": "tv", "title": "사이렌 제로 여성특수수사반", "year": 2015, "display_order": 6 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "lists": [
+    {
+      "slug": "indiana-jones",
+      "title": "인디아나 존스 시리즈",
+      "category": "franchise",
+      "description": "스티븐 스필버그·해리슨 포드의 인디아나 존스 전 시리즈",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 22,
+      "items": [
+        { "tmdb_id": 85,     "tmdb_type": "movie", "title": "레이더스",                       "year": 1981, "display_order": 1 },
+        { "tmdb_id": 87,     "tmdb_type": "movie", "title": "인디아나 존스: 마궁의 사원",     "year": 1984, "display_order": 2 },
+        { "tmdb_id": 89,     "tmdb_type": "movie", "title": "인디아나 존스: 최후의 성전",     "year": 1989, "display_order": 3 },
+        { "tmdb_id": 217,    "tmdb_type": "movie", "title": "인디아나 존스: 크리스탈 해골",   "year": 2008, "display_order": 4 },
+        { "tmdb_id": 285,    "tmdb_type": "movie", "title": "인디아나 존스: 운명의 다이얼",   "year": 2023, "display_order": 5 }
+      ]
+    },
+    {
+      "slug": "bourne-series",
+      "title": "본 시리즈",
+      "category": "franchise",
+      "description": "맷 데이먼 주연 제이슨 본 전 시리즈",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 23,
+      "items": [
+        { "tmdb_id": 2501,   "tmdb_type": "movie", "title": "본 아이덴티티",           "year": 2002, "display_order": 1 },
+        { "tmdb_id": 2502,   "tmdb_type": "movie", "title": "본 슈프리머시",           "year": 2004, "display_order": 2 },
+        { "tmdb_id": 2503,   "tmdb_type": "movie", "title": "본 얼티메이텀",           "year": 2007, "display_order": 3 },
+        { "tmdb_id": 49538,  "tmdb_type": "movie", "title": "본 레거시",               "year": 2012, "display_order": 4 },
+        { "tmdb_id": 260346, "tmdb_type": "movie", "title": "제이슨 본",               "year": 2016, "display_order": 5 }
+      ]
+    },
+    {
+      "slug": "alien-series",
+      "title": "에일리언 시리즈",
+      "category": "franchise",
+      "description": "리들리 스콧이 만든 공포 SF 에일리언 전 시리즈",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 24,
+      "items": [
+        { "tmdb_id": 348,    "tmdb_type": "movie", "title": "에일리언",               "year": 1979, "display_order": 1 },
+        { "tmdb_id": 679,    "tmdb_type": "movie", "title": "에일리언 2",             "year": 1986, "display_order": 2 },
+        { "tmdb_id": 8077,   "tmdb_type": "movie", "title": "에일리언 3",             "year": 1992, "display_order": 3 },
+        { "tmdb_id": 8078,   "tmdb_type": "movie", "title": "에일리언 4: 리저렉션",   "year": 1997, "display_order": 4 },
+        { "tmdb_id": 70981,  "tmdb_type": "movie", "title": "프로메테우스",           "year": 2012, "display_order": 5 },
+        { "tmdb_id": 198663, "tmdb_type": "movie", "title": "에일리언: 코버넌트",     "year": 2017, "display_order": 6 },
+        { "tmdb_id": 945961, "tmdb_type": "movie", "title": "에일리언: 로물루스",     "year": 2024, "display_order": 7 }
+      ]
+    },
+    {
+      "slug": "terminator-series",
+      "title": "터미네이터 시리즈",
+      "category": "franchise",
+      "description": "제임스 카메론의 터미네이터 시리즈 전편",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 25,
+      "items": [
+        { "tmdb_id": 218,    "tmdb_type": "movie", "title": "터미네이터",             "year": 1984, "display_order": 1 },
+        { "tmdb_id": 280,    "tmdb_type": "movie", "title": "터미네이터 2",           "year": 1991, "display_order": 2 },
+        { "tmdb_id": 296,    "tmdb_type": "movie", "title": "터미네이터 3",           "year": 2003, "display_order": 3 },
+        { "tmdb_id": 534,    "tmdb_type": "movie", "title": "터미네이터: 미래전쟁의 시작", "year": 2009, "display_order": 4 },
+        { "tmdb_id": 87101,  "tmdb_type": "movie", "title": "터미네이터: 제니시스",   "year": 2015, "display_order": 5 },
+        { "tmdb_id": 399579, "tmdb_type": "movie", "title": "터미네이터: 다크 페이트", "year": 2019, "display_order": 6 }
+      ]
+    },
+    {
+      "slug": "batman-nolan",
+      "title": "다크 나이트 트릴로지",
+      "category": "franchise",
+      "description": "크리스토퍼 놀란 감독 배트맨 3부작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 26,
+      "items": [
+        { "tmdb_id": 272,    "tmdb_type": "movie", "title": "배트맨 비긴즈",           "year": 2005, "display_order": 1 },
+        { "tmdb_id": 155,    "tmdb_type": "movie", "title": "다크 나이트",             "year": 2008, "display_order": 2 },
+        { "tmdb_id": 49026,  "tmdb_type": "movie", "title": "다크 나이트 라이즈",      "year": 2012, "display_order": 3 }
+      ]
+    },
+    {
+      "slug": "planet-apes",
+      "title": "혹성탈출 리부트 시리즈",
+      "category": "franchise",
+      "description": "시저의 이야기 — 혹성탈출 리부트 5부작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 27,
+      "items": [
+        { "tmdb_id": 61791,  "tmdb_type": "movie", "title": "혹성탈출: 진화의 시작",  "year": 2011, "display_order": 1 },
+        { "tmdb_id": 75612,  "tmdb_type": "movie", "title": "혹성탈출: 반격의 서막",  "year": 2014, "display_order": 2 },
+        { "tmdb_id": 281338, "tmdb_type": "movie", "title": "혹성탈출: 종의 전쟁",    "year": 2017, "display_order": 3 },
+        { "tmdb_id": 653346, "tmdb_type": "movie", "title": "혹성탈출: 새로운 시대",  "year": 2024, "display_order": 4 }
+      ]
+    },
+    {
+      "slug": "ip-man-series",
+      "title": "엽문 시리즈",
+      "category": "franchise",
+      "description": "동자화 감독·견자단 주연 엽문 4부작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 28,
+      "items": [
+        { "tmdb_id": 24494,  "tmdb_type": "movie", "title": "엽문",                   "year": 2008, "display_order": 1 },
+        { "tmdb_id": 40818,  "tmdb_type": "movie", "title": "엽문 2",                 "year": 2010, "display_order": 2 },
+        { "tmdb_id": 189759, "tmdb_type": "movie", "title": "엽문 3",                 "year": 2015, "display_order": 3 },
+        { "tmdb_id": 524048, "tmdb_type": "movie", "title": "엽문 4: 더 파이널",      "year": 2019, "display_order": 4 }
+      ]
+    },
+    {
+      "slug": "ocean-heist",
+      "title": "오션스 시리즈",
+      "category": "franchise",
+      "description": "스티븐 소더버그 감독 오션스 스틸리스트 3부작",
+      "region": "global",
+      "media_type": "movie",
+      "display_order": 29,
+      "items": [
+        { "tmdb_id": 298,    "tmdb_type": "movie", "title": "오션스 일레븐",           "year": 2001, "display_order": 1 },
+        { "tmdb_id": 299,    "tmdb_type": "movie", "title": "오션스 트웰브",           "year": 2004, "display_order": 2 },
+        { "tmdb_id": 300,    "tmdb_type": "movie", "title": "오션스 써틴",             "year": 2007, "display_order": 3 },
+        { "tmdb_id": 402900, "tmdb_type": "movie", "title": "오션스 8",               "year": 2018, "display_order": 4 }
+      ]
+    }
+  ]
+}
