@@ -82,4 +82,14 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// DELETE /api/auth/me — 회원 탈퇴 (users 삭제 시 관련 테이블 CASCADE 삭제)
+router.delete('/me', authMiddleware, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM users WHERE id = $1', [req.user.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

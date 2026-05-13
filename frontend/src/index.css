@@ -364,6 +364,8 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .menu-item:hover { background: #f5f5f3; }
 .menu-item-danger { color: #c0392b; }
 .menu-item-danger:hover { background: #fdf0ef; }
+.menu-item-delete { color: #bbb; font-size: 12px; }
+.menu-item-delete:hover { background: #fdf0ef; color: #c0392b; }
 
 /* ── 소셜 피드 / 비교 ── */
 .feed-item {

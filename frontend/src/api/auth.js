@@ -44,3 +44,15 @@ export async function getMe(token) {
   });
   return res.data;
 }
+
+/**
+ * 회원 탈퇴 API 호출 — users 삭제 및 연관 데이터 CASCADE 삭제
+ * @param {string} token - JWT 토큰
+ * @returns {Promise<{success: boolean}>}
+ */
+export async function deleteAccount(token) {
+  const res = await api.delete('/api/auth/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
