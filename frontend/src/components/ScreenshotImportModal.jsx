@@ -28,7 +28,7 @@ const OTT_OPTIONS = [
 
 /** 신뢰도에 따른 색상 */
 function ConfidenceBadge({ confidence }) {
-  if (confidence >= 0.8) return <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6, background: '#e8f5e9', color: '#2e7d32' }}>✓ 높음</span>;
+  if (confidence >= 0.7) return <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6, background: '#e8f5e9', color: '#2e7d32' }}>✓ 높음</span>;
   if (confidence >= 0.5) return <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6, background: '#fff8e1', color: '#f57f17' }}>△ 보통</span>;
   return <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6, background: '#fce4ec', color: '#c62828' }}>✗ 낮음</span>;
 }

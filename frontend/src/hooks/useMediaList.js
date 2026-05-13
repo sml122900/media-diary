@@ -54,6 +54,8 @@ export function useMediaList(user) {
       cast_info: item.cast_info, poster_url: item.poster_url,
       type: item.type, rating: 0, review_text: '', review_date: '',
       set_watched_at: true,
+      // life_period 보존 — 감상 삭제 시 시청 시기 텍스트는 유지
+      life_period: item.life_period || null,
     });
     setItems(prev => prev.map(i => i.id === updated.id ? updated : i));
   };
@@ -77,6 +79,8 @@ export function useMediaList(user) {
       review_text: item.review_text,
       review_date: item.review_date,
       set_watched_at: false,  // 정보 편집 시 watched_at 유지
+      // life_period 보존 — 항목 정보 편집 시 시청 시기 텍스트는 유지
+      life_period: item.life_period || null,
     });
     setItems(prev => prev.map(i => i.id === updated.id ? updated : i));
     return updated;
