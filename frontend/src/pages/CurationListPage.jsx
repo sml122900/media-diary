@@ -212,17 +212,26 @@ export default function CurationListPage() {
         </>
       )}
 
-      {/* 전체 선택 버튼 + 상태 요약 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+      {/* 모두 선택/해제 버튼 + 선택 카운트 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
         <button
           onClick={toggleAll}
           className="btn"
           style={{ fontSize: 13, padding: '6px 14px' }}
         >
-          {allSelected ? '전체 해제' : '전체 선택'}
+          {allSelected ? '모두 해제' : '모두 선택'}
         </button>
         <span style={{ fontSize: 13, color: 'var(--text-secondary, #666)' }}>
-          {items.length}개 중 이미 추가: {items.filter(i => i.already_added).length}개
+          <strong style={{ color: selected.size > 0 ? '#1565C0' : 'var(--text-secondary, #666)' }}>
+            {selected.size}개 선택됨
+          </strong>
+          {' / '}
+          {notAdded.length}개 중
+          {items.filter(i => i.already_added).length > 0 && (
+            <span style={{ marginLeft: 8, color: '#999' }}>
+              (이미 추가: {items.filter(i => i.already_added).length}개)
+            </span>
+          )}
         </span>
       </div>
 
