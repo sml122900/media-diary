@@ -45,67 +45,46 @@
           "display_order": 5
         },
         {
-          "tmdb_id": 273248,
+          "tmdb_id": 194662,
           "tmdb_type": "movie",
           "title": "버드맨",
           "year": 2014,
           "display_order": 6
         },
         {
-          "tmdb_id": 0,
-          "tmdb_type": "movie",
-          "title": "포르 산체스 (From Afar)",
-          "year": 2015,
-          "display_order": 7
-        },
-        {
           "tmdb_id": 399055,
           "tmdb_type": "movie",
           "title": "셰이프 오브 워터",
           "year": 2017,
-          "display_order": 8
+          "display_order": 7
         },
         {
-          "tmdb_id": 490132,
+          "tmdb_id": 426426,
           "tmdb_type": "movie",
           "title": "로마 (Roma)",
           "year": 2018,
-          "display_order": 9
+          "display_order": 8
         },
         {
           "tmdb_id": 475557,
           "tmdb_type": "movie",
           "title": "조커",
           "year": 2019,
-          "display_order": 10
+          "display_order": 9
         },
         {
           "tmdb_id": 748783,
           "tmdb_type": "movie",
           "title": "노매드랜드",
           "year": 2020,
-          "display_order": 11
-        },
-        {
-          "tmdb_id": 0,
-          "tmdb_type": "movie",
-          "title": "배드럭 뱅잉",
-          "year": 2021,
-          "display_order": 12
+          "display_order": 10
         },
         {
           "tmdb_id": 744594,
           "tmdb_type": "movie",
           "title": "화이트 노이즈",
           "year": 2022,
-          "display_order": 13
-        },
-        {
-          "tmdb_id": 0,
-          "tmdb_type": "movie",
-          "title": "푸어 씽스",
-          "year": 2023,
-          "display_order": 14
+          "display_order": 11
         }
       ]
     },
