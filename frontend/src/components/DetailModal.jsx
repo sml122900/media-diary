@@ -56,6 +56,8 @@ export default function DetailModal({
   const [rewatchFormOpen, setRewatchFormOpen] = useState(false);
   const [rewatchRating, setRewatchRating] = useState(0);
   const [rewatchNote, setRewatchNote] = useState('');
+  const [rewatchDate, setRewatchDate] = useState(new Date().toISOString().slice(0, 10)); // 오늘 날짜 기본값
+  const [rewatchDateUnknown, setRewatchDateUnknown] = useState(false); // "기억이 안 나요" 상태
   const [rewatchSaving, setRewatchSaving] = useState(false);
   // 컨텍스트 섹션
   const [contextOpen, setContextOpen] = useState(false);
@@ -146,14 +148,18 @@ export default function DetailModal({
     setRewatchSaving(true);
     try {
       const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      // 날짜 미기록이면 null, 아니면 입력된 날짜 ISO 문자열
+      const watched_at = rewatchDateUnknown ? null : (rewatchDate ? new Date(rewatchDate).toISOString() : null);
       await axios.post(
         `${BASE}/user-media/${item.id}/rewatch`,
-        { rating: rewatchRating, review_text: rewatchNote },
+        { rating: rewatchRating, review_text: rewatchNote, watched_at },
         { headers: auth }
       );
       setRewatchFormOpen(false);
       setRewatchRating(0);
       setRewatchNote('');
+      setRewatchDate(new Date().toISOString().slice(0, 10));
+      setRewatchDateUnknown(false);
       // 이력 새로고침
       const histRes = await axios.get(
         `${BASE}/user-media/history/${item.tmdb_id}`,
@@ -432,11 +438,13 @@ export default function DetailModal({
             {rewatchHistory.length > 1 && (
               <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #f0f0ee' }}>
                 <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>🔁 시청 이력</div>
-                {rewatchHistory.map((h, i) => (
+                {rewatchHistory.map((h) => (
                   <div key={h.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid #f5f5f5', fontSize: 13 }}>
                     <span style={{ color: '#888', minWidth: 20 }}>{h.rewatch_count}회</span>
                     {h.rating > 0 && <span style={{ color: '#f0a500' }}>{'★'.repeat(h.rating)}</span>}
-                    {h.watched_at && <span style={{ color: '#aaa', fontSize: 11 }}>{new Date(h.watched_at).toLocaleDateString('ko-KR')}</span>}
+                    <span style={{ color: '#aaa', fontSize: 11 }}>
+                      {h.watched_at ? new Date(h.watched_at).toLocaleDateString('ko-KR') : '날짜 미기록'}
+                    </span>
                     {h.review_text && <span style={{ color: '#666', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.review_text}</span>}
                   </div>
                 ))}
@@ -454,21 +462,57 @@ export default function DetailModal({
                   >🔁 다시 봤어요</button>
                 ) : (
                   <div style={{ padding: '10px 12px', background: 'rgba(0,0,0,.03)', borderRadius: 8, border: '1px solid #e8e8e8' }}>
-                    <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>재시청 별점</div>
-                    <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+                    {/* 별점 */}
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>별점</div>
+                    <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
                       {[1,2,3,4,5].map(n => (
                         <button key={n} onClick={() => setRewatchRating(r => r === n ? 0 : n)}
                           style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: n <= rewatchRating ? '#f0a500' : '#ccc', padding: 0 }}>★</button>
                       ))}
                     </div>
+
+                    {/* 시청 날짜 */}
+                    <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>시청 날짜</div>
+                    {!rewatchDateUnknown ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                        <input
+                          type="date"
+                          value={rewatchDate}
+                          onChange={e => setRewatchDate(e.target.value)}
+                          style={{ fontSize: 12, padding: '4px 8px', border: '1px solid #ddd', borderRadius: 6,
+                            background: 'transparent', color: 'inherit', flex: 1 }}
+                        />
+                        <button
+                          onClick={() => setRewatchDate(new Date().toISOString().slice(0, 10))}
+                          style={{ fontSize: 11, padding: '4px 8px', background: 'none', border: '1px solid #ddd',
+                            borderRadius: 6, cursor: 'pointer', color: '#555', whiteSpace: 'nowrap' }}
+                        >오늘</button>
+                        <button
+                          onClick={() => setRewatchDateUnknown(true)}
+                          style={{ fontSize: 11, padding: '4px 8px', background: 'none', border: '1px solid #ddd',
+                            borderRadius: 6, cursor: 'pointer', color: '#999', whiteSpace: 'nowrap' }}
+                        >기억 안 나요</button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                        <span style={{ fontSize: 12, color: '#999', flex: 1 }}>날짜 미기록</span>
+                        <button
+                          onClick={() => setRewatchDateUnknown(false)}
+                          style={{ fontSize: 11, padding: '4px 8px', background: 'none', border: '1px solid #ddd',
+                            borderRadius: 6, cursor: 'pointer', color: '#555' }}
+                        >날짜 입력</button>
+                      </div>
+                    )}
+
+                    {/* 메모 */}
                     <textarea
-                      style={{ width: '100%', fontSize: 12, padding: '6px 8px', border: '1px solid #ddd', borderRadius: 6, resize: 'none', height: 60, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
+                      style={{ width: '100%', fontSize: 12, padding: '6px 8px', border: '1px solid #ddd', borderRadius: 6, resize: 'none', height: 56, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
                       value={rewatchNote}
                       onChange={e => setRewatchNote(e.target.value)}
-                      placeholder="재시청 감상 메모..."
+                      placeholder="재시청 감상 메모 (선택)"
                     />
                     <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-                      <button className="btn" style={{ fontSize: 12 }} onClick={() => setRewatchFormOpen(false)}>취소</button>
+                      <button className="btn" style={{ fontSize: 12 }} onClick={() => { setRewatchFormOpen(false); setRewatchDateUnknown(false); }}>취소</button>
                       <button className="btn btn-primary" style={{ fontSize: 12 }} onClick={handleRewatch} disabled={rewatchSaving}>
                         {rewatchSaving ? '저장 중...' : '재시청 기록 저장'}
                       </button>

@@ -192,16 +192,17 @@ router.post('/:id/rewatch', auth, async (req, res) => {
     );
     const nextCount = (maxRow[0]?.max || 1) + 1;
 
-    // 새 시청 기록 삽입
+    // 새 시청 기록 삽입 — watched_at은 클라이언트에서 전달 (null 허용)
+    const watchedAt = req.body.watched_at !== undefined ? req.body.watched_at : new Date().toISOString();
     const { rows } = await pool.query(
       `INSERT INTO user_media
          (user_id,type,title,year,director,cast_info,poster_url,tmdb_id,rating,review_text,rewatch_count,watched_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW())
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
        RETURNING *`,
       [
         req.user.id, o.type, o.title, o.year,
         o.director, o.cast_info, o.poster_url, o.tmdb_id,
-        req.body.rating || 0, req.body.review_text || '', nextCount,
+        req.body.rating || 0, req.body.review_text || '', nextCount, watchedAt,
       ]
     );
     triggerProfileUpdate(req.user.id);
