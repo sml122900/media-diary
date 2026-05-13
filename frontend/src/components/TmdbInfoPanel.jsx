@@ -27,13 +27,37 @@ function ProviderRow({ list, label }) {
 
 /**
  * TMDB 세부 정보 패널
- * @param {{ detail: object|null }} props
+ * @param {{ detail: object|null, tab: 'info'|'ott' }} props
+ * tab='info': 런타임/장르/줄거리 표시
+ * tab='ott': OTT 스트리밍 정보 표시
  */
-export default function TmdbInfoPanel({ detail }) {
+export default function TmdbInfoPanel({ detail, tab = 'info' }) {
   if (!detail) return null;
   const p = detail.providers || {};
   const hasProviders = p.flatrate?.length || p.rent?.length || p.buy?.length;
 
+  if (tab === 'ott') {
+    return hasProviders ? (
+      <div className="ott-box" style={{ marginTop: 0 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+          📺 한국에서 보기
+          {p.link && (
+            <a href={p.link} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 11, fontWeight: 400, color: '#888', textDecoration: 'none' }}>
+              TMDB에서 보기 ↗
+            </a>
+          )}
+        </div>
+        <ProviderRow list={p.flatrate || []} label="구독" />
+        <ProviderRow list={p.rent || []} label="대여" />
+        <ProviderRow list={p.buy || []} label="구매" />
+      </div>
+    ) : (
+      <div style={{ fontSize: 13, color: '#bbb', padding: '12px 0' }}>🚫 한국 OTT 정보 없음</div>
+    );
+  }
+
+  /* tab === 'info' */
   return (
     <>
       {(detail.runtime || detail.score || detail.genres?.length > 0) && (
@@ -42,24 +66,6 @@ export default function TmdbInfoPanel({ detail }) {
           {detail.score && <span className="tmdb-score">★ {detail.score}</span>}
           {(detail.genres || []).map(g => <span key={g} className="tmdb-badge">{g}</span>)}
         </div>
-      )}
-      {hasProviders ? (
-        <div className="ott-box">
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-            📺 한국에서 보기
-            {p.link && (
-              <a href={p.link} target="_blank" rel="noopener noreferrer"
-                style={{ fontSize: 11, fontWeight: 400, color: '#888', textDecoration: 'none' }}>
-                TMDB에서 보기 ↗
-              </a>
-            )}
-          </div>
-          <ProviderRow list={p.flatrate || []} label="구독" />
-          <ProviderRow list={p.rent || []} label="대여" />
-          <ProviderRow list={p.buy || []} label="구매" />
-        </div>
-      ) : (
-        <div style={{ fontSize: 12, color: '#bbb', marginBottom: 8 }}>🚫 한국 OTT 정보 없음</div>
       )}
       {detail.overview && (
         <div className="tmdb-overview">{detail.overview}</div>

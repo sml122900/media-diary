@@ -177,12 +177,12 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 /* ── 상세 모달 ── */
 .modal {
   background: #fff; border-radius: 16px; border: 1px solid #e8e8e6;
-  width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto;
+  width: 100%; max-width: 860px; max-height: 90vh; overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0,0,0,.15);
 }
-.mhead { display: flex; gap: 16px; padding: 1.5rem; border-bottom: 1px solid #f0f0ee; }
+.mhead { display: flex; gap: 20px; padding: 1.5rem; border-bottom: 1px solid #f0f0ee; align-items: flex-start; }
 .mposter {
-  width: 90px; min-width: 90px; aspect-ratio: 2/3; border-radius: 10px;
+  width: 180px; min-width: 180px; aspect-ratio: 2/3; border-radius: 10px;
   overflow: visible; background: #f0f0ee;
   display: flex; align-items: center; justify-content: center;
   font-size: 30px; position: relative;
@@ -190,6 +190,14 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .mposter > img, .mposter > span:first-child {
   position: absolute; inset: 0; border-radius: 10px; overflow: hidden;
 }
+/* 탭 내비게이션 */
+.mtab-nav { display: flex; gap: 0; border-bottom: 1px solid #eee; margin-bottom: 12px; }
+.mtab-btn {
+  padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: #999; transition: color .15s, border-color .15s;
+}
+.mtab-btn.active { color: #1a1a1a; border-bottom-color: #1a1a1a; }
 /* 포스터 변경 버튼 */
 .poster-change-btn {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
@@ -603,7 +611,7 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
     border-radius: 16px 16px 0 0; max-width: 100%; max-height: 92vh;
   }
   .mhead { padding: 1rem; gap: 12px; }
-  .mposter { width: 70px; min-width: 70px; }
+  .mposter { width: 100px; min-width: 100px; }
   .mtitle { font-size: 16px; }
 
   /* 추가 모달 결과 리스트 터치 영역 */
@@ -665,6 +673,9 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .prev-review { background: #222; border-color: #2e2e2e; color: #ccc; }
   .award { background: #2a2200; border-color: #5a4200; color: #f9cc6c; }
   .mhead { border-color: #2e2e2e; }
+  .mtab-nav { border-color: #2e2e2e; }
+  .mtab-btn { color: #555; }
+  .mtab-btn.active { color: #e8e8e8; border-bottom-color: #e8e8e8; }
   .result-item { border-color: #2e2e2e; }
   .result-item:hover { background: #222; }
   .result-title { color: #e8e8e8; }

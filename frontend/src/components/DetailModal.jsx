@@ -48,6 +48,8 @@ export default function DetailModal({
   const [currentPosterUrl, setCurrentPosterUrl] = useState(posterUrl);
   // 리뷰 공개/비공개
   const [isPublic, setIsPublic] = useState(item.is_public || false);
+  // 기본 정보 / 보러가기 탭
+  const [activeTab, setActiveTab] = useState('info');
   // 다른 사람들의 공개 리뷰
   const [publicReviews, setPublicReviews] = useState([]);
   const [publicReviewsLoaded, setPublicReviewsLoaded] = useState(false);
@@ -213,6 +215,7 @@ export default function DetailModal({
                   alt={item.title}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1, borderRadius: 10 }}
                   onError={e => { e.target.style.display = 'none'; }}
+                  loading="eager"
                 />
               )}
               <button
@@ -284,7 +287,18 @@ export default function DetailModal({
               <div className="mmeta">{item.year}{item.director ? ' · ' + item.director : ''}</div>
               <div className="mcast">{item.cast_info ? '출연: ' + item.cast_info : ''}</div>
               {AWARDS[awardKey] && <div><span className="award">🏆 {AWARDS[awardKey]}</span></div>}
-              <TmdbInfoPanel detail={tmdbDetail} />
+              {/* 기본 정보 / 보러가기 탭 */}
+              <div className="mtab-nav">
+                <button
+                  className={`mtab-btn${activeTab === 'info' ? ' active' : ''}`}
+                  onClick={() => setActiveTab('info')}
+                >기본 정보</button>
+                <button
+                  className={`mtab-btn${activeTab === 'ott' ? ' active' : ''}`}
+                  onClick={() => setActiveTab('ott')}
+                >보러가기</button>
+              </div>
+              <TmdbInfoPanel detail={tmdbDetail} tab={activeTab} />
 
               {/* 친구 활동 (팔로잉 중 이 작품을 본 사람) */}
               {friendsActivity && friendsActivity.count > 0 && (
