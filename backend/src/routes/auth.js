@@ -83,8 +83,10 @@ router.get('/me', authMiddleware, async (req, res) => {
 });
 
 // DELETE /api/auth/me — 회원 탈퇴 (users 삭제 시 관련 테이블 CASCADE 삭제)
+// shared_watchlist_items.added_by 는 CASCADE 없는 FK → 먼저 수동 삭제
 router.delete('/me', authMiddleware, async (req, res) => {
   try {
+    await pool.query('DELETE FROM shared_watchlist_items WHERE added_by = $1', [req.user.id]);
     await pool.query('DELETE FROM users WHERE id = $1', [req.user.id]);
     res.json({ success: true });
   } catch (err) {
