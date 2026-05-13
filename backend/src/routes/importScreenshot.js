@@ -12,6 +12,7 @@ const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const { getExtractionPrompt } = require('../services/screenshotPrompts');
 
 // 스크린샷 인식 일일 한도 (이미지 1장 = 1회 카운트)
 const SCREENSHOT_DAILY_LIMIT = 20;
@@ -49,84 +50,114 @@ const OTT_HINTS = {
   other:      'OTT 또는 영화관 앱',
 };
 
-/** TMDB 검색 — 제목+연도+타입으로 가장 유사한 결과 반환 */
+/**
+ * 제목 정규화 — 시즌/회차/괄호연도 제거
+ * "기묘한 이야기 시즌 4" → "기묘한 이야기"
+ * "타이타닉(1997)" → "타이타닉"
+ */
+function normalizeTitle(title) {
+  return title
+    .replace(/\s*시즌\s*\d+/g, '')
+    .replace(/\s*Season\s*\d+/gi, '')
+    .replace(/\s*S\d{1,2}E\d{1,2}/gi, '')
+    .replace(/\s*\d+화/g, '')
+    .replace(/\s*EP\.?\s*\d+/gi, '')
+    .replace(/\(\d{4}\)/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * TMDB 단일 검색 헬퍼
+ */
+async function tmdbSearch(query, type, yearParam, year) {
+  const params = { query, language: 'ko-KR', api_key: TMDB_KEY };
+  if (year) params[yearParam] = year;
+  const qs = new URLSearchParams(params);
+  const res = await fetch(`${TMDB_BASE}/search/${type}?${qs}`);
+  const data = await res.json();
+  return data.results || [];
+}
+
+/**
+ * TMDB 검색 — 4단계 전략
+ * 1. 원본 제목 + 연도
+ * 2. 정규화 제목 + 연도
+ * 3. 원본 제목 (연도 없이)
+ * 4. 정규화 제목 (연도 없이)
+ * 5. 반대 타입으로 재시도 (정규화 제목)
+ */
 async function searchTmdb(title, year, tmdbType) {
   const type = tmdbType === 'movie' ? 'movie' : 'tv';
+  const altType = type === 'movie' ? 'tv' : 'movie';
   const yearParam = type === 'tv' ? 'first_air_date_year' : 'year';
+  const altYearParam = altType === 'tv' ? 'first_air_date_year' : 'year';
+  const normalized = normalizeTitle(title);
 
   try {
-    // 연도 포함 검색
-    if (year) {
-      const qs = new URLSearchParams({ query: title, language: 'ko-KR', api_key: TMDB_KEY, [yearParam]: year });
-      const res = await fetch(`${TMDB_BASE}/search/${type}?${qs}`);
-      const data = await res.json();
-      if (data.results?.length) return { result: data.results[0], type };
+    const strategies = [
+      { q: title,      t: type,    y: year },
+      { q: normalized, t: type,    y: year },
+      { q: title,      t: type,    y: null },
+      { q: normalized, t: type,    y: null },
+      { q: normalized, t: altType, y: null },
+    ];
+
+    for (const s of strategies) {
+      if (!s.q) continue;
+      const yp = s.t === 'tv' ? 'first_air_date_year' : 'year';
+      const results = await tmdbSearch(s.q, s.t, yp, s.y);
+      if (results.length) return { result: results[0], type: s.t };
     }
-
-    // 연도 없이 재검색
-    const qs2 = new URLSearchParams({ query: title, language: 'ko-KR', api_key: TMDB_KEY });
-    const res2 = await fetch(`${TMDB_BASE}/search/${type}?${qs2}`);
-    const data2 = await res2.json();
-    if (data2.results?.length) return { result: data2.results[0], type };
-
-    // 반대 타입으로 재검색
-    const altType = type === 'movie' ? 'tv' : 'movie';
-    const qs3 = new URLSearchParams({ query: title, language: 'ko-KR', api_key: TMDB_KEY });
-    const res3 = await fetch(`${TMDB_BASE}/search/${altType}?${qs3}`);
-    const data3 = await res3.json();
-    if (data3.results?.length) return { result: data3.results[0], type: altType };
   } catch (_) {}
 
   return null;
 }
 
 /**
- * 매칭 신뢰도 계산 (0~1)
- * Claude 추출 제목 vs TMDB 결과 제목 유사도 + 연도 일치 여부
+ * 제목 유사도 계산 (0~1)
+ * 완전 일치 > 포함 > 공통 글자 비율
  */
-function calcConfidence(extracted, tmdbResult, matchedType) {
-  const tmdbTitle = (tmdbResult.title || tmdbResult.name || '').toLowerCase();
-  const extTitle = extracted.title.toLowerCase();
+function titleSimilarity(a, b) {
+  const na = a.toLowerCase().replace(/\s+/g, '');
+  const nb = b.toLowerCase().replace(/\s+/g, '');
+  if (na === nb) return 1.0;
+  if (na.includes(nb) || nb.includes(na)) return 0.85;
+  // 공통 글자 비율
+  const setA = new Set(na.split(''));
+  const common = nb.split('').filter(c => setA.has(c)).length;
+  return common / Math.max(na.length, nb.length, 1);
+}
 
-  // 제목 완전 일치
-  if (tmdbTitle === extTitle) return 0.95;
-
-  // 제목 포함 관계
-  if (tmdbTitle.includes(extTitle) || extTitle.includes(tmdbTitle)) return 0.8;
+/**
+ * 매칭 신뢰도 계산 (0~1)
+ * 제목 유사도 + 연도 일치 + 인기도 보정
+ */
+function calcConfidence(extracted, tmdbResult) {
+  const tmdbTitle = tmdbResult.title || tmdbResult.name || '';
+  const similarity = titleSimilarity(extracted.title, tmdbTitle);
 
   // 연도 일치 보너스
   const tmdbYear = parseInt((tmdbResult.release_date || tmdbResult.first_air_date || '').slice(0, 4)) || 0;
-  const yearMatch = extracted.year && tmdbYear === extracted.year;
+  const yearBonus = extracted.year && tmdbYear === extracted.year ? 0.1 : 0;
 
-  // popularity 기반 fallback
+  // popularity 기반 기저 신뢰도
   const pop = tmdbResult.popularity || 0;
-  let base = pop > 50 ? 0.65 : pop > 10 ? 0.5 : 0.3;
-  if (yearMatch) base = Math.min(base + 0.15, 0.9);
+  const popBonus = pop > 100 ? 0.05 : pop > 30 ? 0.03 : 0;
 
-  return base;
+  return Math.min(similarity + yearBonus + popBonus, 1.0);
 }
 
 /**
  * Claude Vision으로 이미지에서 작품 목록 추출 (구조화 JSON)
  */
-async function extractWorksFromImage(imageBuffer, mediaType, ottHint) {
+async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplayName) {
   const base64Image = imageBuffer.toString('base64');
-
-  const prompt = `이 이미지는 ${ottHint} 화면의 스크린샷입니다.
-이미지에서 영화·드라마·애니메이션 제목을 모두 찾아주세요.
-
-다음 JSON 배열 형식으로만 응답하세요 (설명 없이):
-[{"title":"제목","year":2023,"type":"movie"},{"title":"제목2","year":null,"type":"tv"}]
-
-규칙:
-- title: 화면에 보이는 제목 그대로 (한글이면 한글, 영어면 영어)
-- year: 보이면 숫자, 안 보이면 null
-- type: "movie"(영화) 또는 "tv"(드라마/애니)
-- 제목이 없으면 []`;
+  const prompt = getExtractionPrompt(ottType, ottDisplayName);
 
   const message = await claude.messages.create({
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 800,
+    max_tokens: 1000,
     messages: [{
       role: 'user',
       content: [
@@ -201,11 +232,11 @@ router.post('/', auth, upload.array('images', 10), async (req, res) => {
     const myTmdbIds = new Set(myItems.map(i => i.tmdb_id).filter(id => id > 0));
     const myTitles = new Set(myItems.map(i => i.title.toLowerCase()));
 
-    // 각 이미지를 병렬 처리
+    // 각 이미지를 병렬 처리 (OTT 타입+표시명 전달)
     const perImageResults = await Promise.all(
       files.map(async (file) => {
         const imageBuffer = fs.readFileSync(file.path);
-        const extracted = await extractWorksFromImage(imageBuffer, file.mimetype, ottHint);
+        const extracted = await extractWorksFromImage(imageBuffer, file.mimetype, ottType, ottHint);
         return extracted;
       })
     );
@@ -246,7 +277,7 @@ router.post('/', auth, upload.array('images', 10), async (req, res) => {
         }
 
         const { result: tmdb, type: matchedType } = match;
-        const confidence = calcConfidence(extracted, tmdb, matchedType);
+        const confidence = calcConfidence(extracted, tmdb);
 
         const tmdbTitle = tmdb.title || tmdb.name || extracted.title;
         const year = parseInt((tmdb.release_date || tmdb.first_air_date || '').slice(0, 4)) || extracted.year || 0;

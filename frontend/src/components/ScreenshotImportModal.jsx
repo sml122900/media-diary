@@ -94,7 +94,7 @@ function InlineSearch({ inputTitle, onSelect }) {
             >
               {r.poster_url && (
                 <img src={r.poster_url} alt={r.title}
-                  style={{ width: 24, height: 36, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
+                  style={{ width: 44, height: 66, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
               )}
               <div>
                 <div style={{ fontSize: 12, fontWeight: 600 }}>{r.title}</div>
@@ -421,8 +421,8 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
                             {r.in_my_list ? '이미 있음' : '추가됨'}
                           </span>
                         ) : (
-                          /* 재검색 버튼 — 낮은 신뢰도 또는 매칭 실패 */
-                          (item.confidence < 0.5 || !r) && (
+                          /* 재검색 버튼 — 보통 이하 신뢰도 또는 매칭 실패 */
+                          (item.confidence < 0.7 || !r) && (
                             <button
                               onClick={(e) => { e.stopPropagation(); setReSearchIdx(isResearching ? null : i); }}
                               style={{ fontSize: 11, padding: '3px 8px', border: '1px solid #ddd',
