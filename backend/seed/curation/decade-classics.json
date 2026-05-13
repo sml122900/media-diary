@@ -17,7 +17,7 @@
         { "tmdb_id": 1813,   "tmdb_type": "movie", "title": "죽은 시인의 사회",        "year": 1989, "display_order": 6  },
         { "tmdb_id": 694,    "tmdb_type": "movie", "title": "샤이닝",                 "year": 1980, "display_order": 7  },
         { "tmdb_id": 764,    "tmdb_type": "movie", "title": "지옥의 묵시록",           "year": 1979, "display_order": 8  },
-        { "tmdb_id": 1373,   "tmdb_type": "movie", "title": "성난 황소",              "year": 1980, "display_order": 9  },
+        { "tmdb_id": 1578,   "tmdb_type": "movie", "title": "성난 황소",              "year": 1980, "display_order": 9  },
         { "tmdb_id": 105,    "tmdb_type": "movie", "title": "백 투 더 퓨처",           "year": 1985, "display_order": 10 },
         { "tmdb_id": 769,    "tmdb_type": "movie", "title": "좋은 친구들",            "year": 1990, "display_order": 11 },
         { "tmdb_id": 380,    "tmdb_type": "movie", "title": "레인맨",                 "year": 1988, "display_order": 12 }
@@ -59,12 +59,12 @@
         { "tmdb_id": 155,    "tmdb_type": "movie", "title": "다크 나이트",             "year": 2008, "display_order": 2  },
         { "tmdb_id": 27205,  "tmdb_type": "movie", "title": "인셉션",                 "year": 2010, "display_order": 3  },
         { "tmdb_id": 129,    "tmdb_type": "movie", "title": "센과 치히로의 행방불명",   "year": 2001, "display_order": 4  },
-        { "tmdb_id": 19552,  "tmdb_type": "movie", "title": "살인의 추억",            "year": 2003, "display_order": 5  },
+        { "tmdb_id": 11423,  "tmdb_type": "movie", "title": "살인의 추억",            "year": 2003, "display_order": 5  },
         { "tmdb_id": 670,    "tmdb_type": "movie", "title": "올드보이",               "year": 2003, "display_order": 6  },
         { "tmdb_id": 37799,  "tmdb_type": "movie", "title": "소셜 네트워크",          "year": 2010, "display_order": 7  },
         { "tmdb_id": 68734,  "tmdb_type": "movie", "title": "아르고",                 "year": 2012, "display_order": 8  },
         { "tmdb_id": 38,     "tmdb_type": "movie", "title": "이터널 선샤인",          "year": 2004, "display_order": 9  },
-        { "tmdb_id": 9529,   "tmdb_type": "movie", "title": "노인을 위한 나라는 없다", "year": 2007, "display_order": 10 },
+        { "tmdb_id": 6977,   "tmdb_type": "movie", "title": "노인을 위한 나라는 없다", "year": 2007, "display_order": 10 },
         { "tmdb_id": 12405,  "tmdb_type": "movie", "title": "슬럼독 밀리어네어",      "year": 2008, "display_order": 11 },
         { "tmdb_id": 4955,   "tmdb_type": "movie", "title": "괴물",                   "year": 2006, "display_order": 12 }
       ]

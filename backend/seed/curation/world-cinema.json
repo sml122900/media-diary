@@ -35,7 +35,7 @@
         { "tmdb_id": 101,    "tmdb_type": "movie", "title": "레옹",                   "year": 1994, "display_order": 2 },
         { "tmdb_id": 194,    "tmdb_type": "movie", "title": "아멜리에",               "year": 2001, "display_order": 3 },
         { "tmdb_id": 152584, "tmdb_type": "movie", "title": "가장 따뜻한 색, 블루",   "year": 2013, "display_order": 4 },
-        { "tmdb_id": 314402, "tmdb_type": "movie", "title": "디판",                   "year": 2015, "display_order": 5 },
+        { "tmdb_id": 293110, "tmdb_type": "movie", "title": "디판",                   "year": 2015, "display_order": 5 },
         { "tmdb_id": 531428, "tmdb_type": "movie", "title": "불타는 여인의 초상",     "year": 2019, "display_order": 6 },
         { "tmdb_id": 832079, "tmdb_type": "movie", "title": "슬픔의 삼각형",          "year": 2022, "display_order": 7 },
         { "tmdb_id": 915935, "tmdb_type": "movie", "title": "추락의 해부",            "year": 2023, "display_order": 8 }

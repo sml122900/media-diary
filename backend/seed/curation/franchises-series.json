@@ -13,7 +13,7 @@
         { "tmdb_id": 87,     "tmdb_type": "movie", "title": "인디아나 존스: 마궁의 사원",     "year": 1984, "display_order": 2 },
         { "tmdb_id": 89,     "tmdb_type": "movie", "title": "인디아나 존스: 최후의 성전",     "year": 1989, "display_order": 3 },
         { "tmdb_id": 217,    "tmdb_type": "movie", "title": "인디아나 존스: 크리스탈 해골",   "year": 2008, "display_order": 4 },
-        { "tmdb_id": 285,    "tmdb_type": "movie", "title": "인디아나 존스: 운명의 다이얼",   "year": 2023, "display_order": 5 }
+        { "tmdb_id": 335977, "tmdb_type": "movie", "title": "인디아나 존스: 운명의 다이얼",   "year": 2023, "display_order": 5 }
       ]
     },
     {
@@ -105,7 +105,7 @@
       "media_type": "movie",
       "display_order": 28,
       "items": [
-        { "tmdb_id": 24494,  "tmdb_type": "movie", "title": "엽문",                   "year": 2008, "display_order": 1 },
+        { "tmdb_id": 14756,  "tmdb_type": "movie", "title": "엽문",                   "year": 2008, "display_order": 1 },
         { "tmdb_id": 40818,  "tmdb_type": "movie", "title": "엽문 2",                 "year": 2010, "display_order": 2 },
         { "tmdb_id": 189759, "tmdb_type": "movie", "title": "엽문 3",                 "year": 2015, "display_order": 3 },
         { "tmdb_id": 524048, "tmdb_type": "movie", "title": "엽문 4: 더 파이널",      "year": 2019, "display_order": 4 }

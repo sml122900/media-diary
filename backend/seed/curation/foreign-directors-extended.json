@@ -59,21 +59,21 @@
           "display_order": 7
         },
         {
-          "tmdb_id": 5765,
+          "tmdb_id": 640,
           "tmdb_type": "movie",
           "title": "캐치 미 이프 유 캔",
           "year": 2002,
           "display_order": 8
         },
         {
-          "tmdb_id": 9522,
+          "tmdb_id": 612,
           "tmdb_type": "movie",
           "title": "뮌헨",
           "year": 2005,
           "display_order": 9
         },
         {
-          "tmdb_id": 96721,
+          "tmdb_id": 72976,
           "tmdb_type": "movie",
           "title": "링컨",
           "year": 2012,
@@ -105,7 +105,7 @@
           "display_order": 1
         },
         {
-          "tmdb_id": 1373,
+          "tmdb_id": 1578,
           "tmdb_type": "movie",
           "title": "성난 황소",
           "year": 1980,
@@ -133,7 +133,7 @@
           "display_order": 5
         },
         {
-          "tmdb_id": 83666,
+          "tmdb_id": 44826,
           "tmdb_type": "movie",
           "title": "휴고",
           "year": 2011,
@@ -186,7 +186,7 @@
           "display_order": 2
         },
         {
-          "tmdb_id": 2397,
+          "tmdb_id": 184,
           "tmdb_type": "movie",
           "title": "재키 브라운",
           "year": 1997,
@@ -260,7 +260,7 @@
           "display_order": 2
         },
         {
-          "tmdb_id": 16154,
+          "tmdb_id": 134,
           "tmdb_type": "movie",
           "title": "오 형제여 어디 있는가?",
           "year": 2000,
@@ -274,21 +274,21 @@
           "display_order": 4
         },
         {
-          "tmdb_id": 12618,
+          "tmdb_id": 4944,
           "tmdb_type": "movie",
           "title": "번 애프터 리딩",
           "year": 2008,
           "display_order": 5
         },
         {
-          "tmdb_id": 45243,
+          "tmdb_id": 44264,
           "tmdb_type": "movie",
           "title": "트루 그릿",
           "year": 2010,
           "display_order": 6
         },
         {
-          "tmdb_id": 142012,
+          "tmdb_id": 86829,
           "tmdb_type": "movie",
           "title": "인사이드 르윈 데이비스",
           "year": 2013,
@@ -320,7 +320,7 @@
           "display_order": 2
         },
         {
-          "tmdb_id": 10918,
+          "tmdb_id": 1949,
           "tmdb_type": "movie",
           "title": "조디악",
           "year": 2007,
@@ -348,7 +348,7 @@
           "display_order": 6
         },
         {
-          "tmdb_id": 694919,
+          "tmdb_id": 614560,
           "tmdb_type": "movie",
           "title": "맨크",
           "year": 2020,
@@ -394,14 +394,14 @@
           "display_order": 3
         },
         {
-          "tmdb_id": 1007,
+          "tmdb_id": 855,
           "tmdb_type": "movie",
           "title": "블랙 호크 다운",
           "year": 2001,
           "display_order": 4
         },
         {
-          "tmdb_id": 1542,
+          "tmdb_id": 1495,
           "tmdb_type": "movie",
           "title": "킹덤 오브 헤븐",
           "year": 2005,
@@ -415,7 +415,7 @@
           "display_order": 6
         },
         {
-          "tmdb_id": 522437,
+          "tmdb_id": 617653,
           "tmdb_type": "movie",
           "title": "라스트 듀얼",
           "year": 2021,
@@ -454,7 +454,7 @@
           "display_order": 2
         },
         {
-          "tmdb_id": 399379,
+          "tmdb_id": 369972,
           "tmdb_type": "movie",
           "title": "퍼스트 맨",
           "year": 2018,
@@ -479,35 +479,35 @@
       "display_order": 10,
       "items": [
         {
-          "tmdb_id": 9587,
+          "tmdb_id": 9428,
           "tmdb_type": "movie",
           "title": "로열 테넌바움",
           "year": 2001,
           "display_order": 1
         },
         {
-          "tmdb_id": 14,
+          "tmdb_id": 421,
           "tmdb_type": "movie",
           "title": "스티브 지소와의 해저생활",
           "year": 2004,
           "display_order": 2
         },
         {
-          "tmdb_id": 11328,
+          "tmdb_id": 4538,
           "tmdb_type": "movie",
           "title": "다즐링 주식회사",
           "year": 2007,
           "display_order": 3
         },
         {
-          "tmdb_id": 10090,
+          "tmdb_id": 10315,
           "tmdb_type": "movie",
           "title": "판타스틱 Mr. 폭스",
           "year": 2009,
           "display_order": 4
         },
         {
-          "tmdb_id": 72279,
+          "tmdb_id": 81413,
           "tmdb_type": "movie",
           "title": "문라이즈 킹덤",
           "year": 2012,
@@ -574,7 +574,7 @@
           "display_order": 3
         },
         {
-          "tmdb_id": 9260,
+          "tmdb_id": 36955,
           "tmdb_type": "movie",
           "title": "트루 라이즈",
           "year": 1994,
