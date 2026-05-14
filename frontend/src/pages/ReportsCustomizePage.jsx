@@ -29,6 +29,7 @@ export default function ReportsCustomizePage() {
   const [aiInput, setAiInput]         = useState('');
   const [aiLoading, setAiLoading]     = useState(false);
   const [tokenError, setTokenError]   = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   // 항목 목록 로딩
   useEffect(() => {
@@ -140,7 +141,37 @@ export default function ReportsCustomizePage() {
         ))}
       </div>
 
-      <div className="rc-count">{selected.size}개 선택됨</div>
+      <div className="rc-count-bar">
+        <span className="rc-count">{selected.size}개 선택됨</span>
+        <button
+          className="btn rc-preview-btn"
+          onClick={() => setShowPreview(v => !v)}
+          disabled={selected.size === 0}
+        >
+          {showPreview ? '▲ 미리보기 닫기' : '▼ 미리보기'}
+        </button>
+      </div>
+
+      {/* 미리보기 패널 — 선택 항목 요약 (토큰 소모 없음) */}
+      {showPreview && selected.size > 0 && (
+        <div className="rc-preview">
+          <div className="rc-preview-title">📋 이 템플릿으로 생성될 리포트 섹션</div>
+          <ol className="rc-preview-list">
+            {components
+              .filter(c => selected.has(c.code))
+              .map(c => (
+                <li key={c.code} className="rc-preview-item">
+                  <strong>{c.name}</strong>
+                  <span>{c.desc}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <p className="rc-preview-note">
+            실제 리포트는 "리포트 생성" 시 위 항목을 중심으로 Claude가 분석합니다 (5토큰).
+          </p>
+        </div>
+      )}
 
       {/* 템플릿 저장 */}
       <div className="rc-save-section">

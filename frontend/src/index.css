@@ -1494,3 +1494,22 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 }
 .rc-error { font-size: 13px; color: #f87171; }
 .rc-save-btn { align-self: flex-end; padding: 10px 28px; font-size: 15px; }
+
+/* rc 미리보기 패널 */
+.rc-count-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.rc-count { font-size: 13px; color: #888; }
+.rc-preview-btn { font-size: 12px; padding: 5px 12px; }
+
+.rc-preview {
+  background: #1a1a1a; border: 1px solid #333; border-radius: 12px;
+  padding: 16px 20px; margin-bottom: 1.2rem;
+}
+.rc-preview-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #d2a8ff; }
+.rc-preview-list  { padding-left: 18px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.rc-preview-item  { font-size: 13px; color: #ccc; }
+.rc-preview-item strong { color: #eee; margin-right: 6px; }
+.rc-preview-item span   { color: #888; font-size: 12px; }
+.rc-preview-note  { font-size: 11px; color: #555; }

@@ -11,7 +11,8 @@ import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
 import InsufficientTokensModal from '../components/InsufficientTokensModal';
 
-const BASE = `${import.meta.env.VITE_API_URL}/api`;
+const API = import.meta.env.VITE_API_URL;
+const BASE = `${API}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
 // YYYY-MM → "2026년 5월" 형식 변환
@@ -54,7 +55,7 @@ export default function ReportsPage() {
       .then(res => { setReports(res.data.data || []); setLoading(false); })
       .catch(() => setLoading(false));
     // 템플릿 목록 로딩
-    axios.get(`${BASE.replace('/me', '')}/reports/templates`, { headers: headers() })
+    axios.get(`${API}/api/reports/templates`, { headers: headers() })
       .then(res => {
         const list = res.data.data || [];
         setTemplates(list);
