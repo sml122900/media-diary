@@ -13,14 +13,23 @@ import { confirmPayment } from '../api/billing';
 export default function BillingSuccessPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { token } = useAuthStore();
   const { setBalance } = useTokenStore();
 
+  const { token, isLoading } = useAuthStore();
   const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
   const [result, setResult] = useState(null);
   const [errMsg, setErrMsg] = useState('');
 
+  // isLoading이 false가 된 뒤에 confirm 호출 (auth 초기화 race condition 방지)
   useEffect(() => {
+    if (isLoading) return;
+
+    if (!token) {
+      setErrMsg('로그인이 필요합니다.');
+      setStatus('error');
+      return;
+    }
+
     const paymentKey = params.get('paymentKey');
     const orderId = params.get('orderId');
     const amount = params.get('amount');
@@ -41,7 +50,7 @@ export default function BillingSuccessPage() {
         setErrMsg(err.response?.data?.message || '결제 승인 중 오류가 발생했습니다.');
         setStatus('error');
       });
-  }, []);
+  }, [isLoading]); // auth 초기화 완료 시 실행
 
   if (status === 'loading') {
     return (

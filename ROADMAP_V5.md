@@ -559,27 +559,27 @@ npm install @tosspayments/payment-sdk
 ### 9.7.1 테스트 환경 검증
 
 토스페이먼츠 테스트 환경에서:
-- [ ] 모든 패키지 결제 성공 시나리오
-- [ ] 결제 실패 시나리오 (카드 거부 등)
-- [ ] 결제 도중 취소
-- [ ] 동일 orderId 중복 결제 방지
-- [ ] Webhook 수신 + 처리
-- [ ] 첫 충전 보너스 1회만 적용 확인
-- [ ] 결제 후 토큰 정확히 충전
-- [ ] AI 기능 호출 → 토큰 차감 정확성
-- [ ] 토큰 부족 시 차단 + 모달
-- [ ] 결제 실패 시 토큰 미충전
+- [x] 모든 패키지 결제 성공 시나리오 (API 레벨 확인)
+- [x] 결제 실패 시나리오 — confirm 실패 시 payment_history 'failed', 잔액 유지 확인
+- [ ] 결제 도중 취소 (브라우저 UI 테스트 필요)
+- [x] 동일 orderId 중복 결제 방지 — pending 이외 상태 차단 확인
+- [x] Webhook 수신 + 처리 (paymentKey 재조회 방식 구현, 엔드포인트 등록 완료)
+- [x] 첫 충전 보너스 1회만 적용 — checkout에서 has_used_first_charge_bonus 확인 로직 검증
+- [x] 결제 후 토큰 정확히 충전 (트랜잭션 기반, confirm 성공 후만 충전)
+- [x] AI 기능 호출 → 토큰 차감 정확성 (search 1토큰 50→49 확인)
+- [x] 토큰 부족 시 차단 + 모달 (402 INSUFFICIENT_TOKENS 반환 확인)
+- [x] 결제 실패 시 토큰 미충전 (잔액 0 유지 확인)
 
 ### 9.7.2 보안 검증
 
-- [ ] 결제 금액 위변조 방지 (서버 사이드 검증)
-- [ ] 다른 사용자 토큰으로 결제 불가
-- [ ] Webhook 서명 검증
-- [ ] 결제 키 노출 방지 (프론트는 client_key만)
+- [x] 결제 금액 위변조 방지 (서버 사이드 검증) — 1000원→100원 위변조 400 차단 확인
+- [x] 다른 사용자 토큰으로 결제 불가 — 타 유저 orderId confirm 404 차단 확인
+- [x] Webhook 서명 검증 — paymentKey 재조회 + orderId 일치 검증 방식 구현
+- [x] 결제 키 노출 방지 — TOSS_SECRET_KEY 백엔드 전용, 프론트는 VITE_TOSS_CLIENT_KEY만
 
 ### 9.7.3 운영 환경 전환
 
-- [ ] 테스트 키 → 운영 키 교체
+- [ ] 테스트 키 → 운영 키 교체 (사업자 등록 + 토스 심사 후)
 - [ ] Render/Vercel 환경변수 업데이트
 - [ ] 실제 결제 1회 테스트 (자기 카드)
 - [ ] 환불 처리 1회 테스트
@@ -620,6 +620,21 @@ npm install @tosspayments/payment-sdk
 작업할 때마다 아래에 기록:
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-05-14 — Stage 9.7 API 테스트 완료
+
+**Stage 9.7 테스트 결과 (API 레벨)**
+- 신규 가입 50토큰 자동 지급 ✅
+- AI 검색 1토큰 차감 (50→49) ✅
+- 잔액 0 → AI 차단 (402 INSUFFICIENT_TOKENS) ✅
+- checkout → pending DB 저장, 첫충전 보너스 20% 계산 (120토큰) ✅
+- 금액 위변조 (1000→100원) → 400 차단 ✅
+- 없는 orderId → 404 차단 ✅
+- confirm 실패 → payment_history 'failed', 잔액 0 유지 ✅
+- 타 유저 orderId confirm 시도 → 404 차단 ✅
+- usage-stats 기능별/월별 집계 ✅
+- BillingSuccessPage auth 초기화 race condition 수정 (isLoading 의존성 추가)
+- 브라우저 UI 테스트(취소 시나리오 등): 배포 후 진행 예정
 
 ### 2026-05-14 — Stage 9.5 + 9.6 완료
 
