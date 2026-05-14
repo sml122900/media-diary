@@ -24,6 +24,10 @@ import RestorePage from './pages/RestorePage';
 import CurationListPage from './pages/CurationListPage';
 import MemoryChatPage from './pages/MemoryChatPage';
 import OnboardingPage from './pages/OnboardingPage';
+import BillingChargePage from './pages/BillingChargePage';
+import BillingSuccessPage from './pages/BillingSuccessPage';
+import BillingFailPage from './pages/BillingFailPage';
+import BillingHistoryPage from './pages/BillingHistoryPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -164,6 +168,17 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/billing/charge"
+          element={<PrivateRoute><BillingChargePage /></PrivateRoute>}
+        />
+        <Route
+          path="/billing/history"
+          element={<PrivateRoute><BillingHistoryPage /></PrivateRoute>}
+        />
+        {/* 토스 리다이렉트 — 인증 불필요 (URL에 결제 정보 포함) */}
+        <Route path="/billing/success" element={<BillingSuccessPage />} />
+        <Route path="/billing/fail" element={<BillingFailPage />} />
         {/* 공개 프로필 — 비로그인 접근 가능 */}
         <Route path="/u/:username" element={<PublicProfilePage />} />
         <Route path="/login" element={<LoginPage />} />

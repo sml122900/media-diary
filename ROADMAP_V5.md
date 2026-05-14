@@ -390,16 +390,16 @@ npm install @tosspayments/payment-sdk
 
 ### 9.4.2 결제 페이지 (/billing/charge)
 
-- [ ] **3개 패키지 카드 UI**
+- [x] **3개 패키지 카드 UI**
   - 소형 (₩1,000 / 100토큰)
   - 중형 (₩3,000 / 350토큰) — "+50 보너스" 배지
   - 대형 (₩10,000 / 1,300토큰) — "+300 보너스 / 가장 인기" 배지
 
-- [ ] **첫 충전 시 +20% 보너스 안내**
+- [x] **첫 충전 시 +20% 보너스 안내**
   - 첫 충전 사용자에게는 각 패키지 위에 "+20% 보너스" 표시
   - 예상 받을 토큰 계산해서 표시
 
-- [ ] **결제 흐름**
+- [x] **결제 흐름**
   - 패키지 선택 → 결제 정보 확인 모달
   - "결제하기" 클릭 → 백엔드 POST /api/billing/checkout → orderId 받음
   - 토스 결제창 호출:
@@ -416,36 +416,36 @@ npm install @tosspayments/payment-sdk
 
 ### 9.4.3 결제 성공/실패 페이지
 
-- [ ] **/billing/success**
+- [x] **/billing/success**
   - URL query에서 paymentKey, orderId, amount 추출
   - 백엔드 POST /api/billing/confirm 호출
   - 성공 시: "충전 완료! XX 토큰이 추가됐어요" + 잔액 표시
   - 실패 시: 안내 메시지
 
-- [ ] **/billing/fail**
+- [x] **/billing/fail**
   - 결제 실패 안내
   - "다시 시도" 버튼
 
 ### 9.4.4 결제 이력 페이지 (/billing/history)
 
-- [ ] 결제 이력 목록 표시
-- [ ] 각 항목: 날짜, 패키지, 금액, 충전된 토큰, 상태
-- [ ] 환불 신청 버튼 (이메일로 문의 안내 — 자동 환불은 안 함)
+- [x] 결제 이력 목록 표시
+- [x] 각 항목: 날짜, 패키지, 금액, 충전된 토큰, 상태
+- [x] 환불 신청 버튼 (이메일로 문의 안내 — 자동 환불은 안 함)
 
 ### 9.4.5 토큰 잔액 표시
 
-- [ ] **헤더에 토큰 잔액 표시**
+- [x] **헤더에 토큰 잔액 표시**
   - 우상단 "🪙 48토큰" 같은 형식
   - 클릭 시 /billing/charge로 이동
 
-- [ ] **AI 기능 호출 후 잔액 자동 업데이트**
+- [x] **AI 기능 호출 후 잔액 자동 업데이트**
 
 ### 9.4.6 토큰 부족 모달
 
-- [ ] AI 기능 호출 시 402 응답 받으면 모달 노출
-- [ ] "토큰이 부족해요" 메시지
-- [ ] 현재 잔액 / 필요 토큰 표시
-- [ ] [충전하기] [취소] 버튼
+- [x] AI 기능 호출 시 402 응답 받으면 모달 노출
+- [x] "토큰이 부족해요" 메시지
+- [x] 현재 잔액 / 필요 토큰 표시
+- [x] [충전하기] [취소] 버튼
 
 ### 사용자 확인 체크리스트
 
@@ -620,6 +620,26 @@ npm install @tosspayments/payment-sdk
 작업할 때마다 아래에 기록:
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-05-14 — Stage 9.3 Webhook 업데이트 + Stage 9.4 완료
+
+**Stage 9.3.3 Webhook 재구현**
+- paymentKey로 GET /payments/:paymentKey 재조회해 진위 검증 (시크릿 없는 방식)
+- CANCEL_STATUS_CHANGED 이벤트 처리 추가
+- 토스에 즉시 200 응답 후 비동기 처리 (재전송 방지)
+- orderId 불일치 시 위조 의심으로 무시
+
+**Stage 9.4 (프론트엔드 결제 UI)**
+- frontend/src/api/billing.js 신규
+- frontend/src/store/tokenStore.js 신규 (Zustand, 전역 잔액 관리)
+- frontend/src/components/InsufficientTokensModal.jsx 신규 (402 응답 시 표시)
+- frontend/src/pages/BillingChargePage.jsx 신규 (패키지 3종, 첫충전 배너, 토스 SDK CDN)
+- frontend/src/pages/BillingSuccessPage.jsx 신규 (confirm 호출 → 잔액 갱신)
+- frontend/src/pages/BillingFailPage.jsx 신규
+- frontend/src/pages/BillingHistoryPage.jsx 신규
+- App.jsx: /billing/* 라우트 추가 (success/fail은 공개 라우트)
+- HomePage.jsx: 헤더 토큰 칩 + 메뉴 충전/이력 링크 추가
+- index.css: 결제 전용 스타일 추가
 
 ### 2026-05-14 — Stage 9.3 완료
 

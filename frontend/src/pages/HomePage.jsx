@@ -19,11 +19,13 @@ import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
 import { useTheme } from '../hooks/useTheme';
 import { deleteAccount } from '../api/auth';
+import useTokenStore from '../store/tokenStore';
 
 export default function HomePage() {
   const { user, token, logout } = useAuthStore();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { balance, fetchBalance } = useTokenStore();
 
   // 미디어 데이터 + CRUD 훅
   const {
@@ -53,6 +55,11 @@ export default function HomePage() {
   const [quickOpen, setQuickOpen] = useState(false);
   const [toast, setToast] = useState(null); // { text: string }
   const menuRef = useRef(null);
+
+  // 토큰 잔액 초기 로딩
+  useEffect(() => {
+    if (token) fetchBalance(token);
+  }, [token]);
 
   // 메뉴 외부 클릭 시 닫기
   useEffect(() => {
@@ -269,6 +276,15 @@ export default function HomePage() {
           </select>
           <button className="btn btn-primary" onClick={() => setAddModalOpen(true)}>+ 추가</button>
 
+          {/* 토큰 잔액 칩 */}
+          <button
+            className="token-chip"
+            onClick={() => navigate('/billing/charge')}
+            title="토큰 충전하기"
+          >
+            🪙 {balance !== null ? `${balance}` : '···'}
+          </button>
+
           {/* ── 드롭다운 메뉴 ── */}
           <div className="menu-wrap" ref={menuRef}>
             <button
@@ -303,6 +319,15 @@ export default function HomePage() {
                 {/* 과거 기록 복원 (Phase 6.1~6.3) */}
                 <Link to="/restore" className="menu-item" onClick={closeMenu}>📚 과거 기록 복원</Link>
                 <Link to="/onboarding" className="menu-item" onClick={closeMenu}>🔄 온보딩 다시 하기</Link>
+
+                <div className="menu-divider" />
+
+                {/* 토큰 */}
+                <div className="menu-section-title">토큰</div>
+                <Link to="/billing/charge" className="menu-item" onClick={closeMenu}>
+                  🪙 충전하기 {balance !== null && <span className="menu-token-balance">{balance}토큰</span>}
+                </Link>
+                <Link to="/billing/history" className="menu-item" onClick={closeMenu}>결제 이력</Link>
 
                 <div className="menu-divider" />
 

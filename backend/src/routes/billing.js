@@ -37,7 +37,7 @@ function tossAuthHeader() {
   return `Basic ${encoded}`;
 }
 
-/** 토스 API 호출 — 실패 시 에러 throw */
+/** 토스 API POST 호출 — 실패 시 에러 throw */
 async function tossRequest(path, body = null) {
   const res = await fetch(`${TOSS_API_BASE}${path}`, {
     method: 'POST',
@@ -50,6 +50,22 @@ async function tossRequest(path, body = null) {
   const data = await res.json();
   if (!res.ok) {
     const err = new Error(data.message || '토스페이먼츠 API 오류');
+    err.tossCode = data.code;
+    err.httpStatus = res.status;
+    throw err;
+  }
+  return data;
+}
+
+/** 토스 API GET 호출 — paymentKey로 결제 정보 재조회 */
+async function tossGet(path) {
+  const res = await fetch(`${TOSS_API_BASE}${path}`, {
+    method: 'GET',
+    headers: { Authorization: tossAuthHeader() },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const err = new Error(data.message || '토스페이먼츠 조회 실패');
     err.tossCode = data.code;
     err.httpStatus = res.status;
     throw err;
@@ -197,28 +213,74 @@ router.post('/confirm', auth, async (req, res) => {
 /**
  * POST /api/billing/webhook
  * 토스페이먼츠 Webhook — confirm API 실패 시 이중 안전장치
+ * 검증: paymentKey로 토스 API 재조회해 실제 결제 정보 확인 (시크릿 키 없는 방식)
  * 인증 없음 (토스에서 직접 호출)
- * 주의: TOSS_WEBHOOK_SECRET 설정 시 app.js에서 rawBody 캡처 필요
  */
 router.post('/webhook', async (req, res) => {
+  // 토스에 즉시 200 응답 (처리는 비동기로 — 재전송 방지)
+  res.status(200).json({ received: true });
+
   try {
     const { eventType, data } = req.body || {};
+    const paymentKey = data?.paymentKey;
+    const orderId = data?.orderId;
 
-    // 결제 완료 이벤트 — confirm이 이미 처리했을 수도 있으므로 pending인 경우만 업데이트
-    if (eventType === 'PAYMENT_STATUS_CHANGED' && data?.status === 'DONE') {
-      await pool.query(
-        `UPDATE payment_history
-         SET status = 'success', toss_payment_key = $1, updated_at = NOW()
-         WHERE toss_order_id = $2 AND status = 'pending'`,
-        [data.paymentKey, data.orderId]
-      );
+    if (!paymentKey || !orderId) return;
+
+    // paymentKey로 토스 API 재조회 — Webhook 진위 검증
+    const verified = await tossGet(`/payments/${paymentKey}`);
+
+    // 재조회한 orderId가 Webhook의 orderId와 일치하지 않으면 위조 가능성
+    if (verified.orderId !== orderId) {
+      console.warn('billing/webhook: orderId 불일치, 무시');
+      return;
     }
 
-    // 토스에 200 빠르게 응답 (재전송 방지)
-    res.status(200).json({ received: true });
+    if (eventType === 'PAYMENT_STATUS_CHANGED' && verified.status === 'DONE') {
+      // confirm이 이미 처리했을 수 있으므로 pending인 경우만 처리
+      const { rows: orderRows } = await pool.query(
+        `SELECT * FROM payment_history WHERE toss_order_id = $1 AND status = 'pending'`,
+        [orderId]
+      );
+      if (!orderRows[0]) return; // 이미 confirm으로 처리됨
+
+      const order = orderRows[0];
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query(
+          `UPDATE payment_history
+           SET status = 'success', toss_payment_key = $1, payment_method = $2, updated_at = NOW()
+           WHERE toss_order_id = $3`,
+          [verified.paymentKey, verified.method, orderId]
+        );
+        await client.query(
+          `UPDATE users
+           SET token_balance = token_balance + $1, has_used_first_charge_bonus = true
+           WHERE id = $2`,
+          [order.tokens_added, order.user_id]
+        );
+        await client.query('COMMIT');
+        console.log(`billing/webhook: ${orderId} 결제 처리 완료 (${order.tokens_added}토큰)`);
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
+    }
+
+    if (eventType === 'CANCEL_STATUS_CHANGED' && verified.status === 'CANCELED') {
+      // 토스 측에서 취소된 경우 DB 동기화 (refund API가 이미 처리했을 수 있음)
+      await pool.query(
+        `UPDATE payment_history
+         SET status = 'refunded', updated_at = NOW()
+         WHERE toss_payment_key = $1 AND status NOT IN ('refunded', 'failed')`,
+        [paymentKey]
+      );
+    }
   } catch (err) {
-    console.error('billing/webhook 오류:', err.message);
-    res.status(200).json({ received: true });
+    console.error('billing/webhook 처리 오류:', err.message);
   }
 });
 
