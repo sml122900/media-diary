@@ -6,6 +6,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import InsufficientTokensModal from '../components/InsufficientTokensModal';
+import useTokenStore from '../store/tokenStore';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api/restore`;
 const IMG_BASE = 'https://image.tmdb.org/t/p/w200';
@@ -191,10 +193,11 @@ export default function MemoryChatPage() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [remaining, setRemaining] = useState(30);
+  const [tokenError, setTokenError] = useState(null);
   const [toast, setToast] = useState(null);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const { balance: tokenBalance, setBalance } = useTokenStore();
 
   // 히스토리 로드
   useEffect(() => {
@@ -239,7 +242,9 @@ export default function MemoryChatPage() {
           content: json.data.message,
           suggested_works: json.data.works,
         }]);
-        setRemaining(json.data.remaining);
+        if (json.data.token_balance !== undefined) setBalance(json.data.token_balance);
+      } else if (res.status === 402) {
+        setTokenError(json);
       } else if (res.status === 429) {
         showToast(json.message);
       } else {
@@ -296,7 +301,7 @@ export default function MemoryChatPage() {
               🤖 AI 기억 복원
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-secondary, #888)' }}>
-              오늘 남은 횟수: {remaining}회
+              🪙 잔액: {tokenBalance !== null ? `${tokenBalance}토큰` : '...'}
             </div>
           </div>
         </div>
@@ -409,6 +414,15 @@ export default function MemoryChatPage() {
           </button>
         </div>
       </div>
+
+      {/* 토큰 부족 모달 */}
+      {tokenError && (
+        <InsufficientTokensModal
+          required={tokenError.required}
+          balance={tokenError.balance}
+          onClose={() => setTokenError(null)}
+        />
+      )}
 
       {/* 토스트 */}
       {toast && (

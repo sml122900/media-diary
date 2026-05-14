@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import axios from 'axios';
+import InsufficientTokensModal from './InsufficientTokensModal';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -22,9 +23,9 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [explanation, setExplanation] = useState('');
-  const [remaining, setRemaining] = useState(null);
   const [error, setError] = useState('');
   const [addedIds, setAddedIds] = useState(new Set());
+  const [tokenError, setTokenError] = useState(null);
 
   const existingTmdbIds = new Set(existingItems.map(i => i.tmdb_id).filter(Boolean));
 
@@ -43,10 +44,12 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
       );
       setResults(res.data.data || []);
       setExplanation(res.data.meta?.explanation || '');
-      setRemaining(res.data.meta?.remaining_calls ?? null);
     } catch (err) {
-      const msg = err.response?.data?.message || 'AI 검색 중 오류가 발생했습니다';
-      setError(msg);
+      if (err.response?.status === 402) {
+        setTokenError(err.response.data);
+      } else {
+        setError(err.response?.data?.message || 'AI 검색 중 오류가 발생했습니다');
+      }
     }
     setSearching(false);
   };
@@ -74,11 +77,6 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <span style={{ fontSize: 16 }}>✨</span>
           <h2 style={{ margin: 0 }}>AI 검색</h2>
-          {remaining !== null && (
-            <span style={{ marginLeft: 'auto', fontSize: 12, color: '#aaa' }}>
-              오늘 {remaining}회 남음
-            </span>
-          )}
         </div>
 
         <p style={{ fontSize: 13, color: '#888', marginBottom: 14 }}>
@@ -178,6 +176,14 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
           <button className="btn" onClick={onClose}>닫기</button>
         </div>
       </div>
+
+      {tokenError && (
+        <InsufficientTokensModal
+          required={tokenError.required}
+          balance={tokenError.balance}
+          onClose={() => setTokenError(null)}
+        />
+      )}
     </div>
   );
 }

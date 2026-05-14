@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
+import InsufficientTokensModal from '../components/InsufficientTokensModal';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -40,6 +41,7 @@ export default function ReportsPage() {
   const [reportContent, setReportContent] = useState('');
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState('');
+  const [tokenError, setTokenError] = useState(null);
 
   // 현재 연월 (기본 생성 대상)
   const now = new Date();
@@ -83,7 +85,11 @@ export default function ReportsPage() {
       setSelectedPeriod(report.period);
       setReportContent(report.content);
     } catch (err) {
-      setGenError(err.response?.data?.message || '리포트 생성에 실패했습니다');
+      if (err.response?.status === 402) {
+        setTokenError(err.response.data);
+      } else {
+        setGenError(err.response?.data?.message || '리포트 생성에 실패했습니다');
+      }
     }
     setGenerating(false);
   };
@@ -183,6 +189,14 @@ export default function ReportsPage() {
           </div>
         ))}
       </div>
+
+      {tokenError && (
+        <InsufficientTokensModal
+          required={tokenError.required}
+          balance={tokenError.balance}
+          onClose={() => setTokenError(null)}
+        />
+      )}
     </div>
   );
 }

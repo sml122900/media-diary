@@ -6,6 +6,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
+import InsufficientTokensModal from './InsufficientTokensModal';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -123,6 +124,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
   const [adding, setAdding] = useState(false);
   const [reSearchIdx, setReSearchIdx] = useState(null); // 재검색 중인 항목 index
   const [dragOver, setDragOver] = useState(false);
+  const [tokenError, setTokenError] = useState(null);
   const fileInputRef = useRef(null);
 
   /** 파일 추가 처리 (중복 제거, 최대 10장) */
@@ -181,7 +183,11 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
       );
       setSelected(autoSelected);
     } catch (err) {
-      setMessage(err.response?.data?.message || '이미지 분석에 실패했습니다.');
+      if (err.response?.status === 402) {
+        setTokenError(err.response.data);
+      } else {
+        setMessage(err.response?.data?.message || '이미지 분석에 실패했습니다.');
+      }
     }
     setAnalyzing(false);
   };
@@ -471,6 +477,14 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
           <button className="btn" onClick={onClose}>닫기</button>
         </div>
       </div>
+
+      {tokenError && (
+        <InsufficientTokensModal
+          required={tokenError.required}
+          balance={tokenError.balance}
+          onClose={() => setTokenError(null)}
+        />
+      )}
     </div>
   );
 }
