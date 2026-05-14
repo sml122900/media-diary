@@ -18,6 +18,7 @@ const yearInReviewRouter = require('./routes/yearInReview');
 const curationRouter = require('./routes/curation');
 const restoreRouter = require('./routes/restore');
 const onboardingRouter = require('./routes/onboarding');
+const billingRouter = require('./routes/billing');
 // wishlistRouter는 meRouter 내부에서 /watchlist로 마운트 (me.js 참고)
 
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/year-in-review', yearInReviewRouter);
 app.use('/api/curation', curationRouter);
 app.use('/api/restore', restoreRouter);
 app.use('/api/onboarding', onboardingRouter);
+app.use('/api/billing', billingRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });

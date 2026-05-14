@@ -291,18 +291,17 @@ module.exports = { requireTokens, deductTokens };
 
 ### 사전 준비
 
-- [ ] **환경변수 추가**
+- [x] **환경변수 추가**
   - `TOSS_CLIENT_KEY` (프론트엔드용, 결제창 호출)
   - `TOSS_SECRET_KEY` (백엔드용, 결제 승인)
-  - `TOSS_WEBHOOK_SECRET` (Webhook 검증용)
+  - `TOSS_WEBHOOK_SECRET` (Webhook 검증용 — 운영 전환 시 설정)
 
-- [ ] **토스페이먼츠 SDK 설치 (Node.js)**
-  - 공식 SDK가 없으므로 axios로 직접 REST API 호출
-  - 또는 `@tosspayments/payment-sdk` (프론트엔드용)
+- [x] **토스페이먼츠 SDK 설치 (Node.js)**
+  - fetch로 직접 REST API 호출 (별도 SDK 불필요)
 
 ### 9.3.1 결제 요청 API
 
-- [ ] **POST /api/billing/checkout**
+- [x] **POST /api/billing/checkout**
   - 요청: `{ packageType: 'small' | 'medium' | 'large' }`
   - 동작:
     1. 패키지별 가격/토큰 계산
@@ -327,7 +326,7 @@ if (!user.has_used_first_charge_bonus) {
 
 ### 9.3.2 결제 승인 API
 
-- [ ] **POST /api/billing/confirm**
+- [x] **POST /api/billing/confirm**
   - 요청: `{ paymentKey, orderId, amount }` (프론트에서 결제창 통과 후 호출)
   - 동작:
     1. payment_history에서 order_id 조회 (pending 상태 확인)
@@ -342,23 +341,23 @@ if (!user.has_used_first_charge_bonus) {
 
 ### 9.3.3 Webhook 처리
 
-- [ ] **POST /api/billing/webhook**
+- [x] **POST /api/billing/webhook**
   - 토스페이먼츠에서 결제 상태 변경 시 자동 호출
   - 검증: 토스가 보낸 서명 확인
   - 처리: 결제 상태 동기화 (이중 안전장치)
 
 ### 9.3.4 결제 이력 API
 
-- [ ] **GET /api/billing/history**
+- [x] **GET /api/billing/history**
   - 내 결제 이력 (최근 50건)
   - 응답: 배열 of `{ id, package_type, amount, tokens, status, created_at }`
 
-- [ ] **GET /api/billing/history/:id**
+- [x] **GET /api/billing/history/:id**
   - 특정 결제 상세
 
 ### 9.3.5 환불 API (관리자용)
 
-- [ ] **POST /api/billing/refund/:paymentId** (관리자 전용)
+- [x] **POST /api/billing/refund/:paymentId** (관리자 전용)
   - 동작:
     1. payment_history 조회
     2. 사용한 토큰 계산 (충전 후 차감된 토큰)
@@ -621,6 +620,18 @@ npm install @tosspayments/payment-sdk
 작업할 때마다 아래에 기록:
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-05-14 — Stage 9.3 완료
+
+**Stage 9.3 (토스페이먼츠 백엔드)**
+- backend/.env: TOSS_SECRET_KEY, TOSS_CLIENT_KEY, TOSS_WEBHOOK_SECRET, ADMIN_USER_ID 추가
+- frontend/.env: VITE_TOSS_CLIENT_KEY 추가
+- backend/src/routes/billing.js 신규 (checkout/confirm/webhook/history/refund)
+- app.js: /api/billing 라우터 등록
+- SDK 없이 fetch 직접 호출 (공식 Node.js SDK 없음)
+- confirm: 금액 위변조 검증, 트랜잭션으로 토큰 충전 + 첫 충전 보너스 처리
+- refund: ADMIN_USER_ID 기반 관리자 체크, 미사용 토큰 비율 환불
+- TOSS_WEBHOOK_SECRET 미설정 시 서명 검증 skip (테스트 모드)
 
 ### 2026-05-14 — Stage 9.1 + 9.2 완료
 
