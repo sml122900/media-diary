@@ -189,4 +189,59 @@ router.get('/life-periods', auth, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/me/tokens
+ * 토큰 잔액 + 오늘/이번 달 사용량 조회
+ */
+router.get('/tokens', auth, async (req, res) => {
+  try {
+    // 잔액 + 첫 충전 보너스 여부
+    const { rows: userRows } = await pool.query(
+      'SELECT token_balance, has_used_first_charge_bonus FROM users WHERE id = $1',
+      [req.user.id]
+    );
+
+    // 오늘 기능별 사용량
+    const { rows: todayRows } = await pool.query(
+      `SELECT feature, SUM(tokens_used)::int AS tokens
+       FROM token_usage_log
+       WHERE user_id = $1
+         AND created_at >= CURRENT_DATE
+       GROUP BY feature`,
+      [req.user.id]
+    );
+
+    // 이번 달 합계
+    const { rows: monthRows } = await pool.query(
+      `SELECT
+         SUM(tokens_used)::int AS total_tokens,
+         ROUND(SUM(tokens_used) * 10)::int AS cost_estimate_krw
+       FROM token_usage_log
+       WHERE user_id = $1
+         AND created_at >= DATE_TRUNC('month', NOW())`,
+      [req.user.id]
+    );
+
+    const todayUsage = { chat: 0, screenshot: 0, search: 0, report: 0 };
+    for (const row of todayRows) {
+      if (row.feature in todayUsage) todayUsage[row.feature] = row.tokens;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        balance: userRows[0]?.token_balance ?? 0,
+        has_used_first_charge_bonus: userRows[0]?.has_used_first_charge_bonus ?? false,
+        today_usage: todayUsage,
+        month_usage: {
+          total_tokens: monthRows[0]?.total_tokens ?? 0,
+          cost_estimate_krw: monthRows[0]?.cost_estimate_krw ?? 0,
+        },
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

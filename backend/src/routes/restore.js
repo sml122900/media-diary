@@ -14,6 +14,7 @@ const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -30,9 +31,6 @@ const csvUpload = multer({
 });
 const TMDB_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = 'https://api.themoviedb.org/3';
-
-// 사용자별 일일 대화 한도
-const DAILY_CHAT_LIMIT = 30;
 
 // Claude가 반드시 호출해야 하는 작품 제안 도구 정의
 const SUGGEST_TOOL = {
@@ -97,64 +95,14 @@ async function searchTmdb(title, year, tmdbType) {
 }
 
 /**
- * 일일 사용량 확인 및 증가
- * 오늘 처음 호출이면 카운트 리셋
- * @returns {{ allowed: boolean, remaining: number }}
- */
-async function checkAndIncrementChatLimit(userId) {
-  const { rows } = await pool.query(
-    'SELECT daily_chat_count, last_chat_reset_at FROM users WHERE id = $1',
-    [userId]
-  );
-  const user = rows[0];
-  const now = new Date();
-  const today = now.toISOString().slice(0, 10); // YYYY-MM-DD
-
-  const lastReset = user.last_chat_reset_at
-    ? new Date(user.last_chat_reset_at).toISOString().slice(0, 10)
-    : null;
-
-  let count = user.daily_chat_count || 0;
-
-  // 날짜가 바뀌었으면 리셋
-  if (lastReset !== today) {
-    count = 0;
-    await pool.query(
-      'UPDATE users SET daily_chat_count = 0, last_chat_reset_at = NOW() WHERE id = $1',
-      [userId]
-    );
-  }
-
-  if (count >= DAILY_CHAT_LIMIT) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  // 카운트 증가
-  await pool.query(
-    'UPDATE users SET daily_chat_count = daily_chat_count + 1 WHERE id = $1',
-    [userId]
-  );
-  return { allowed: true, remaining: DAILY_CHAT_LIMIT - count - 1 };
-}
-
-/**
  * POST /api/restore/chat
  * 사용자 메시지 → Claude 호출 → 작품 제안 반환
  * body: { message: string }
  */
-router.post('/chat', auth, async (req, res) => {
+router.post('/chat', auth, requireTokens(2, 'chat'), async (req, res) => {
   const { message } = req.body;
   if (!message?.trim()) {
     return res.status(400).json({ success: false, message: '메시지를 입력해주세요.' });
-  }
-
-  // 일일 한도 확인
-  const limitCheck = await checkAndIncrementChatLimit(req.user.id);
-  if (!limitCheck.allowed) {
-    return res.status(429).json({
-      success: false,
-      message: `오늘 대화 한도(${DAILY_CHAT_LIMIT}회)를 초과했습니다. 내일 다시 시도해주세요.`,
-    });
   }
 
   try {
@@ -215,6 +163,12 @@ ${existingList || '(없음)'}`;
       throw new Error('Claude가 도구를 호출하지 않았습니다.');
     }
 
+    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: claudeRes.usage?.input_tokens,
+      output_tokens: claudeRes.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (chat):', err.message));
+
     const { message: aiMessage, works: rawWorks } = toolUse.input;
 
     // 각 작품을 TMDB에서 검색해 tmdb_id / poster_path 보강
@@ -251,7 +205,7 @@ ${existingList || '(없음)'}`;
       data: {
         message: aiMessage,
         works: enrichedWorks,
-        remaining: limitCheck.remaining,
+        token_balance: req.tokenInfo.balance - req.tokenInfo.required,
       },
     });
   } catch (err) {

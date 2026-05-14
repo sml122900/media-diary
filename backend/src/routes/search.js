@@ -9,15 +9,15 @@ const router = express.Router();
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const TMDB_KEY = process.env.TMDB_API_KEY;
 const IMG_BASE = 'https://image.tmdb.org/t/p/w300';
-const DAILY_LIMIT = 20; // 사용자당 일일 AI 검색 제한
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-/** TMDB API GET 요청 */
+/** TMDB API GET 요청 — path 경로로 GET 요청 후 JSON 반환 */
 async function tmdbGet(path, params = {}) {
   const qs = new URLSearchParams({ ...params, api_key: TMDB_KEY }).toString();
   const res = await fetch(`${TMDB_BASE}${path}?${qs}`);
@@ -26,62 +26,14 @@ async function tmdbGet(path, params = {}) {
 }
 
 /**
- * 사용자의 오늘 AI 검색 사용 횟수 확인 및 카운트 증가
- * 자정 기준으로 초기화 (last_ai_reset_at 기준)
- * @returns {{ allowed: boolean, remaining: number }}
- */
-async function checkAndIncrementAiLimit(userId) {
-  const { rows } = await pool.query(
-    'SELECT daily_ai_calls, last_ai_reset_at FROM users WHERE id = $1',
-    [userId]
-  );
-  const user = rows[0];
-  if (!user) return { allowed: false, remaining: 0 };
-
-  const now = new Date();
-  const resetAt = user.last_ai_reset_at ? new Date(user.last_ai_reset_at) : null;
-
-  // 오늘 자정이 지났으면 카운트 초기화
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const needsReset = !resetAt || resetAt < todayStart;
-
-  if (needsReset) {
-    await pool.query(
-      'UPDATE users SET daily_ai_calls = 1, last_ai_reset_at = NOW() WHERE id = $1',
-      [userId]
-    );
-    return { allowed: true, remaining: DAILY_LIMIT - 1 };
-  }
-
-  if (user.daily_ai_calls >= DAILY_LIMIT) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  await pool.query(
-    'UPDATE users SET daily_ai_calls = daily_ai_calls + 1 WHERE id = $1',
-    [userId]
-  );
-  return { allowed: true, remaining: DAILY_LIMIT - user.daily_ai_calls - 1 };
-}
-
-/**
  * POST /api/search/natural
  * 자연어 쿼리를 Claude API로 분석 → TMDB 검색 → 결과 반환
  * 요청: { query: "우주 배경의 잔잔한 SF 영화" }
  */
-router.post('/natural', auth, async (req, res) => {
+router.post('/natural', auth, requireTokens(1, 'search'), async (req, res) => {
   const { query } = req.body;
   if (!query?.trim()) {
     return res.status(400).json({ success: false, message: '검색어를 입력해주세요' });
-  }
-
-  // 일일 사용 한도 확인
-  const { allowed, remaining } = await checkAndIncrementAiLimit(req.user.id);
-  if (!allowed) {
-    return res.status(429).json({
-      success: false,
-      message: `일일 AI 검색 한도(${DAILY_LIMIT}회)에 도달했습니다. 내일 다시 시도해주세요.`,
-    });
   }
 
   try {
@@ -100,6 +52,12 @@ router.post('/natural', auth, async (req, res) => {
 {"keywords":"영어 작품 제목 또는 핵심 단어 (TMDB에서 검색될 실제 제목, 예: Arrival, Parasite)","korean_keywords":"한국어 작품 제목 또는 키워드","type":"movie 또는 tv 또는 both","explanation":"검색 해석 (한국어 15자 이내)"}`,
       }],
     });
+
+    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: message.usage?.input_tokens,
+      output_tokens: message.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (search):', err.message));
 
     // Claude 응답 파싱
     let parsed;
@@ -162,7 +120,7 @@ router.post('/natural', auth, async (req, res) => {
     res.json({
       success: true,
       data: results,
-      meta: { explanation, remaining_calls: remaining },
+      meta: { explanation, token_balance: req.tokenInfo.balance - req.tokenInfo.required },
     });
   } catch (err) {
     // Claude API 오류 시 카운트 롤백 (선택적 — 현재는 그냥 에러 반환)

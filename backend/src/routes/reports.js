@@ -9,6 +9,7 @@ const router = express.Router();
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const TYPE_LABEL = { movie: '영화', anime: '애니메이션', drama: '드라마' };
@@ -72,7 +73,7 @@ router.get('/:period', auth, async (req, res) => {
  * 리포트 생성 (이미 있으면 기존 반환)
  * body: { period?: "YYYY-MM" }  (없으면 이번 달)
  */
-router.post('/generate', auth, async (req, res) => {
+router.post('/generate', auth, requireTokens(5, 'report'), async (req, res) => {
   const now = new Date();
   const defaultPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const period = req.body.period || defaultPeriod;
@@ -169,6 +170,12 @@ ${formatItemsForPrompt(items)}
     });
 
     const content = message.content[0].text;
+
+    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: message.usage?.input_tokens,
+      output_tokens: message.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (report):', err.message));
 
     // DB 저장
     const { rows: saved } = await pool.query(

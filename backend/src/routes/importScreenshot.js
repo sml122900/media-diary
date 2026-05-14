@@ -12,10 +12,8 @@ const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
 const { getExtractionPrompt } = require('../services/screenshotPrompts');
-
-// 스크린샷 인식 일일 한도 (이미지 1장 = 1회 카운트)
-const SCREENSHOT_DAILY_LIMIT = 20;
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const TMDB_BASE = 'https://api.themoviedb.org/3';
@@ -181,44 +179,13 @@ async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplay
  * 멀티 이미지 업로드 → 구조화 추출 → TMDB 매칭 → 신뢰도 포함 반환
  * body (multipart): images[] + ott_type (optional)
  */
-router.post('/', auth, upload.array('images', 10), async (req, res) => {
+router.post('/', auth, requireTokens(3, 'screenshot'), upload.array('images', 10), async (req, res) => {
   const files = req.files || [];
   const filePaths = files.map(f => f.path);
 
   try {
     if (files.length === 0) {
       return res.status(400).json({ success: false, message: '이미지를 1장 이상 업로드해주세요.' });
-    }
-
-    // 일일 한도 확인 (이미지 장수 기준)
-    const { rows: uRows } = await pool.query(
-      'SELECT daily_ai_calls, last_ai_reset_at FROM users WHERE id = $1',
-      [req.user.id]
-    );
-    const u = uRows[0];
-    if (u) {
-      const todayStr = new Date().toISOString().slice(0, 10);
-      const lastReset = u.last_ai_reset_at ? new Date(u.last_ai_reset_at).toISOString().slice(0, 10) : null;
-      const needsReset = lastReset !== todayStr;
-      const currentCount = needsReset ? 0 : (u.daily_ai_calls || 0);
-
-      if (currentCount + files.length > SCREENSHOT_DAILY_LIMIT) {
-        return res.status(429).json({
-          success: false,
-          message: `일일 인식 한도를 초과합니다. 오늘 남은 횟수: ${Math.max(0, SCREENSHOT_DAILY_LIMIT - currentCount)}장`,
-        });
-      }
-      if (needsReset) {
-        await pool.query(
-          'UPDATE users SET daily_ai_calls = $1, last_ai_reset_at = NOW() WHERE id = $2',
-          [files.length, req.user.id]
-        );
-      } else {
-        await pool.query(
-          'UPDATE users SET daily_ai_calls = daily_ai_calls + $1 WHERE id = $2',
-          [files.length, req.user.id]
-        );
-      }
     }
 
     const ottType = (req.body.ott_type || 'other').toLowerCase();
@@ -240,6 +207,11 @@ router.post('/', auth, upload.array('images', 10), async (req, res) => {
         return extracted;
       })
     );
+
+    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      metadata: { image_count: files.length },
+    }).catch(err => console.error('토큰 차감 실패 (screenshot):', err.message));
 
     // 전체 추출 결과 병합 + 제목 기준 중복 제거
     const seenTitles = new Set();
