@@ -222,9 +222,9 @@ router.get('/tokens', auth, async (req, res) => {
       [req.user.id]
     );
 
-    const todayUsage = { chat: 0, screenshot: 0, search: 0, report: 0 };
+    const todayUsage = {};
     for (const row of todayRows) {
-      if (row.feature in todayUsage) todayUsage[row.feature] = row.tokens;
+      todayUsage[row.feature] = row.tokens;
     }
 
     res.json({
@@ -293,9 +293,9 @@ router.get('/usage-stats', auth, async (req, res) => {
       [uid]
     );
 
-    const byFeature = { chat: 0, screenshot: 0, search: 0, report: 0 };
+    const byFeature = {};
     for (const row of byFeatureRows) {
-      if (row.feature in byFeature) byFeature[row.feature] = row.tokens;
+      byFeature[row.feature] = row.tokens;
     }
 
     res.json({

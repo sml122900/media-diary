@@ -13,9 +13,9 @@ import axios from 'axios';
 const BASE = import.meta.env.VITE_API_URL;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
-const FEATURE_LABELS = { chat: 'AI 채팅', screenshot: '스크린샷', search: 'AI 검색', report: '리포트' };
-const FEATURE_COLORS = { chat: '#a78bfa', screenshot: '#34d399', search: '#fbbf24', report: '#f87171' };
-const PIE_COLORS   = ['#a78bfa', '#34d399', '#fbbf24', '#f87171'];
+const FEATURE_LABELS = { chat: 'AI 채팅', screenshot: '스크린샷', search: 'AI 검색', report: '리포트', discover_chat: 'AI 추천 채팅', report_chat: '리포트 AI 채팅' };
+const FEATURE_COLORS = { chat: '#a78bfa', screenshot: '#34d399', search: '#fbbf24', report: '#f87171', discover_chat: '#60a5fa', report_chat: '#fb923c' };
+const PIE_COLORS   = ['#a78bfa', '#34d399', '#fbbf24', '#f87171', '#60a5fa', '#fb923c'];
 
 export default function BillingUsagePage() {
   const navigate = useNavigate();

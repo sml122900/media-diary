@@ -1513,3 +1513,15 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .rc-preview-item strong { color: #eee; margin-right: 6px; }
 .rc-preview-item span   { color: #888; font-size: 12px; }
 .rc-preview-note  { font-size: 11px; color: #555; }
+
+/* 미리보기 확인 모달 */
+.rc-confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+.rc-confirm-box {
+  background: #1e1e1e; border: 1px solid #333; border-radius: 14px;
+  padding: 24px 28px; max-width: 340px; width: 90%;
+}
+.rc-confirm-msg  { font-size: 14px; color: #ddd; line-height: 1.6; margin-bottom: 20px; }
+.rc-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }

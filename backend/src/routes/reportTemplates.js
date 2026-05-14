@@ -172,6 +172,114 @@ router.delete('/templates/:id', auth, async (req, res) => {
 });
 
 /**
+ * POST /api/reports/preview
+ * 선택한 항목으로 미리보기 리포트 생성 (DB 저장 없음, 5토큰)
+ * body: { components: ['basic_count', ...], period?: 'YYYY-MM' }
+ */
+router.post('/preview', auth, requireTokens(5, 'report'), async (req, res) => {
+  const { components, period } = req.body;
+  if (!Array.isArray(components) || components.length === 0) {
+    return res.status(400).json({ success: false, message: '항목을 하나 이상 선택해주세요.' });
+  }
+
+  const now = new Date();
+  const targetPeriod = (period && /^\d{4}-\d{2}$/.test(period))
+    ? period
+    : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  const validComponents = components.filter(c => REPORT_COMPONENTS[c]);
+
+  try {
+    // 해당 기간 감상 항목 조회
+    const { rows: periodItems } = await pool.query(
+      `SELECT title, year, type, director, rating, review_text
+       FROM user_media
+       WHERE user_id = $1
+         AND watched_at >= $2::date
+         AND watched_at < ($2::date + INTERVAL '1 month')
+       ORDER BY watched_at DESC`,
+      [req.user.id, targetPeriod + '-01']
+    );
+
+    const { rows: fallbackItems } = periodItems.length === 0
+      ? await pool.query(
+          `SELECT title, year, type, director, rating, review_text
+           FROM user_media
+           WHERE user_id = $1 AND (rating > 0 OR review_text <> '')
+           ORDER BY created_at DESC LIMIT 30`,
+          [req.user.id]
+        )
+      : { rows: [] };
+
+    const items = periodItems.length > 0 ? periodItems : fallbackItems;
+
+    if (items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '미리보기를 생성할 감상 기록이 없습니다.',
+      });
+    }
+
+    const [y, m] = targetPeriod.split('-');
+    const periodLabel = periodItems.length > 0 ? `${y}년 ${parseInt(m)}월` : '최근 감상 기록';
+    const TYPE_LABEL = { movie: '영화', anime: '애니메이션', drama: '드라마' };
+
+    const avgRating = items.filter(i => i.rating > 0).length > 0
+      ? (items.filter(i => i.rating > 0).reduce((s, i) => s + i.rating, 0) /
+         items.filter(i => i.rating > 0).length).toFixed(1)
+      : '-';
+
+    const itemsText = items.map(i => {
+      const parts = [
+        `- ${i.title} (${i.year || '?'}, ${TYPE_LABEL[i.type] || i.type})`,
+        i.director ? `  감독: ${i.director}` : null,
+        i.rating > 0 ? `  별점: ${'★'.repeat(i.rating)}` : null,
+        i.review_text ? `  감상: ${i.review_text.slice(0, 80)}` : null,
+      ].filter(Boolean);
+      return parts.join('\n');
+    }).join('\n\n');
+
+    const componentInstructions = '선택된 분석 항목:\n' +
+      validComponents.map(c => `- ${COMPONENT_PROMPTS[c] || c}`).join('\n');
+
+    const message = await claude.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1500,
+      messages: [{
+        role: 'user',
+        content: `당신은 영화·드라마·애니 감상 분석 전문가입니다.
+아래 감상 기록을 바탕으로 한국어 마크다운 리포트를 작성해주세요.
+따뜻하고 통찰력 있는 문체로, 사용자가 자신의 취향을 발견하도록 도와주세요.
+
+[분석 대상]
+기간: ${periodLabel}
+총 ${items.length}편 (평균 별점: ${avgRating})
+
+[감상 목록]
+${itemsText}
+
+[리포트 지시사항]
+제목: ## ${periodLabel} 감상 리포트 (미리보기)
+
+${componentInstructions}
+
+각 항목을 ### 제목으로 구분하고, 감상 목록에서 실제 데이터를 근거로 분석하세요.
+데이터가 부족한 항목은 가능한 범위에서 추론하세요.`,
+      }],
+    });
+
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: message.usage?.input_tokens,
+      output_tokens: message.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (preview):', err.message));
+
+    res.json({ success: true, data: { content: message.content[0].text } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
  * POST /api/reports/customize-chat
  * 자연어 설명 → 항목 코드 자동 선택 (2토큰)
  * body: { description: "장르 변화에 집중한 리포트" }

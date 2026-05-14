@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 import InsufficientTokensModal from '../components/InsufficientTokensModal';
 import useTokenStore from '../store/tokenStore';
 
@@ -26,10 +27,14 @@ export default function ReportsCustomizePage() {
   const [saving, setSaving]           = useState(false);
   const [message, setMessage]         = useState('');
 
-  const [aiInput, setAiInput]         = useState('');
-  const [aiLoading, setAiLoading]     = useState(false);
-  const [tokenError, setTokenError]   = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
+  const [aiInput, setAiInput]               = useState('');
+  const [aiLoading, setAiLoading]           = useState(false);
+  const [tokenError, setTokenError]         = useState(null);
+  const [showPreview, setShowPreview]       = useState(false);
+  const [previewConfirm, setPreviewConfirm] = useState(false);
+  const [previewContent, setPreviewContent] = useState('');
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError]     = useState('');
 
   // 항목 목록 로딩
   useEffect(() => {
@@ -80,6 +85,24 @@ export default function ReportsCustomizePage() {
       setMessage(err.response?.data?.message || '저장에 실패했습니다.');
     }
     setSaving(false);
+  };
+
+  // 실시간 미리보기 (5토큰)
+  const handlePreview = async () => {
+    setPreviewConfirm(false);
+    setPreviewLoading(true);
+    setPreviewError('');
+    setPreviewContent('');
+    try {
+      const res = await axios.post(`${BASE}/api/reports/preview`,
+        { components: [...selected] }, { headers: h() });
+      setPreviewContent(res.data.data?.content || '');
+      if (res.data.data?.token_balance !== undefined) setBalance(res.data.data.token_balance);
+    } catch (err) {
+      if (err.response?.status === 402) setTokenError(err.response.data);
+      else setPreviewError(err.response?.data?.message || '미리보기 생성에 실패했습니다.');
+    }
+    setPreviewLoading(false);
   };
 
   // AI 자동 선택
@@ -145,31 +168,36 @@ export default function ReportsCustomizePage() {
         <span className="rc-count">{selected.size}개 선택됨</span>
         <button
           className="btn rc-preview-btn"
-          onClick={() => setShowPreview(v => !v)}
-          disabled={selected.size === 0}
+          onClick={() => setPreviewConfirm(true)}
+          disabled={selected.size === 0 || previewLoading}
         >
-          {showPreview ? '▲ 미리보기 닫기' : '▼ 미리보기'}
+          {previewLoading ? '✨ 생성 중...' : '✨ 미리보기 (5토큰)'}
         </button>
       </div>
 
-      {/* 미리보기 패널 — 선택 항목 요약 (토큰 소모 없음) */}
-      {showPreview && selected.size > 0 && (
+      {/* 미리보기 확인 모달 */}
+      {previewConfirm && (
+        <div className="rc-confirm-overlay" onClick={() => setPreviewConfirm(false)}>
+          <div className="rc-confirm-box" onClick={e => e.stopPropagation()}>
+            <p className="rc-confirm-msg">미리보기 생성 시 <strong>5토큰</strong>이 차감됩니다. 계속하시겠어요?</p>
+            <div className="rc-confirm-actions">
+              <button className="btn btn-primary" onClick={handlePreview}>확인</button>
+              <button className="btn" onClick={() => setPreviewConfirm(false)}>취소</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 미리보기 에러 */}
+      {previewError && <p className="rc-error">{previewError}</p>}
+
+      {/* 미리보기 결과 (Claude 생성 마크다운) */}
+      {previewContent && (
         <div className="rc-preview">
-          <div className="rc-preview-title">📋 이 템플릿으로 생성될 리포트 섹션</div>
-          <ol className="rc-preview-list">
-            {components
-              .filter(c => selected.has(c.code))
-              .map(c => (
-                <li key={c.code} className="rc-preview-item">
-                  <strong>{c.name}</strong>
-                  <span>{c.desc}</span>
-                </li>
-              ))
-            }
-          </ol>
-          <p className="rc-preview-note">
-            실제 리포트는 "리포트 생성" 시 위 항목을 중심으로 Claude가 분석합니다 (5토큰).
-          </p>
+          <div className="rc-preview-title">✨ 미리보기 리포트</div>
+          <div className="report-content">
+            <ReactMarkdown>{previewContent}</ReactMarkdown>
+          </div>
         </div>
       )}
 
