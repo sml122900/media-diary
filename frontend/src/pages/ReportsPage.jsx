@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
@@ -42,6 +42,8 @@ export default function ReportsPage() {
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState('');
   const [tokenError, setTokenError] = useState(null);
+  const [templates, setTemplates]   = useState([]);
+  const [selectedTmpl, setSelectedTmpl] = useState('');
 
   // 현재 연월 (기본 생성 대상)
   const now = new Date();
@@ -51,6 +53,15 @@ export default function ReportsPage() {
     axios.get(`${BASE}/me/reports`, { headers: headers() })
       .then(res => { setReports(res.data.data || []); setLoading(false); })
       .catch(() => setLoading(false));
+    // 템플릿 목록 로딩
+    axios.get(`${BASE.replace('/me', '')}/reports/templates`, { headers: headers() })
+      .then(res => {
+        const list = res.data.data || [];
+        setTemplates(list);
+        const def = list.find(t => t.is_default);
+        if (def) setSelectedTmpl(String(def.id));
+      })
+      .catch(() => {});
   }, []);
 
   // 리포트 카드 클릭 — 상세 로드
@@ -72,7 +83,7 @@ export default function ReportsPage() {
     try {
       const res = await axios.post(
         `${BASE}/me/reports/generate`,
-        { period: currentPeriod },
+        { period: currentPeriod, templateId: selectedTmpl || undefined },
         { headers: headers() }
       );
       const report = res.data.data;
@@ -104,6 +115,28 @@ export default function ReportsPage() {
         <div className="mdb-controls">
           <button className="btn" onClick={() => navigate('/')}>← 돌아가기</button>
         </div>
+      </div>
+
+      {/* 템플릿 선택 */}
+      <div className="report-template-bar">
+        <select
+          className="report-tmpl-select"
+          value={selectedTmpl}
+          onChange={e => setSelectedTmpl(e.target.value)}
+        >
+          <option value="">기본 리포트</option>
+          {templates.map(t => (
+            <option key={t.id} value={String(t.id)}>{t.name}</option>
+          ))}
+        </select>
+        <Link to="/reports/customize" className="btn" style={{ fontSize: 13 }}>
+          + 템플릿 만들기
+        </Link>
+        {selectedTmpl && (
+          <Link to={`/reports/customize?edit=${selectedTmpl}`} className="btn" style={{ fontSize: 13 }}>
+            수정
+          </Link>
+        )}
       </div>
 
       {/* 리포트 생성 버튼 */}

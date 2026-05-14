@@ -26,6 +26,7 @@ import MemoryChatPage from './pages/MemoryChatPage';
 import OnboardingPage from './pages/OnboardingPage';
 import DiscoverPage from './pages/DiscoverPage';
 import DiscoverChatPage from './pages/DiscoverChatPage';
+import ReportsCustomizePage from './pages/ReportsCustomizePage';
 import BillingChargePage from './pages/BillingChargePage';
 import BillingSuccessPage from './pages/BillingSuccessPage';
 import BillingFailPage from './pages/BillingFailPage';
@@ -171,6 +172,10 @@ function App() {
               <CurationListPage />
             </PrivateRoute>
           }
+        />
+        <Route
+          path="/reports/customize"
+          element={<PrivateRoute><ReportsCustomizePage /></PrivateRoute>}
         />
         <Route
           path="/discover"

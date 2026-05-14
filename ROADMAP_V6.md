@@ -421,7 +421,7 @@ app.get('/api/proxy/poster', async (req, res) => {
 
 ### 10.6.1 데이터 모델
 
-- [ ] **`report_templates` 테이블 신설**
+- [x] **`report_templates` 테이블 신설**
   ```sql
   CREATE TABLE report_templates (
     id BIGSERIAL PRIMARY KEY,
@@ -434,7 +434,7 @@ app.get('/api/proxy/poster', async (req, res) => {
   );
   ```
 
-- [ ] **리포트 항목 정의 (코드 상수)**
+- [x] **리포트 항목 정의 (코드 상수)**
   ```javascript
   const REPORT_COMPONENTS = {
     'basic_count': {
@@ -502,46 +502,46 @@ app.get('/api/proxy/poster', async (req, res) => {
 
 ### 10.6.2 백엔드 API
 
-- [ ] **GET /api/reports/components**
+- [x] **GET /api/reports/components**
   - 사용 가능한 리포트 항목 목록 + 설명
 
-- [ ] **GET /api/reports/templates**
+- [x] **GET /api/reports/templates**
   - 사용자의 저장된 템플릿 목록
 
-- [ ] **POST /api/reports/templates**
+- [x] **POST /api/reports/templates**
   - 새 템플릿 저장
   - 요청: `{ name, components: ['basic_count', 'top_genres', ...] }`
 
-- [ ] **PUT /api/reports/templates/:id**
+- [x] **PUT /api/reports/templates/:id**
   - 템플릿 수정
 
-- [ ] **DELETE /api/reports/templates/:id**
+- [x] **DELETE /api/reports/templates/:id**
   - 템플릿 삭제
 
-- [ ] **POST /api/me/reports/generate** (기존 API 개선)
+- [x] **POST /api/me/reports/generate** (기존 API 개선)
   - 요청에 templateId 옵션 추가
   - templateId 있으면 해당 템플릿 항목으로 리포트 생성
   - 없으면 기본 항목
 
-- [ ] **POST /api/reports/customize-chat** (AI 채팅)
+- [x] **POST /api/reports/customize-chat** (AI 채팅)
   - 사용자 자연어 입력으로 항목 추천
   - 예: "장르 변화에 집중한 리포트" → ['new_genre', 'top_genres', 'yoy_change']
   - Claude API로 항목 매핑
 
 ### 10.6.3 프론트엔드
 
-- [ ] **/reports 페이지 개선**
+- [x] **/reports 페이지 개선**
   - 상단: "내 템플릿 선택" 드롭다운 + "새 템플릿 만들기" 버튼
   - 중앙: 선택된 템플릿으로 리포트 생성/조회
   - 하단: 월별 저장된 리포트 목록
 
-- [ ] **/reports/customize 페이지 신설**
+- [x] **/reports/customize 페이지 신설**
   - 16개+ 리포트 항목 체크박스 그리드
   - 각 항목에 설명 표시
   - "미리보기" 버튼 → 선택한 항목으로 임시 리포트 생성
   - "템플릿 저장" 버튼
 
-- [ ] **AI 채팅 옵션**
+- [x] **AI 채팅 옵션**
   - /reports/customize 페이지에 "AI와 채팅으로 만들기" 버튼
   - 모달 또는 별도 페이지에서 AI 대화
   - 예: "장르 변화에 집중한 리포트로"
@@ -587,6 +587,21 @@ app.get('/api/proxy/poster', async (req, res) => {
 작업할 때마다 아래에 기록:
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-05-14 — Stage 10.6 완료
+
+**Stage 10.6 (리포트 커스터마이징)**
+- report_templates 테이블 신설 (Supabase 적용 완료)
+- reportTemplates.js 신규:
+  - 16개 REPORT_COMPONENTS 상수 (basic_count ~ top_watched_with)
+  - GET /api/reports/components
+  - GET/POST/PUT/DELETE /api/reports/templates
+  - POST /api/reports/customize-chat (2토큰, AI가 자연어→항목 코드 매핑)
+- reports.js 업데이트: templateId 파라미터 지원, 선택 항목별 Claude 프롬프트 동적 생성
+- ReportsCustomizePage.jsx 신규 (/reports/customize):
+  - 16개 체크박스 그리드 + AI 자동 선택 입력창
+  - 템플릿 이름 입력 + 저장/수정 기능
+- ReportsPage.jsx 업데이트: 템플릿 선택 드롭다운 + 커스터마이징 진입 버튼
 
 ### 2026-05-14 — Stage 10.5 완료
 

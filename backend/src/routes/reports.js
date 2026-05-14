@@ -13,6 +13,7 @@ const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const TYPE_LABEL = { movie: '영화', anime: '애니메이션', drama: '드라마' };
+const { REPORT_COMPONENTS, COMPONENT_PROMPTS } = require('./reportTemplates');
 
 /**
  * 감상 기록 배열을 Claude 프롬프트용 텍스트로 변환
@@ -76,7 +77,8 @@ router.get('/:period', auth, async (req, res) => {
 router.post('/generate', auth, requireTokens(5, 'report'), async (req, res) => {
   const now = new Date();
   const defaultPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const period = req.body.period || defaultPeriod;
+  const period     = req.body.period || defaultPeriod;
+  const templateId = req.body.templateId || null; // 선택된 템플릿 ID
 
   // 기간 형식 검증
   if (!/^\d{4}-\d{2}$/.test(period)) {
@@ -135,10 +137,33 @@ router.post('/generate', auth, requireTokens(5, 'report'), async (req, res) => {
          items.filter(i => i.rating > 0).length).toFixed(1)
       : '-';
 
+    // 템플릿 항목 조회 (templateId가 있으면)
+    let selectedComponents = null;
+    if (templateId) {
+      const { rows: tmplRows } = await pool.query(
+        'SELECT components FROM report_templates WHERE id = $1 AND user_id = $2',
+        [templateId, req.user.id]
+      );
+      if (tmplRows[0]?.components?.length) {
+        selectedComponents = tmplRows[0].components;
+      }
+    }
+
+    // 선택된 항목별 지시문 빌드
+    const componentInstructions = selectedComponents
+      ? '선택된 분석 항목:\n' + selectedComponents
+          .map(c => `- ${COMPONENT_PROMPTS[c] || c}`)
+          .join('\n')
+      : `기본 형식:
+### 이달의 하이라이트 (가장 인상 깊은 작품 1-2편)
+### 감상 패턴 분석 (장르/연대/감독 선호, 별점 경향)
+### 이달의 한 줄 (대표 문장 또는 인상적인 리뷰 인용)
+### 다음 달 추천 (패턴 기반 2-3편 추천)`;
+
     // Claude API 리포트 생성
     const message = await claude.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1200,
+      max_tokens: 1500,
       messages: [{
         role: 'user',
         content: `당신은 영화·드라마·애니 감상 분석 전문가입니다.
@@ -152,20 +177,13 @@ router.post('/generate', auth, requireTokens(5, 'report'), async (req, res) => {
 [감상 목록]
 ${formatItemsForPrompt(items)}
 
-[리포트 형식 - 이 구조를 반드시 따르세요]
-## ${periodLabel} 감상 리포트
+[리포트 지시사항]
+제목: ## ${periodLabel} 감상 리포트
 
-### 이달의 하이라이트
-(가장 인상 깊은 작품 1-2편과 그 이유)
+${componentInstructions}
 
-### 감상 패턴 분석
-(어떤 장르/연대/감독을 선호했는지, 별점 경향)
-
-### 이달의 한 줄
-(이번 달 감상을 대표하는 문장 또는 인상적인 감상 메모 인용)
-
-### 다음 달 추천
-(감상 패턴을 바탕으로 볼 만한 작품 2-3편 추천)`,
+각 항목을 ### 제목으로 구분하고, 감상 목록에서 실제 데이터를 근거로 분석하세요.
+데이터가 부족한 항목은 가능한 범위에서 추론하세요.`,
       }],
     });
 
