@@ -310,7 +310,7 @@ app.get('/api/proxy/poster', async (req, res) => {
 
 ### 10.5.1 데이터 모델
 
-- [ ] **`discovery_chats` 테이블 신설**
+- [x] **`discovery_chats` 테이블 신설**
   ```sql
   CREATE TABLE discovery_chats (
     id BIGSERIAL PRIMARY KEY,
@@ -326,13 +326,13 @@ app.get('/api/proxy/poster', async (req, res) => {
     ON discovery_chats(user_id, session_id, created_at);
   ```
 
-- [ ] **memory_chats와 분리**
+- [x] **memory_chats와 분리**
   - 기억 복원(/restore/chat)과 추천(/discover/chat)은 다른 의도
   - 별도 테이블로 분리해 분석 + 컨텍스트 관리 명확
 
 ### 10.5.2 백엔드 API
 
-- [ ] **POST /api/discover/chat**
+- [x] **POST /api/discover/chat**
   - 요청: `{ message, sessionId? }`
   - 처리:
     1. 사용자 메시지 저장
@@ -342,7 +342,7 @@ app.get('/api/proxy/poster', async (req, res) => {
     5. AI 응답 + 추천 작품 저장
     6. 응답 반환
 
-- [ ] **시스템 프롬프트 설계**
+- [x] **시스템 프롬프트 설계**
   ```
   당신은 사용자의 영화/드라마/애니메이션 취향을 파악해서
   완벽한 다음 작품을 추천하는 큐레이터입니다.
@@ -361,13 +361,13 @@ app.get('/api/proxy/poster', async (req, res) => {
   - get_user_history: 사용자가 본 작품 확인
   ```
 
-- [ ] **GET /api/discover/chat/sessions**
+- [x] **GET /api/discover/sessions**
   - 사용자의 이전 대화 세션 목록
 
 - [ ] **POST /api/discover/chat/sessions/new**
   - 새 대화 시작 (sessionId 발급)
 
-- [ ] **GET /api/discover/chat/history?sessionId=**
+- [x] **GET /api/discover/history?sessionId=**
   - 특정 세션 대화 이력
 
 - [ ] **POST /api/discover/chat/add-to-watchlist**
@@ -375,19 +375,19 @@ app.get('/api/proxy/poster', async (req, res) => {
 
 ### 10.5.3 프론트엔드
 
-- [ ] **`/discover/chat` 라우트**
+- [x] **`/discover/chat` 라우트**
 
-- [ ] **DiscoveryChat 컴포넌트**
+- [x] **DiscoveryChat 컴포넌트**
   - 메신저 스타일 UI (기존 MemoryChat 참고)
   - 좌측: 이전 대화 세션 목록 (사이드바)
   - 중앙: 채팅 영역
   - 하단: 입력창
 
-- [ ] **추천 카드 임베드**
+- [x] **추천 카드 임베드**
   - AI 메시지 안에 작품 카드 그리드
   - 각 카드에 "위시리스트 추가" / "이미 봤어요" / "관심 없음" 버튼
 
-- [ ] **예시 시작 질문 (빈 화면일 때)**
+- [x] **예시 시작 질문 (빈 화면일 때)**
   ```
   "오랜만에 SF 영화 보고 싶어"
   "비 오는 날 어울리는 영화 추천해줘"
@@ -395,7 +395,7 @@ app.get('/api/proxy/poster', async (req, res) => {
   "최근 본 [영화] 같은 거 더 없어?"
   ```
 
-- [ ] **토큰 비용 안내**
+- [x] **토큰 비용 안내**
   - AI 추천 채팅 1회 = 2토큰 (기억 복원 채팅과 동일)
   - 헤더 토큰 잔액 표시 연동
 
@@ -587,6 +587,22 @@ app.get('/api/proxy/poster', async (req, res) => {
 작업할 때마다 아래에 기록:
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-05-14 — Stage 10.5 완료
+
+**Stage 10.5 (AI 채팅형 추천)**
+- discovery_chats 테이블 신설 (Supabase 적용 완료)
+- backend/src/routes/discover.js 신규:
+  - POST /api/discover/chat (requireTokens(2), 큐레이터 시스템 프롬프트, 세션 컨텍스트)
+  - GET /api/discover/sessions (이전 세션 목록)
+  - GET /api/discover/history?sessionId= (세션별 이력)
+- DiscoverChatPage.jsx 신규 (/discover/chat):
+  - 좌측 세션 사이드바 (데스크탑) / 모바일 슬라이드 패널
+  - 빈 화면 6개 예시 질문
+  - 채팅 버블 + AI 응답에 추천 카드 그리드 임베드
+  - "내 목록에 추가" / "나중에 보기" 버튼
+  - 토큰 부족 시 InsufficientTokensModal 연결
+  - 2토큰 차감
 
 ### 2026-05-14 — Stage 10.4 완료
 

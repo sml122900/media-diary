@@ -25,6 +25,7 @@ import CurationListPage from './pages/CurationListPage';
 import MemoryChatPage from './pages/MemoryChatPage';
 import OnboardingPage from './pages/OnboardingPage';
 import DiscoverPage from './pages/DiscoverPage';
+import DiscoverChatPage from './pages/DiscoverChatPage';
 import BillingChargePage from './pages/BillingChargePage';
 import BillingSuccessPage from './pages/BillingSuccessPage';
 import BillingFailPage from './pages/BillingFailPage';
@@ -174,6 +175,10 @@ function App() {
         <Route
           path="/discover"
           element={<PrivateRoute><DiscoverPage /></PrivateRoute>}
+        />
+        <Route
+          path="/discover/chat"
+          element={<PrivateRoute><DiscoverChatPage /></PrivateRoute>}
         />
         <Route
           path="/billing/charge"
