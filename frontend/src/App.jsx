@@ -28,6 +28,8 @@ import BillingChargePage from './pages/BillingChargePage';
 import BillingSuccessPage from './pages/BillingSuccessPage';
 import BillingFailPage from './pages/BillingFailPage';
 import BillingHistoryPage from './pages/BillingHistoryPage';
+import BillingUsagePage from './pages/BillingUsagePage';
+import PolicyPage from './pages/PolicyPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -176,9 +178,15 @@ function App() {
           path="/billing/history"
           element={<PrivateRoute><BillingHistoryPage /></PrivateRoute>}
         />
+        <Route
+          path="/billing/usage"
+          element={<PrivateRoute><BillingUsagePage /></PrivateRoute>}
+        />
         {/* 토스 리다이렉트 — 인증 불필요 (URL에 결제 정보 포함) */}
         <Route path="/billing/success" element={<BillingSuccessPage />} />
         <Route path="/billing/fail" element={<BillingFailPage />} />
+        {/* 정책 페이지 — 비로그인 접근 가능 */}
+        <Route path="/policy/:type" element={<PolicyPage />} />
         {/* 공개 프로필 — 비로그인 접근 가능 */}
         <Route path="/u/:username" element={<PublicProfilePage />} />
         <Route path="/login" element={<LoginPage />} />

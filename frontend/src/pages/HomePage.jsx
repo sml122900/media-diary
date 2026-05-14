@@ -328,6 +328,7 @@ export default function HomePage() {
                   🪙 충전하기 {balance !== null && <span className="menu-token-balance">{balance}토큰</span>}
                 </Link>
                 <Link to="/billing/history" className="menu-item" onClick={closeMenu}>결제 이력</Link>
+                <Link to="/billing/usage" className="menu-item" onClick={closeMenu}>사용량 통계</Link>
 
                 <div className="menu-divider" />
 

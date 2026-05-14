@@ -466,36 +466,36 @@ npm install @tosspayments/payment-sdk
 
 ### 9.5.1 환불 정책 페이지
 
-- [ ] **/policy/refund**
+- [x] **/policy/refund**
   - 환불 가능 조건
   - 환불 요청 방법 (이메일)
   - 처리 기간
 
 ### 9.5.2 이용약관
 
-- [ ] **/policy/terms**
+- [x] **/policy/terms**
   - 서비스 이용 약관
   - 결제 관련 조항
   - 사용자 책임
 
 ### 9.5.3 개인정보처리방침
 
-- [ ] **/policy/privacy**
+- [x] **/policy/privacy**
   - 수집 정보
   - 이용 목적
   - 보관 기간
 
 ### 9.5.4 결제 페이지에 약관 동의 체크박스
 
-- [ ] 결제 진행 전 동의 필수
-  - [ ] 이용약관 동의
-  - [ ] 환불 정책 동의
+- [x] 결제 진행 전 동의 필수
+  - [x] 이용약관 동의
+  - [x] 환불 정책 동의
 
 ### 사용자 확인 체크리스트
 
-- [ ] 3개 정책 페이지 접근 가능
-- [ ] 결제 전 약관 동의 흐름
-- [ ] 헤더/푸터에 정책 링크
+- [x] 3개 정책 페이지 접근 가능
+- [x] 결제 전 약관 동의 흐름
+- [x] 헤더/푸터에 정책 링크
 
 ---
 
@@ -506,7 +506,7 @@ npm install @tosspayments/payment-sdk
 
 ### 9.6.1 사용량 통계 API
 
-- [ ] **GET /api/me/usage-stats**
+- [x] **GET /api/me/usage-stats**
   - 응답:
     ```json
     {
@@ -527,13 +527,13 @@ npm install @tosspayments/payment-sdk
 
 ### 9.6.2 사용량 페이지 (/billing/usage)
 
-- [ ] **시각화**
+- [x] **시각화**
   - 잔액 큰 숫자
   - 누적 충전 / 사용 비교
   - 기능별 사용량 도넛 차트
   - 월별 사용 추이 바 차트
 
-- [ ] **결제 이력 링크**
+- [x] **결제 이력 링크**
 
 ### 9.6.3 관리자 대시보드 (선택)
 
@@ -545,9 +545,9 @@ npm install @tosspayments/payment-sdk
 
 ### 사용자 확인 체크리스트
 
-- [ ] 사용량 페이지 표시 정상
-- [ ] 차트 데이터 정확
-- [ ] 모바일 반응형
+- [x] 사용량 페이지 표시 정상
+- [x] 차트 데이터 정확
+- [x] 모바일 반응형
 
 ---
 
@@ -620,6 +620,19 @@ npm install @tosspayments/payment-sdk
 작업할 때마다 아래에 기록:
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-05-14 — Stage 9.5 + 9.6 완료
+
+**Stage 9.5 (약관·정책 페이지)**
+- PolicyPage.jsx 신규 — /policy/:type 단일 컴포넌트 (terms/refund/privacy 3종)
+- BillingChargePage: 이용약관+환불정책 동의 체크박스 추가 (미동의 시 결제 버튼 비활성)
+- BillingHistoryPage: 정책 링크 + 사용량 통계 링크 추가
+- App.jsx: /policy/:type, /billing/usage 라우트 추가
+- HomePage 메뉴: 사용량 통계 링크 추가
+
+**Stage 9.6 (사용량 대시보드)**
+- GET /api/me/usage-stats 신규 (잔액/충전합계/사용합계/기능별/월별)
+- BillingUsagePage.jsx 신규 (PieChart 기능별 도넛 + BarChart 월별 추이)
 
 ### 2026-05-14 — Stage 9.3 Webhook 업데이트 + Stage 9.4 완료
 

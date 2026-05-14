@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import useTokenStore from '../store/tokenStore';
 import { createCheckout } from '../api/billing';
@@ -57,6 +57,7 @@ export default function BillingChargePage() {
   const [selected, setSelected] = useState('medium');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
     if (token) fetchBalance(token);
@@ -151,12 +152,28 @@ export default function BillingChargePage() {
       {error && <p className="billing-error">{error}</p>}
 
       <div className="billing-actions">
+        {/* 약관 동의 체크박스 */}
+        <label className="terms-agree">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={e => setAgreed(e.target.checked)}
+          />
+          <span>
+            <Link to="/policy/terms" target="_blank" rel="noopener">이용약관</Link>
+            {' '}및{' '}
+            <Link to="/policy/refund" target="_blank" rel="noopener">환불 정책</Link>
+            에 동의합니다 (필수)
+          </span>
+        </label>
+
         <button
           className="btn btn-primary btn-charge"
           onClick={handleCharge}
-          disabled={loading}
+          disabled={loading || !agreed}
+          title={!agreed ? '약관에 동의해주세요' : ''}
         >
-          {loading ? '처리 중...' : `결제하기`}
+          {loading ? '처리 중...' : '결제하기'}
         </button>
         <p className="billing-notice">
           결제 후 7일 이내 미사용분은 이메일로 환불 요청 가능합니다.

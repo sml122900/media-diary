@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import { getBillingHistory } from '../api/billing';
 
@@ -36,6 +36,7 @@ export default function BillingHistoryPage() {
       <div className="billing-header">
         <button className="btn" onClick={() => navigate(-1)}>← 뒤로</button>
         <h2>결제 이력</h2>
+        <Link to="/billing/usage" className="btn" style={{ marginLeft: 'auto' }}>사용량 통계</Link>
       </div>
 
       {loading ? (
@@ -79,6 +80,13 @@ export default function BillingHistoryPage() {
 
       <div className="billing-refund-notice">
         <p>환불 문의: 결제 후 7일 이내 미사용분은 이메일(sml122900@gmail.com)로 문의해주세요.</p>
+        <p style={{ marginTop: 8 }}>
+          <Link to="/policy/refund">환불 정책</Link>
+          {' · '}
+          <Link to="/policy/terms">이용약관</Link>
+          {' · '}
+          <Link to="/policy/privacy">개인정보처리방침</Link>
+        </p>
       </div>
     </div>
   );

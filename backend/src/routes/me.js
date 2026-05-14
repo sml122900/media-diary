@@ -244,4 +244,73 @@ router.get('/tokens', auth, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/me/usage-stats
+ * 토큰 누적 충전/사용량, 기능별 사용, 월별 추이 (최근 6개월)
+ */
+router.get('/usage-stats', auth, async (req, res) => {
+  try {
+    const uid = req.user.id;
+
+    // 현재 잔액
+    const { rows: userRows } = await pool.query(
+      'SELECT token_balance FROM users WHERE id = $1', [uid]
+    );
+
+    // 전체 충전 합계 (성공한 결제만)
+    const { rows: chargedRows } = await pool.query(
+      `SELECT COALESCE(SUM(tokens_added), 0)::int AS total
+       FROM payment_history WHERE user_id = $1 AND status = 'success'`,
+      [uid]
+    );
+
+    // 전체 사용 합계
+    const { rows: usedRows } = await pool.query(
+      `SELECT COALESCE(SUM(tokens_used), 0)::int AS total
+       FROM token_usage_log WHERE user_id = $1`,
+      [uid]
+    );
+
+    // 기능별 사용량
+    const { rows: byFeatureRows } = await pool.query(
+      `SELECT feature, SUM(tokens_used)::int AS tokens
+       FROM token_usage_log WHERE user_id = $1
+       GROUP BY feature`,
+      [uid]
+    );
+
+    // 월별 사용량 (최근 6개월)
+    const { rows: monthlyRows } = await pool.query(
+      `SELECT
+         TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS month,
+         SUM(tokens_used)::int AS tokens_used,
+         ROUND(SUM(tokens_used) * 10)::int AS cost_estimate_krw
+       FROM token_usage_log
+       WHERE user_id = $1
+         AND created_at >= NOW() - INTERVAL '6 months'
+       GROUP BY DATE_TRUNC('month', created_at)
+       ORDER BY month ASC`,
+      [uid]
+    );
+
+    const byFeature = { chat: 0, screenshot: 0, search: 0, report: 0 };
+    for (const row of byFeatureRows) {
+      if (row.feature in byFeature) byFeature[row.feature] = row.tokens;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        current_balance: userRows[0]?.token_balance ?? 0,
+        total_charged: chargedRows[0].total,
+        total_used: usedRows[0].total,
+        by_feature: byFeature,
+        monthly_breakdown: monthlyRows,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

@@ -1078,3 +1078,52 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .token-short    { color: #f87171; font-weight: 700; }
 
 .token-shortage-actions { display: flex; gap: 10px; justify-content: center; }
+
+/* ── 약관 페이지 (Phase 9.5) ── */
+.policy-page { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+.policy-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;
+}
+.policy-header h2 { font-size: 20px; font-weight: 600; }
+.policy-body { display: flex; flex-direction: column; gap: 20px; }
+.policy-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.policy-section p  { font-size: 14px; color: #aaa; line-height: 1.7; }
+.policy-updated    { font-size: 12px; color: #555; margin-top: 12px; }
+
+/* 약관 동의 체크박스 */
+.terms-agree {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; cursor: pointer; margin-bottom: 12px; color: #aaa;
+}
+.terms-agree input[type="checkbox"] { width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
+.terms-agree a { color: #d2a8ff; text-decoration: underline; }
+
+/* ── 사용량 대시보드 (Phase 9.6) ── */
+.usage-summary-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin-bottom: 2rem;
+}
+@media (max-width: 560px) {
+  .usage-summary-grid { grid-template-columns: 1fr; }
+}
+
+.usage-card {
+  background: #1e1e1e; border-radius: 12px; padding: 16px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.usage-card-main { border: 1px solid #a78bfa; }
+.usage-card-label { font-size: 12px; color: #888; }
+.usage-card-value { font-size: 26px; font-weight: 700; }
+.usage-card-value span { font-size: 13px; color: #888; margin-left: 4px; font-weight: 400; }
+.usage-ratio { font-size: 12px; color: #666; margin-top: 2px; }
+
+.usage-section { margin-bottom: 2rem; }
+.usage-section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.usage-empty { color: #666; font-size: 14px; padding: 20px 0; }
+
+.usage-donut-wrap { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+.usage-feature-list { display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
+.usage-feature-row  { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.usage-feature-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.usage-feature-name { flex: 1; color: #aaa; }
+.usage-feature-val  { font-weight: 600; }
