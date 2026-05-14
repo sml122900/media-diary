@@ -24,6 +24,7 @@ import RestorePage from './pages/RestorePage';
 import CurationListPage from './pages/CurationListPage';
 import MemoryChatPage from './pages/MemoryChatPage';
 import OnboardingPage from './pages/OnboardingPage';
+import DiscoverPage from './pages/DiscoverPage';
 import BillingChargePage from './pages/BillingChargePage';
 import BillingSuccessPage from './pages/BillingSuccessPage';
 import BillingFailPage from './pages/BillingFailPage';
@@ -169,6 +170,10 @@ function App() {
               <CurationListPage />
             </PrivateRoute>
           }
+        />
+        <Route
+          path="/discover"
+          element={<PrivateRoute><DiscoverPage /></PrivateRoute>}
         />
         <Route
           path="/billing/charge"

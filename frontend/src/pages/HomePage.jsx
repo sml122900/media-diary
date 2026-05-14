@@ -11,7 +11,6 @@ import MediaCard from '../components/MediaCard';
 import DetailModal from '../components/DetailModal';
 import AddModal from '../components/AddModal';
 import CsvImportModal from '../components/CsvImportModal';
-import DailyRecommendations from '../components/DailyRecommendations';
 import AiSearchModal from '../components/AiSearchModal';
 import ScreenshotImportModal from '../components/ScreenshotImportModal';
 import QuickInputModal from '../components/QuickInputModal';
@@ -310,6 +309,7 @@ export default function HomePage() {
 
                 {/* 탐색 */}
                 <div className="menu-section-title">탐색</div>
+                <Link to="/discover" className="menu-item" onClick={closeMenu}>🎬 발견하기</Link>
                 <Link to="/stats" className="menu-item" onClick={closeMenu}>통계</Link>
                 <Link to="/reports" className="menu-item" onClick={closeMenu}>리포트</Link>
                 <Link to="/feed" className="menu-item" onClick={closeMenu}>피드</Link>
@@ -440,8 +440,15 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ── 오늘의 추천 위젯 ── */}
-      <DailyRecommendations onAdd={handleAdd} existingItems={items} />
+      {/* ── 발견하기 진입 버튼 ── */}
+      <div className="discover-entry" onClick={() => navigate('/discover')}>
+        <span className="discover-entry-icon">🎬</span>
+        <div>
+          <div className="discover-entry-title">발견하기</div>
+          <div className="discover-entry-sub">취향 기반 추천 · AI 채팅 추천</div>
+        </div>
+        <span className="discover-entry-arrow">→</span>
+      </div>
 
       {/* ── 홈 위젯 ── */}
       <div className="widget-bar">

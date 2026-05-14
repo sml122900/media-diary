@@ -253,14 +253,14 @@ app.get('/api/proxy/poster', async (req, res) => {
 
 ### 10.4.1 홈 화면에서 "오늘의 추천" 위젯 제거
 
-- [ ] **HomePage.jsx에서 DailyRecommendations 컴포넌트 제거**
-- [ ] **대신 진입 버튼 추가**
+- [x] **HomePage.jsx에서 DailyRecommendations 컴포넌트 제거**
+- [x] **대신 진입 버튼 추가**
   - "🎬 영화 추천받기" 버튼
   - 클릭 시 /discover로 이동
 
 ### 10.4.2 /discover 페이지 신설
 
-- [ ] **새 라우트 추가** — `/discover`
+- [x] **새 라우트 추가** — `/discover`
 
 - [ ] **페이지 구조**
   ```
@@ -284,11 +284,11 @@ app.get('/api/proxy/poster', async (req, res) => {
 
 ### 10.4.3 추천 카드 강화
 
-- [ ] **추천 이유 명시**
+- [x] **추천 이유 명시**
   - 각 추천 작품 카드 하단에 "왜 추천?"
   - 예: "당신이 ★5 준 인터스텔라와 같은 SF 장르"
 
-- [ ] **상호작용**
+- [x] **상호작용**
   - 작품 클릭 → 상세 모달
   - "관심 없음" 버튼 → 다시는 안 보임 (선택)
   - "위시리스트에 추가" 빠른 버튼
@@ -587,6 +587,18 @@ app.get('/api/proxy/poster', async (req, res) => {
 작업할 때마다 아래에 기록:
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-05-14 — Stage 10.4 완료
+
+**Stage 10.4 (추천 페이지 분리)**
+- HomePage: DailyRecommendations 위젯 제거 → "🎬 발견하기" 진입 배너 교체
+- HomePage 메뉴: "🎬 발견하기" 링크 추가
+- DiscoverPage.jsx 신규 (`/discover`):
+  - AI 채팅 추천 진입 카드 (→ /discover/chat, Stage 10.5에서 활성화)
+  - 내 취향 기반 추천 6개 카드 그리드 (이유·장르·포스터·줄거리·액션 버튼)
+  - "내 목록에 추가" / "나중에 보기" 버튼
+  - 큐레이션 둘러보기 배너 (→ /restore)
+- App.jsx: /discover 라우트 추가
 
 ### 2026-05-14 — Stage 10.1 + 10.2 + 10.3 완료
 

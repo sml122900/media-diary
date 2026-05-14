@@ -1139,3 +1139,118 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .theme-radio-item input[type="radio"] {
   width: 16px; height: 16px; cursor: pointer; accent-color: #a78bfa;
 }
+
+/* ── Phase 10.4 발견하기 진입 버튼 (HomePage) ── */
+.discover-entry {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-radius: 14px; margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, rgba(167,139,250,.12), rgba(210,168,255,.08));
+  border: 1px solid rgba(167,139,250,.3); cursor: pointer;
+  transition: background .15s;
+}
+.discover-entry:hover { background: linear-gradient(135deg, rgba(167,139,250,.2), rgba(210,168,255,.14)); }
+.discover-entry-icon  { font-size: 28px; flex-shrink: 0; }
+.discover-entry-title { font-size: 15px; font-weight: 700; color: #d2a8ff; }
+.discover-entry-sub   { font-size: 12px; color: #888; margin-top: 2px; }
+.discover-entry-arrow { margin-left: auto; font-size: 18px; color: #a78bfa; }
+
+/* ── DiscoverPage ── */
+.discover-page { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+.discover-header {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 1.5rem;
+}
+.discover-title { font-size: 22px; font-weight: 700; }
+
+/* AI 채팅 진입 카드 */
+.discover-ai-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 22px; border-radius: 16px; margin-bottom: 2rem;
+  background: linear-gradient(135deg, #1a0d2e, #0d1a2e);
+  border: 1px solid #a78bfa; cursor: pointer;
+  transition: filter .15s;
+}
+.discover-ai-card:hover { filter: brightness(1.1); }
+.discover-ai-icon  { font-size: 36px; flex-shrink: 0; }
+.discover-ai-body  { flex: 1; min-width: 0; }
+.discover-ai-title { font-size: 17px; font-weight: 700; color: #d2a8ff; margin-bottom: 4px; }
+.discover-ai-sub   { font-size: 13px; color: #888; line-height: 1.5; margin-bottom: 6px; }
+.discover-ai-cost  { font-size: 12px; color: #a78bfa; }
+.discover-ai-arrow { font-size: 22px; color: #a78bfa; flex-shrink: 0; }
+
+/* 섹션 */
+.discover-section { margin-bottom: 2.5rem; }
+.discover-section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.discover-section-title { font-size: 16px; font-weight: 700; }
+
+/* 카드 그리드 */
+.discover-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+@media (max-width: 700px) { .discover-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .discover-grid { grid-template-columns: 1fr; } }
+
+/* 추천 카드 */
+.discover-card {
+  border-radius: 12px; overflow: hidden;
+  background: #1e1e1e; border: 1px solid #2a2a2a;
+  display: flex; flex-direction: column;
+}
+.discover-card.skeleton { min-height: 260px; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.discover-card-poster {
+  position: relative; aspect-ratio: 2/3; overflow: hidden;
+  background: #111; display: flex; align-items: center; justify-content: center;
+}
+.discover-card-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.discover-type-badge {
+  position: absolute; top: 6px; left: 6px;
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+  background: rgba(0,0,0,.7); color: #d2a8ff;
+}
+
+.discover-card-info { padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.discover-card-title {
+  font-size: 13px; font-weight: 700; line-height: 1.3;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.discover-card-year    { font-size: 11px; color: #666; }
+.discover-card-reason  { font-size: 11px; color: #a78bfa; line-height: 1.4; }
+.discover-card-overview {
+  font-size: 11px; color: #666; line-height: 1.5;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.discover-card-genres  { display: flex; flex-wrap: wrap; gap: 4px; }
+.discover-genre-tag    {
+  font-size: 10px; padding: 1px 6px; border-radius: 10px;
+  background: rgba(167,139,250,.15); color: #a78bfa;
+}
+
+.discover-card-actions { display: flex; gap: 6px; margin-top: auto; padding-top: 6px; }
+.discover-btn-list, .discover-btn-wish {
+  flex: 1; padding: 6px 4px; font-size: 11px; font-weight: 600;
+  border-radius: 8px; border: none; cursor: pointer; transition: background .15s;
+}
+.discover-btn-list         { background: #a78bfa; color: #fff; }
+.discover-btn-list.done    { background: #34d399; }
+.discover-btn-list:disabled { opacity: .7; cursor: default; }
+.discover-btn-wish         { background: #2a2a2a; color: #aaa; border: 1px solid #333; }
+.discover-btn-wish.done    { background: #1e3a2e; color: #34d399; border-color: #34d399; }
+.discover-btn-wish:disabled { opacity: .7; cursor: default; }
+
+.discover-empty { text-align: center; padding: 32px; color: #666; }
+.discover-empty p { margin-bottom: 14px; }
+
+/* 큐레이션 배너 */
+.discover-curation-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; border-radius: 14px;
+  background: #1e1e1e; border: 1px solid #333;
+  cursor: pointer; transition: border-color .15s;
+}
+.discover-curation-banner:hover { border-color: #a78bfa; }
