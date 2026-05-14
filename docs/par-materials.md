@@ -266,6 +266,58 @@
 
 ---
 
+### 소재 21 — AI 결제 토큰 시스템 설계 및 구현 (토스페이먼츠 연동)
+
+**Problem (상황/문제)**
+> AI 기능 남용을 막고 서비스 지속 가능성을 확보해야 했다. 기존 일일 횟수 제한 방식은 기능별 비용 차이를 반영하지 못하고, 배포 후 비용 통제 수단이 없었다.
+
+**Action (내가 한 것)**
+> 토큰 경제(token economy) 구조를 설계했다. DB에 `token_balance`, `payment_history`, `token_usage_log` 테이블을 신설하고, `requireTokens(n, feature)` + `deductTokens()` 미들웨어로 AI 엔드포인트마다 기능별 비용(chat 2토큰, screenshot 3토큰, report 5토큰)을 차감했다. AI 호출 실패 시 차감하지 않는 성공 후 차감 원칙을 적용했다. 토스페이먼츠 단건결제 REST API를 직접 연동했고, 금액 서버 검증·중복 order_id 차단·첫충전 보너스 트랜잭션을 구현했다.
+
+**Result (결과)**
+> 신규 가입자 50토큰 지급, 차감·충전·환불·Webhook 전 흐름을 E2E 테스트로 검증했다. 사용량 대시보드(PieChart + BarChart)로 기능별 소비 패턴을 시각화해 사용자에게 투명하게 제공한다.
+
+---
+
+### 소재 22 — html2canvas CORS 오염 디버깅 및 포스터 프록시 패턴 도입
+
+**Problem (상황/문제)**
+> Spotify Wrapped 스타일 연말 결산 PNG 저장 기능에서 포스터가 X박스로 렌더링됐다. 로컬 환경에서만 재현되지 않아 원인 파악이 어려웠다.
+
+**Action (내가 한 것)**
+> 두 가지 원인을 규명했다. ① 앱 곳곳의 일반 `<img>` 태그가 `crossOrigin` 속성 없이 TMDB URL을 로드해 브라우저 캐시를 오염시켰고, html2canvas가 CORS 캐시 충돌로 이미지를 읽지 못했다. ② html2canvas 호출 시점에 이미지가 아직 로딩 중이었다. 백엔드에 `/api/proxy/poster` 엔드포인트(TMDB 도메인만 허용, SSRF 방어, 1주일 캐시, CORS 헤더)를 신설해 프록시 URL로 요청했다. 프록시 URL은 원본과 다르므로 캐시 충돌이 없고, `Promise.all` 프리로딩으로 렌더링 전 로딩을 완료했다.
+
+**Result (결과)**
+> PNG 저장 시 포스터가 정상 렌더링됐다. 프록시 패턴은 향후 이미지 최적화·캐싱·Rate Limit 관리를 백엔드에서 일괄 적용할 수 있는 구조도 된다.
+
+---
+
+### 소재 23 — AI 채팅형 맥락 추천 시스템 (/discover/chat)
+
+**Problem (상황/문제)**
+> 기존 "오늘의 추천"은 취향 프로필 기반 정적 리스트라 대화 맥락이 없었다. "요즘 힐링 영화 보고 싶어", "박찬욱 다 봤는데 비슷한 감독 있어?" 같은 자연어 수요를 충족하지 못했다.
+
+**Action (내가 한 것)**
+> `discovery_chats` 테이블로 세션 단위 대화 이력을 관리했다. 클라이언트에서 `crypto.randomUUID()`로 session_id를 생성해 별도 서버 세션 없이 대화 연속성을 구현했다. Claude 호출 시 취향 프로필(장르·감독 선호)과 최근 감상 목록을 시스템 프롬프트에 포함해 맥락을 인식하고, 추천 결과를 포스터 카드로 렌더링한 뒤 위시리스트 즉시 추가 인라인 액션을 제공했다.
+
+**Result (결과)**
+> 대화 흐름 내에서 맥락이 이어지는 추천이 가능해졌다. 세션당 2토큰으로 비용을 통제하면서 ChatGPT 스타일 AI 추천 UX를 구현했다.
+
+---
+
+### 소재 24 — 리포트 커스터마이징: 16개 항목 선택 + AI 자동 구성
+
+**Problem (상황/문제)**
+> 월간 리포트가 고정된 4개 섹션만 생성해 사용자마다 다른 관심사(장르 분석, 재시청 패턴, 함께 본 사람 통계 등)를 반영하지 못했다.
+
+**Action (내가 한 것)**
+> 16개 리포트 항목(`REPORT_COMPONENTS`)과 항목별 Claude 지시문(`COMPONENT_PROMPTS`)을 정의했다. 사용자가 항목을 체크박스로 직접 선택하거나 자연어로 설명하면 Claude가 적합한 4~8개 항목을 자동 선택(2토큰)하도록 했다. 선택한 항목을 `report_templates` DB에 저장하고, 리포트 생성 시 `templateId`로 조회해 선택된 항목의 `COMPONENT_PROMPTS`만 Claude에 전달하는 동적 지시문 구성 방식을 적용했다. 실시간 미리보기(5토큰)로 저장 전 결과를 확인할 수도 있다.
+
+**Result (결과)**
+> 사용자마다 다른 리포트를 생성할 수 있는 커스터마이징 시스템이 완성됐다. AI가 자연어로 항목을 선택해주는 메타 AI 기능과, 저장 없이 즉시 확인하는 미리보기 UX까지 갖췄다.
+
+---
+
 ## 키워드 뱅크 (기술 스택 & 성과 표현)
 
 - React, Vite, Zustand, React Router
@@ -320,6 +372,15 @@
 - 데이터 파이프라인 멱등성 (ON CONFLICT UPDATE, fill → seed 재실행 가능)
 - 300ms 디바운스 인물 검색 (PersonSearch, 프로필 드롭다운)
 - 큐레이션 필터 검색바 (리스트 이름 실시간 필터링)
+- 토큰 경제 설계 (requireTokens / deductTokens 미들웨어, 성공 후 차감 원칙)
+- 토스페이먼츠 REST API 연동 (금액 서버 검증, 첫충전 보너스 트랜잭션, Webhook paymentKey 재조회)
+- html2canvas CORS 오염 디버깅 (crossOrigin 캐시 충돌, 이미지 프리로딩 패턴)
+- 백엔드 이미지 프록시 (SSRF 방어, TMDB 도메인 화이트리스트, 1주일 캐시)
+- crypto.randomUUID() 클라이언트 세션 관리 (서버 세션 없이 대화 이력 연속성)
+- prefers-color-scheme 자동 감지 (matchMedia 리스너, 3-way 다크모드)
+- 리포트 항목 동적 구성 (COMPONENT_PROMPTS 매핑, templateId 기반 지시문 빌드)
+- 자연어 → AI 항목 자동 선택 (Claude + JSON 배열 파싱, fallback 처리)
+- 실시간 미리보기 (DB 저장 없는 임시 Claude 호출, 5토큰 확인 모달)
 
 ---
 
