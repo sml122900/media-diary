@@ -202,7 +202,6 @@ export default function StatsPage() {
       <div className="mdb-header" style={{ marginBottom: 24 }}>
         <h1 className="mdb-title">통계</h1>
         <div className="mdb-controls">
-          <button className="btn" onClick={toggleTheme}>{theme === 'dark' ? '라이트' : '다크'}</button>
           <button className="btn" onClick={() => navigate('/')}>← 돌아가기</button>
         </div>
       </div>

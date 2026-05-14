@@ -153,9 +153,10 @@ async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplay
   const base64Image = imageBuffer.toString('base64');
   const prompt = getExtractionPrompt(ottType, ottDisplayName);
 
+  // Sonnet 4.6 — Haiku 대비 인식 정확도 대폭 향상 (Phase 10.3)
   const message = await claude.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1000,
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1500,
     messages: [{
       role: 'user',
       content: [
@@ -179,7 +180,8 @@ async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplay
  * 멀티 이미지 업로드 → 구조화 추출 → TMDB 매칭 → 신뢰도 포함 반환
  * body (multipart): images[] + ott_type (optional)
  */
-router.post('/', auth, requireTokens(3, 'screenshot'), upload.array('images', 10), async (req, res) => {
+// Sonnet 업그레이드로 5토큰으로 조정 (Phase 10.3)
+router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10), async (req, res) => {
   const files = req.files || [];
   const filePaths = files.map(f => f.path);
 

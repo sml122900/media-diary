@@ -351,9 +351,7 @@ export default function HomePage() {
 
                 {/* 계정 */}
                 <div className="menu-section-title">계정</div>
-                <button className="menu-item" onClick={() => { toggleTheme(); closeMenu(); }}>
-                  {theme === 'dark' ? '라이트 모드' : '다크 모드'}
-                </button>
+                <Link to="/settings" className="menu-item" onClick={closeMenu}>⚙ 화면 모드 설정</Link>
                 <Link to="/settings" className="menu-item" onClick={closeMenu}>설정</Link>
                 <button className="menu-item menu-item-danger" onClick={handleLogout}>
                   로그아웃

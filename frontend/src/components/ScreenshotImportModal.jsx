@@ -257,9 +257,12 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
           <span style={{ fontSize: 16 }}>📸</span>
           <h2 style={{ margin: 0 }}>스크린샷으로 가져오기</h2>
         </div>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 14 }}>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
           OTT 시청 목록, 영화관 앱 관람 내역 스크린샷을 올리면 작품을 자동 인식합니다 (최대 10장)
         </p>
+        <div style={{ fontSize: 12, color: '#a78bfa', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 4 }}>
+          🪙 <strong>5토큰</strong> 차감 · Sonnet 고정밀 인식
+        </div>
 
         {/* OTT 종류 선택 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>

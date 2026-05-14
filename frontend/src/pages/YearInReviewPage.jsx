@@ -13,6 +13,12 @@ import html2canvas from 'html2canvas';
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
+// TMDB 포스터 URL → 백엔드 프록시 URL 변환 (html2canvas CORS 우회)
+const proxyPoster = (url) =>
+  url?.startsWith('https://image.tmdb.org/')
+    ? `${import.meta.env.VITE_API_URL}/api/proxy/poster?url=${encodeURIComponent(url)}`
+    : (url || '');
+
 // 슬라이드별 배경 색상 (어두운 시네마틱 팔레트)
 const SLIDE_THEMES = [
   { bg: '#0d1117', accent: '#58a6ff' }, // 인트로 — 다크 블루
@@ -72,9 +78,20 @@ export default function YearInReviewPage() {
     if (!slideRef.current || saving) return;
     setSaving(true);
     try {
+      // 모든 img 요소 로드 완료 대기 (미완료 시 X박스 방지)
+      await Promise.all(
+        Array.from(slideRef.current.querySelectorAll('img')).map(img =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise(resolve => { img.onload = resolve; img.onerror = resolve; })
+        )
+      );
+
       const canvas = await html2canvas(slideRef.current, {
-        scale: 2,          // 고해상도
-        useCORS: true,     // 외부 이미지(포스터) CORS 허용
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
         backgroundColor: SLIDE_THEMES[slide].bg,
       });
       const link = document.createElement('a');
@@ -196,7 +213,7 @@ export default function YearInReviewPage() {
             <div key={i} style={{ width: 72, textAlign: 'center' }}>
               <div style={{ width: 72, height: 108, borderRadius: 6, overflow: 'hidden', background: '#1a1a1a', marginBottom: 4 }}>
                 {item.poster_url
-                  ? <img src={item.poster_url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
+                  ? <img src={proxyPoster(item.poster_url)} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} crossOrigin="anonymous" />
                   : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, opacity: .3 }}>🎬</div>
                 }
               </div>

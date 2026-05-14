@@ -50,6 +50,35 @@ app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
 });
 
+/**
+ * TMDB 이미지 프록시 — html2canvas CORS 우회용 (Phase 10.1)
+ * TMDB URL만 허용 (SSRF 방지), 1주일 캐시
+ * GET /api/proxy/poster?url=https://image.tmdb.org/t/p/w500/abc.jpg
+ */
+app.get('/api/proxy/poster', async (req, res) => {
+  const { url } = req.query;
+
+  // SSRF 방지 — TMDB 이미지 도메인만 허용
+  if (!url || !url.startsWith('https://image.tmdb.org/')) {
+    return res.status(400).json({ error: 'TMDB 이미지 URL만 허용됩니다' });
+  }
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return res.status(response.status).end();
+
+    res.set('Cache-Control', 'public, max-age=604800'); // 1주일 캐시
+    res.set('Content-Type', response.headers.get('content-type') || 'image/jpeg');
+    res.set('Access-Control-Allow-Origin', '*'); // html2canvas CORS 허용
+
+    // 스트림으로 전달
+    const buffer = await response.arrayBuffer();
+    res.send(Buffer.from(buffer));
+  } catch {
+    res.status(502).end();
+  }
+});
+
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (

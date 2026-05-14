@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
+import useTokenStore from '../store/tokenStore';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -16,7 +17,13 @@ const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, themePref, setThemePref } = useTheme();
+  const { balance, fetchBalance } = useTokenStore();
+
+  useEffect(() => {
+    const t = localStorage.getItem('token');
+    if (t) fetchBalance(t);
+  }, []);
 
   const [form, setForm] = useState({
     username: '',
@@ -70,7 +77,6 @@ export default function SettingsPage() {
       <div className="mdb-header" style={{ marginBottom: 24 }}>
         <h1 className="mdb-title">프로필 설정</h1>
         <div className="mdb-controls">
-          <button className="btn" onClick={toggleTheme}>{theme === 'dark' ? '라이트' : '다크'}</button>
           <button className="btn" onClick={() => navigate('/')}>← 돌아가기</button>
         </div>
       </div>
@@ -134,6 +140,29 @@ export default function SettingsPage() {
               onError={e => { e.target.style.display = 'none'; }}
             />
           )}
+        </div>
+
+        {/* 화면 모드 */}
+        <div className="settings-section">
+          <div className="settings-label">화면 모드</div>
+          <div className="theme-radio-group">
+            {[
+              { value: 'auto',  label: '시스템 설정 따르기' },
+              { value: 'light', label: '라이트 모드' },
+              { value: 'dark',  label: '다크 모드' },
+            ].map(opt => (
+              <label key={opt.value} className="theme-radio-item">
+                <input
+                  type="radio"
+                  name="theme"
+                  value={opt.value}
+                  checked={themePref === opt.value}
+                  onChange={() => setThemePref(opt.value)}
+                />
+                <span>{opt.label}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         {/* 공개 설정 */}
