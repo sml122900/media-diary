@@ -331,6 +331,19 @@
 
 ---
 
+### 소재 26 — prop 전달 체인 설계와 stale state 회피 (포스터+제목 동시 업데이트)
+
+**Problem (상황/문제)**
+> 포스터를 변경할 때 선택한 TMDB 결과의 제목도 자동으로 반영해달라는 요구사항이 생겼다. 포스터 업데이트(PATCH)와 제목 업데이트(PUT)를 순서대로 호출하는 구조를 검토했으나, 두 번째 PUT 호출 시 `item.poster_url`이 구 포스터 URL을 가리키는 stale 상태 문제가 있었다.
+
+**Action (내가 한 것)**
+> `PosterPicker → DetailModal → HomePage → useMediaList` 4단계 prop 전달 체인에 `title` 파라미터를 추가했다. `useMediaList.handleUpdatePoster`에서 `newTitle` 인수가 있을 때는 PATCH 대신 PUT으로 포스터와 제목을 단일 API 호출로 처리하도록 분기했다. 이를 통해 stale state 회피와 API 호출 최소화를 동시에 달성했다. DetailModal의 `editFields` 상태도 즉시 갱신해 편집 폼에도 새 제목이 반영되도록 했다.
+
+**Result (결과)**
+> 포스터 교체 즉시 카드 카드 제목과 편집 폼 제목이 함께 변경된다. API 호출 1회로 처리되어 race condition 없이 안정적으로 동작한다.
+
+---
+
 ## 키워드 뱅크 (기술 스택 & 성과 표현)
 
 - React, Vite, Zustand, React Router
