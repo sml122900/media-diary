@@ -194,6 +194,16 @@ export default function HomePage() {
 
   // ── 핸들러 ────────────────────────────────────────────────────────────────
 
+  // 추가 후 연도 범위가 새 항목을 커버하도록 확장
+  const handleAddAndExpandYear = async (itemData) => {
+    const saved = await handleAdd(itemData);
+    if (saved?.year > 0) {
+      if (saved.year < yearMin) setYearMin(saved.year);
+      if (saved.year > yearMax) setYearMax(saved.year);
+    }
+    return saved;
+  };
+
   // 편집 후 모달의 item도 최신화
   const handleEditItemAndUpdate = async (item, fields) => {
     const updated = await handleEditItem(item, fields);
@@ -584,7 +594,7 @@ export default function HomePage() {
           onDeleteItem={handleDeleteItem}
           onEditItem={handleEditItemAndUpdate}
           onUpdatePoster={handleUpdatePosterAndCache}
-          onAdd={handleAdd}
+          onAdd={handleAddAndExpandYear}
           existingItems={items}
         />
       )}
@@ -593,7 +603,7 @@ export default function HomePage() {
       {addModalOpen && (
         <AddModal
           onClose={() => setAddModalOpen(false)}
-          onAdd={handleAdd}
+          onAdd={handleAddAndExpandYear}
           existingItems={items}
           currentTab={tab}
         />
@@ -603,7 +613,7 @@ export default function HomePage() {
       {aiSearchOpen && (
         <AiSearchModal
           onClose={() => setAiSearchOpen(false)}
-          onAdd={handleAdd}
+          onAdd={handleAddAndExpandYear}
           existingItems={items}
         />
       )}
@@ -612,7 +622,7 @@ export default function HomePage() {
       {screenshotOpen && (
         <ScreenshotImportModal
           onClose={() => setScreenshotOpen(false)}
-          onAdd={handleAdd}
+          onAdd={handleAddAndExpandYear}
         />
       )}
 
@@ -620,7 +630,7 @@ export default function HomePage() {
       {csvImportOpen && (
         <CsvImportModal
           onClose={() => setCsvImportOpen(false)}
-          onAdd={handleAdd}
+          onAdd={handleAddAndExpandYear}
           existingItems={items}
           onImportDone={reloadItems}
         />
@@ -630,7 +640,7 @@ export default function HomePage() {
       {quickOpen && (
         <QuickInputModal
           onClose={() => setQuickOpen(false)}
-          onAdd={handleAdd}
+          onAdd={handleAddAndExpandYear}
           onSaved={(title, rating) => setToast({ text: `${title} ★${rating}로 저장됐어요!` })}
         />
       )}
