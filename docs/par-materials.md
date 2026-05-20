@@ -318,6 +318,19 @@
 
 ---
 
+### 소재 25 — useMemo 의존성 + 단발성 초기화 가드로 인한 상태 누락 버그 디버깅
+
+**Problem (상황/문제)**
+> 작품을 추가하면 `items` 상태는 즉시 갱신되는데 카드 그리드에 나타나지 않아 새로고침이 필요했다. 상태 업데이트 자체는 정상이라 원인을 특정하기 어려웠다.
+
+**Action (내가 한 것)**
+> `displayItems` useMemo가 `yearMin`/`yearMax`를 의존성으로 가진다는 점에 주목했다. 연도 범위 초기화 `useEffect`가 `yearInitRef.current = true` 가드로 최초 로드 시 한 번만 실행되도록 되어 있어서, 이후 추가된 항목의 연도가 초기 범위 밖이면 필터에 걸려 렌더링 대상에서 제외된다는 것을 확인했다. 새로고침 시 범위가 재계산되어 나타나는 동작이 이를 뒷받침했다. `handleAdd`를 `handleAddAndExpandYear` 래퍼로 교체해, 추가된 항목의 연도가 범위 밖이면 즉시 `yearMin`/`yearMax`를 확장하는 방식으로 수정했다.
+
+**Result (결과)**
+> 추가 즉시 카드 그리드에 표시된다. 기존 사용자 필터 조정 값은 보존되고 범위만 확장되므로 UX 부작용이 없다. 모든 추가 진입점(AddModal, AiSearch, Screenshot, CSV, QuickInput, DetailModal) 6곳에 일괄 적용했다.
+
+---
+
 ## 키워드 뱅크 (기술 스택 & 성과 표현)
 
 - React, Vite, Zustand, React Router
