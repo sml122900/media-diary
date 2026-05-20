@@ -212,8 +212,8 @@ export default function HomePage() {
   };
 
   // 포스터 업데이트 후 캐시 갱신
-  const handleUpdatePosterAndCache = async (id, posterUrl) => {
-    const updated = await handleUpdatePoster(id, posterUrl);
+  const handleUpdatePosterAndCache = async (id, posterUrl, title) => {
+    const updated = await handleUpdatePoster(id, posterUrl, title);
     if (updated) updateCacheKey(`${updated.title}_${updated.year}`, posterUrl);
   };
 

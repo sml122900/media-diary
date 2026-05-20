@@ -196,9 +196,10 @@ export default function DetailModal({
     setEditMode(false);
   };
 
-  const handleApplyPoster = async (url) => {
-    await onUpdatePoster(item.id, url);
+  const handleApplyPoster = async (url, title) => {
+    await onUpdatePoster(item.id, url, title);
     setCurrentPosterUrl(url);
+    if (title) setEditFields(prev => ({ ...prev, title }));
     setPosterPickerOpen(false);
   };
 

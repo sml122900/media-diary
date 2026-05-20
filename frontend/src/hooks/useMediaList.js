@@ -95,9 +95,21 @@ export function useMediaList(user) {
     return saved;
   };
 
-  /** 포스터 URL 업데이트 */
-  const handleUpdatePoster = async (id, posterUrl) => {
-    const updated = await updatePosterItem(id, posterUrl);
+  /** 포스터 URL 업데이트 (newTitle 있으면 제목도 함께 변경) */
+  const handleUpdatePoster = async (id, posterUrl, newTitle) => {
+    let updated;
+    if (newTitle) {
+      const target = items.find(i => i.id === id);
+      updated = await updateMediaItem(id, {
+        title: newTitle,
+        year: target.year, director: target.director, cast_info: target.cast_info,
+        type: target.type, poster_url: posterUrl,
+        rating: target.rating, review_text: target.review_text, review_date: target.review_date,
+        set_watched_at: false, life_period: target.life_period || null,
+      });
+    } else {
+      updated = await updatePosterItem(id, posterUrl);
+    }
     setItems(prev => prev.map(i => i.id === updated.id ? updated : i));
     return updated;
   };

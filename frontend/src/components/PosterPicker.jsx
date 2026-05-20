@@ -9,7 +9,7 @@ import { IMG_BASE } from '../utils/constants';
 
 /**
  * @param {{ item: object, onClose: Function, onApply: Function }} props
- * onApply(posterUrl) — 선택한 포스터 URL 전달
+ * onApply(posterUrl, title) — 선택한 포스터 URL과 제목 전달
  */
 export default function PosterPicker({ item, onClose, onApply }) {
   const [query, setQuery] = useState(item.title);
@@ -60,7 +60,7 @@ export default function PosterPicker({ item, onClose, onApply }) {
             <div
               key={r.id}
               className="picker-item"
-              onClick={() => onApply(IMG_BASE + r.poster_path)}
+              onClick={() => onApply(IMG_BASE + r.poster_path, r.title || r.name)}
               title={r.title || r.name}
             >
               <img
