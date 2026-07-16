@@ -3,9 +3,10 @@
  * 미디어 추가 모달 — 단건 TMDB 검색 / 일괄 추가
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { searchTmdb } from '../api/tmdb';
 import { IMG_BASE } from '../utils/constants';
+import { findExistingMedia } from '../utils/mediaMatch';
 
 /**
  * @param {{ onClose: Function, onAdd: Function, existingItems: Array, currentTab: string }} props
@@ -21,11 +22,6 @@ export default function AddModal({ onClose, onAdd, existingItems, currentTab }) 
   const [bulkSearching, setBulkSearching] = useState(false);
   const [bulkProgress, setBulkProgress] = useState('');
   const [addedIds, setAddedIds] = useState(new Set());
-
-  const existingTmdbIds = useMemo(
-    () => new Set(existingItems.map(i => i.tmdb_id).filter(Boolean)),
-    [existingItems]
-  );
 
   const tmdbType = addType === 'movie' ? 'movie' : 'tv';
 
@@ -77,7 +73,7 @@ export default function AddModal({ onClose, onAdd, existingItems, currentTab }) 
           const tmdbItemType = match.title ? 'movie' : 'tv';
           const tmdbTitle = match.title || match.name || '';
           const year = parseInt((match.release_date || match.first_air_date || '').slice(0, 4)) || 0;
-          const alreadyIn = existingItems.some(i => i.title === tmdbTitle && i.year === year);
+          const alreadyIn = !!findExistingMedia(existingItems, { tmdb_id: match.id, title: tmdbTitle, year });
           result = {
             tmdb_id: match.id,
             title: tmdbTitle, year,
@@ -153,7 +149,7 @@ export default function AddModal({ onClose, onAdd, existingItems, currentTab }) 
               {singleResults.map(r => {
                 const title = r.title || r.name || '';
                 const year = (r.release_date || r.first_air_date || '').slice(0, 4);
-                const added = existingTmdbIds.has(r.id) || addedIds.has(r.id);
+                const added = !!findExistingMedia(existingItems, { tmdb_id: r.id, title, year: parseInt(year) || 0 }) || addedIds.has(r.id);
                 return (
                   <div key={r.id} className="result-item">
                     <div className="result-thumb">

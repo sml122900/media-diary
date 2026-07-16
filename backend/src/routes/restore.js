@@ -249,16 +249,12 @@ router.post('/chat/accept', auth, async (req, res) => {
   let skipped = 0;
 
   for (const w of works) {
-    // tmdb_id가 있으면 중복 체크, 없으면 제목+연도 중복 체크
-    const { rows: existing } = w.tmdb_id > 0
-      ? await pool.query(
-          'SELECT id FROM user_media WHERE user_id = $1 AND tmdb_id = $2',
-          [req.user.id, w.tmdb_id]
-        )
-      : await pool.query(
-          'SELECT id FROM user_media WHERE user_id = $1 AND title = $2 AND year = $3',
-          [req.user.id, w.title, w.year]
-        );
+    // 중복 체크 (tmdb_id 일치 OR title+year 일치 — tmdb_id가 있어도 title+year로도 대조)
+    const { rows: existing } = await pool.query(
+      `SELECT id FROM user_media
+       WHERE user_id = $1 AND ((tmdb_id = $2 AND tmdb_id > 0) OR (title = $3 AND year = $4))`,
+      [req.user.id, w.tmdb_id || 0, w.title, w.year || 0]
+    );
 
     if (existing.length > 0) { skipped++; continue; }
 
@@ -371,11 +367,11 @@ router.post('/letterboxd-csv', auth, csvUpload.single('file'), async (req, res) 
 
     // 사용자 기존 목록 (중복 체크)
     const { rows: existing } = await pool.query(
-      'SELECT tmdb_id, title FROM user_media WHERE user_id = $1',
+      'SELECT tmdb_id, title, year FROM user_media WHERE user_id = $1',
       [req.user.id]
     );
     const existingTmdbIds = new Set(existing.map(r => r.tmdb_id).filter(id => id > 0));
-    const existingTitles  = new Set(existing.map(r => r.title.toLowerCase()));
+    const existingTitleYears = new Set(existing.map(r => `${r.title.toLowerCase()}::${r.year}`));
 
     let added = 0, skipped = 0, failed = 0;
 
@@ -394,14 +390,15 @@ router.post('/letterboxd-csv', auth, csvUpload.single('file'), async (req, res) 
         } catch (_) {}
       }
 
-      // 중복 체크
-      if (tmdbResult && existingTmdbIds.has(tmdbResult.id)) { skipped++; continue; }
-      if (!tmdbResult && existingTitles.has(item.title.toLowerCase())) { skipped++; continue; }
+      const tmdbId = tmdbResult?.id || 0;
+      const title  = tmdbResult?.title || tmdbResult?.name || item.title;
+      const year   = parseInt((tmdbResult?.release_date || tmdbResult?.first_air_date || '').slice(0, 4)) || item.year;
+
+      // 중복 체크 (tmdb_id 일치 OR title+year 일치)
+      const isDup = (tmdbId && existingTmdbIds.has(tmdbId)) || existingTitleYears.has(`${title.toLowerCase()}::${year}`);
+      if (isDup) { skipped++; continue; }
 
       try {
-        const tmdbId    = tmdbResult?.id || 0;
-        const title     = tmdbResult?.title || tmdbResult?.name || item.title;
-        const year      = parseInt((tmdbResult?.release_date || tmdbResult?.first_air_date || '').slice(0, 4)) || item.year;
         const posterUrl = tmdbResult?.poster_path ? `https://image.tmdb.org/t/p/w500${tmdbResult.poster_path}` : '';
         const mediaType = tmdbType === 'movie' ? 'movie' : 'drama';
         const watchedAt = item.watchedDate ? `'${item.watchedDate}'::date` : null;
@@ -415,7 +412,7 @@ router.post('/letterboxd-csv', auth, csvUpload.single('file'), async (req, res) 
             : [req.user.id, mediaType, title, year, tmdbId, posterUrl, item.rating]
         );
         if (tmdbId) existingTmdbIds.add(tmdbId);
-        existingTitles.add(title.toLowerCase());
+        existingTitleYears.add(`${title.toLowerCase()}::${year}`);
         added++;
       } catch (_) {
         failed++;

@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchSimilarRecs } from '../api/recommend';
+import { findExistingMedia } from '../utils/mediaMatch';
 
 /**
  * @param {{
@@ -27,9 +28,6 @@ export default function SimilarRecommendations({ mediaId, onAdd, existingItems }
       setLoading(false);
     });
   }, [mediaId]);
-
-  // 이미 내 목록에 있는 tmdb_id 집합
-  const existingTmdbIds = new Set(existingItems.map(i => i.tmdb_id).filter(Boolean));
 
   const handleAdd = async (rec) => {
     const saved = await onAdd({
@@ -58,7 +56,7 @@ export default function SimilarRecommendations({ mediaId, onAdd, existingItems }
       <div className="similar-title">이 작품을 좋아하셨다면</div>
       <div className="similar-scroll">
         {recs.map(rec => {
-          const inList = existingTmdbIds.has(rec.tmdb_id) || addedIds.has(rec.tmdb_id);
+          const inList = !!findExistingMedia(existingItems, rec) || addedIds.has(rec.tmdb_id);
           return (
             <div key={rec.tmdb_id} className="similar-card">
               {/* 포스터 */}

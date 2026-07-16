@@ -80,19 +80,21 @@ router.get('/lists/:slug/items', async (req, res) => {
       } catch (_) {}
     }
 
-    let addedSet = new Set();
+    let addedTmdbIds = new Set();
+    let addedTitleYears = new Set();
     if (userId) {
-      // 사용자가 이미 추가한 tmdb_id 목록 조회
+      // 사용자가 이미 추가한 작품 조회 (tmdb_id 또는 title+year 기준으로 대조)
       const { rows: added } = await pool.query(
-        'SELECT tmdb_id FROM user_media WHERE user_id = $1 AND tmdb_id > 0',
+        'SELECT tmdb_id, title, year FROM user_media WHERE user_id = $1',
         [userId]
       );
-      addedSet = new Set(added.map(r => r.tmdb_id));
+      addedTmdbIds = new Set(added.filter(r => r.tmdb_id > 0).map(r => r.tmdb_id));
+      addedTitleYears = new Set(added.map(r => `${r.title}::${r.year}`));
     }
 
     const result = items.map(item => ({
       ...item,
-      already_added: addedSet.has(item.tmdb_id),
+      already_added: addedTmdbIds.has(item.tmdb_id) || addedTitleYears.has(`${item.title}::${item.year}`),
     }));
 
     res.json({ success: true, data: { list, items: result } });
@@ -118,10 +120,11 @@ router.post('/bulk-add', auth, async (req, res) => {
   for (const item of items) {
     const { tmdb_id, tmdb_type, title, year } = item;
 
-    // 이미 있으면 스킵
+    // 이미 있으면 스킵 (tmdb_id 또는 title+year 기준)
     const { rows: existing } = await pool.query(
-      'SELECT id FROM user_media WHERE user_id = $1 AND tmdb_id = $2 AND tmdb_id > 0',
-      [req.user.id, tmdb_id]
+      `SELECT id FROM user_media
+       WHERE user_id = $1 AND ((tmdb_id = $2 AND tmdb_id > 0) OR (title = $3 AND year = $4))`,
+      [req.user.id, tmdb_id, title, year]
     );
     if (existing.length > 0) {
       skipped++;
@@ -268,22 +271,27 @@ router.get('/person/:tmdbId/works', auth, async (req, res) => {
 
     works = works.slice(0, 60);
 
-    // 사용자가 이미 추가한 tmdb_id 집합
+    // 사용자가 이미 추가한 작품 조회 (tmdb_id 또는 title+year 기준으로 대조)
     const { rows: added } = await pool.query(
-      'SELECT tmdb_id FROM user_media WHERE user_id = $1 AND tmdb_id > 0',
+      'SELECT tmdb_id, title, year FROM user_media WHERE user_id = $1',
       [req.user.id]
     );
-    const addedSet = new Set(added.map(r => r.tmdb_id));
+    const addedTmdbIds = new Set(added.filter(r => r.tmdb_id > 0).map(r => r.tmdb_id));
+    const addedTitleYears = new Set(added.map(r => `${r.title}::${r.year}`));
 
-    const result = works.map(w => ({
-      tmdb_id:       w.id,
-      tmdb_type:     w.tmdb_type,
-      title:         w.title || w.name,
-      year:          parseInt((w.release_date || w.first_air_date || '').slice(0, 4)) || 0,
-      poster_path:   w.poster_path || null,
-      media_type:    w.media_type,
-      already_added: addedSet.has(w.id),
-    }));
+    const result = works.map(w => {
+      const title = w.title || w.name;
+      const year = parseInt((w.release_date || w.first_air_date || '').slice(0, 4)) || 0;
+      return {
+        tmdb_id:       w.id,
+        tmdb_type:     w.tmdb_type,
+        title,
+        year,
+        poster_path:   w.poster_path || null,
+        media_type:    w.media_type,
+        already_added: addedTmdbIds.has(w.id) || addedTitleYears.has(`${title}::${year}`),
+      };
+    });
 
     res.json({ success: true, data: result });
   } catch (err) {

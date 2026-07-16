@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import InsufficientTokensModal from './InsufficientTokensModal';
+import { findExistingMedia } from '../utils/mediaMatch';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -26,8 +27,6 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
   const [error, setError] = useState('');
   const [addedIds, setAddedIds] = useState(new Set());
   const [tokenError, setTokenError] = useState(null);
-
-  const existingTmdbIds = new Set(existingItems.map(i => i.tmdb_id).filter(Boolean));
 
   const handleSearch = async () => {
     if (!query.trim() || searching) return;
@@ -136,7 +135,7 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
             <div className="searching">결과가 없습니다</div>
           )}
           {results.map(r => {
-            const inList = existingTmdbIds.has(r.tmdb_id) || addedIds.has(r.tmdb_id);
+            const inList = !!findExistingMedia(existingItems, r) || addedIds.has(r.tmdb_id);
             return (
               <div key={r.tmdb_id} className="result-item">
                 <div className="result-thumb">

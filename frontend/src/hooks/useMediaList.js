@@ -11,6 +11,7 @@ import {
   deleteMediaItem,
   updatePosterItem,
 } from '../api/userMedia';
+import { findExistingMedia } from '../utils/mediaMatch';
 
 /**
  * @param {object|null} user - 로그인한 유저 (Zustand authStore)
@@ -88,7 +89,7 @@ export function useMediaList(user) {
 
   /** 미디어 항목 추가 */
   const handleAdd = async (itemData) => {
-    const already = items.some(i => i.title === itemData.title && i.year === itemData.year);
+    const already = !!findExistingMedia(items, itemData);
     if (already) { alert('이미 목록에 있어요!'); return null; }
     const saved = await saveMediaItem(itemData);
     if (saved) setItems(prev => [...prev, saved]);
