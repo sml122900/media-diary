@@ -20,6 +20,7 @@ const restoreRouter = require('./routes/restore');
 const onboardingRouter = require('./routes/onboarding');
 const billingRouter  = require('./routes/billing');
 const discoverRouter        = require('./routes/discover');
+const healthRouter = require('./routes/health');
 const { router: reportTemplatesRouter } = require('./routes/reportTemplates');
 // wishlistRouter는 meRouter 내부에서 /watchlist로 마운트 (me.js 참고)
 
@@ -49,6 +50,7 @@ app.use('/api/onboarding', onboardingRouter);
 app.use('/api/billing',  billingRouter);
 app.use('/api/discover', discoverRouter);
 app.use('/api/reports',  reportTemplatesRouter);
+app.use('/api/health', healthRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
