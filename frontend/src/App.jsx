@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import useAuthStore from './store/authStore';
+import { useAndroidBackButton } from './hooks/useAndroidBackButton';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
@@ -47,6 +48,15 @@ function PrivateRoute({ children }) {
 }
 
 /**
+ * Android 하드웨어 뒤로가기 버튼 리스너
+ * useAndroidBackButton이 react-router 컨텍스트를 필요로 해 BrowserRouter 내부에 배치
+ */
+function AndroidBackButtonListener() {
+  useAndroidBackButton();
+  return null;
+}
+
+/**
  * 앱 루트 컴포넌트
  * 앱 시작 시 localStorage 토큰으로 인증 상태 복원
  */
@@ -60,6 +70,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <AndroidBackButtonListener />
       <Routes>
         <Route
           path="/"

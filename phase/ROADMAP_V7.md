@@ -128,23 +128,26 @@
 
 ### 11.2.3 API 통신 확인
 
-- [ ] **환경변수 점검**
-  - 앱 번들에서 `VITE_API_URL`이 프로덕션 URL(Render)을 가리키는지
-  - 빌드 시점 주입이므로 프로덕션 빌드 스크립트 확인
+- [x] **환경변수 점검** (2026-07-20)
+  - 발견: 이전 Capacitor 빌드가 로컬 `frontend/.env`(`VITE_API_URL=http://localhost:4000`)를 그대로 사용해 APK에 잘못된 URL이 박혀 있었음
+  - `frontend/.env.production` 신설 (`VITE_API_URL=https://media-diary-api.onrender.com`, git-ignore 처리) → `vite build` 기본 모드가 production이라 자동 적용
+  - `npm run build` 후 번들에서 `media-diary-api.onrender.com` 포함 / `localhost:4000` 미포함 확인
 
-- [ ] **CORS 확인**
-  - Capacitor 앱의 origin은 `https://localhost` (androidScheme 설정 기준)
-  - 백엔드 CORS_ORIGINS에 `https://localhost` 추가 필요
-  - Render 환경변수 업데이트 안내 [사용자 작업]
+- [x] **CORS 확인** (2026-07-20)
+  - 확인 결과: `backend/src/app.js`가 `app.use(cors())`를 옵션 없이 호출해 **현재 모든 origin을 허용 중** (CORS_ORIGINS env는 코드에서 읽히지 않음, 2026-05-12 세션 미결 항목이 방치된 것으로 확인)
+  - 사용자 결정: 지금은 그대로 두고 진행 (Capacitor 앱은 이미 정상 동작). 화이트리스트 적용은 "기술 부채 & 후속 과제" 섹션에 기록해 출시 전 처리
+  - Render 측 조치 불필요 (코드가 CORS_ORIGINS를 안 읽으므로 값 추가해도 효과 없음)
 
 - [ ] **에뮬레이터/실기기에서 전체 흐름 테스트**
   - 로그인 → 작품 추가 → AI 기능 → 통계
 
 ### 11.2.4 딥링크 & 뒤로가기 처리
 
-- [ ] Android 하드웨어 뒤로가기 버튼 → react-router 히스토리 연동
-  - `@capacitor/app` 플러그인의 backButton 이벤트
-  - 히스토리 없으면 앱 종료 확인 다이얼로그
+- [x] Android 하드웨어 뒤로가기 버튼 → react-router 히스토리 연동 (2026-07-20)
+  - `@capacitor/app` 설치, `frontend/src/hooks/useAndroidBackButton.js` 신설
+  - 홈(`/`)이 아니면 `navigate(-1)`, 홈이면 `window.confirm` 종료 확인 후 `App.exitApp()`
+  - `App.jsx`에 `AndroidBackButtonListener` 컴포넌트로 BrowserRouter 내부에 연결 (useNavigate/useLocation 컨텍스트 필요)
+  - `cap sync` + `gradlew assembleDebug` 재검증 — BUILD SUCCESSFUL
 
 ### 사용자 확인 체크리스트
 
@@ -343,6 +346,7 @@
 - [ ] 푸시 알림 (Capacitor 이점 활용, 추후 Phase)
 - [ ] iOS 빌드 검토 (Capacitor 코드 재사용, Apple 개발자 계정 $99/년 필요)
 - [ ] Voided Purchases 자동 환불 감지
+- [ ] **CORS_ORIGINS 미적용** — `backend/.env`에 값은 있지만 `app.js`가 `cors()`를 옵션 없이 호출해 실제로는 모든 origin 허용 중 (2026-05-12 세션에 "미결"로 남았던 항목, 그 후 방치됨). Play Store 정식 출시 전 `cors({ origin: process.env.CORS_ORIGINS.split(',') })`로 화이트리스트 적용 필요 (2026-07-20 확인)
 
 ---
 
