@@ -1,0 +1,8 @@
+{
+  "appId": "com.mediadiary.app",
+  "appName": "미디어 다이어리",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

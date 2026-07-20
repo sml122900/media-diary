@@ -407,6 +407,22 @@
 - 리포트 항목 동적 구성 (COMPONENT_PROMPTS 매핑, templateId 기반 지시문 빌드)
 - 자연어 → AI 항목 자동 선택 (Claude + JSON 배열 파싱, fallback 처리)
 - 실시간 미리보기 (DB 저장 없는 임시 Claude 호출, 5토큰 확인 모달)
+- Capacitor 네이티브 래핑 (WebView + Bridge, webDir 번들 모드)
+- Android AndroidManifest 설정 (screenOrientation 고정, configChanges)
+- Gradle 디버그 빌드 (`gradlew assembleDebug`), ANDROID_HOME/JAVA_HOME 환경 구성
+
+---
+
+### 소재 27 — 웹앱의 Capacitor 네이티브 래핑 (Google Play 출시 준비)
+
+**Problem (상황/문제)**
+> 완성된 React 웹 서비스를 Google Play Store에 출시해야 했다. 코드베이스를 새로 작성하지 않고 기존 웹 자산을 그대로 네이티브 앱으로 포장할 방법이 필요했다.
+
+**Action (내가 한 것)**
+> Capacitor(WebView + Bridge 방식)를 채택해 `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`를 설치하고 appId `com.mediadiary.app`으로 프로젝트를 초기화했다. Vite 빌드 산출물(`dist`)을 `webDir`로 지정해 웹 자산을 그대로 재사용하고, `server.androidScheme: https`로 설정해 Android WebView가 HTTPS 오리진 기준으로 동작하도록 했다. 카드 그리드·모달 중심의 UX 특성을 고려해 `AndroidManifest.xml`에 `screenOrientation="portrait"`를 추가해 세로 모드로 고정했다. `./gradlew assembleDebug`로 디버그 APK 빌드까지 성공을 직접 검증했다.
+
+**Result (결과)**
+> 코드 재작성 없이 기존 웹 서비스를 네이티브 Android 앱으로 패키징하는 파이프라인을 구축했다. 이후 Google Play 인앱 결제 연동, 뒤로가기 버튼 처리 등 Phase 11의 후속 단계로 이어지는 기반을 마련했다.
 
 ---
 

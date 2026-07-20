@@ -143,8 +143,11 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Phase 10.5: AI 채팅형 추천 (/discover/chat, discovery_chats 테이블, 세션 대화 이력, 2토큰)
 - Phase 10.6: 리포트 커스터마이징 (report_templates 테이블, 16개 항목, AI 자동 선택 2토큰, 실시간 미리보기 5토큰)
 - Phase 10 감사 + 개선: 사용량 통계 동적 집계 (전 feature), discover_chat/report_chat 표시 추가
+- Phase 11.1.1: PWA 매니페스트 & 아이콘 (manifest.json, favicon.svg 기반 PNG 아이콘, index.html 메타 태그)
+- Phase 11.1.2: 세로 모드 고정 결정
+- Phase 11.2.1: Capacitor 프로젝트 셋업 (core/cli/android 설치, appId com.mediadiary.app, AndroidManifest screenOrientation=portrait, gradlew assembleDebug 빌드 검증)
 
-**진행 중:** 없음
+**진행 중:** Phase 11 (Google Play Store 출시) — Stage 11.2 Capacitor 셋업
 
 **예정:**
 - Phase 9 운영 전환 (사업자 등록 → 토스 정식 계약 → 운영 키 교체)
@@ -274,6 +277,8 @@ CREATE TABLE user_media (
 | 2026-05-14 | crypto.randomUUID() 클라이언트 세션 ID | 서버 세션 테이블 불필요, JWT와 동일한 stateless 설계 | 서버에서 session_id 발급 |
 | 2026-05-14 | 리포트 항목 COMPONENT_PROMPTS 상수 분리 | templateId별 지시문 동적 구성, 항목 추가 시 상수만 수정 | 프롬프트 하드코딩 |
 | 2026-05-14 | byFeature 동적 집계 (하드코딩 제거) | 신규 feature 추가 시 코드 변경 없이 자동 포함 | 기능 추가 시마다 수동 등록 |
+| 2026-07-20 | Capacitor 네이티브 래핑 채택 (WebView + Bridge, 번들 모드) | 기존 웹 자산 재사용으로 Google Play 출시, 코드 재작성 불필요 | React Native 재작성, PWA만 유지 |
+| 2026-07-20 | AndroidManifest screenOrientation=portrait 고정 | 카드 그리드·모달 중심 UX라 세로 전용이 자연스러움 | 양방향 지원 후 반응형 처리 |
 
 ---
 
@@ -295,6 +300,7 @@ CREATE TABLE user_media (
 | 2026-05-14 | seed-curation.js 재실행으로 오류 수정 불가 | ON CONFLICT DO NOTHING 제약 → 별도 UPDATE/DELETE 스크립트 필요 |
 | 2026-05-14 | 가장 따뜻한 색, 블루 수정 오류 (152584→129575 → 재수정) | 칸 리스트의 129575가 오류였는데 world-cinema의 정상값 152584를 대신 수정 → 재역전 처리 |
 | 2026-05-14 | BillingSuccessPage auth race condition | useEffect가 token=null 상태에서 실행 → isLoading 의존성 추가로 auth 초기화 완료 후 실행 |
+| 2026-07-20 | ANDROID_HOME이 VSCode 재시작 후에도 세션에 미반영 | 레지스트리엔 정상 등록됐으나 세션 셸 프로세스가 예전 환경 스냅샷 유지 → 명령마다 export로 우회 (근본 해결은 재부팅 필요) |
 
 ---
 

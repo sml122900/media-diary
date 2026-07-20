@@ -68,7 +68,7 @@
 
 ### 11.1.2 스플래시 & 모바일 최적화 점검
 
-- [ ] 세로 모드 고정 여부 결정 (기본: 세로 고정 권장)
+- [x] 세로 모드 고정 여부 결정 (기본: 세로 고정 권장) — 세로 고정으로 확정, Stage 11.2.1에서 AndroidManifest.xml에 반영 (2026-07-20)
 - [ ] 모바일 뷰포트 메타 태그 확인
 - [ ] 터치 영역 44px 이상 (기존 Phase 8 반응형 재확인)
 
@@ -85,37 +85,40 @@
 
 ### 11.2.1 Capacitor 설치 및 초기화
 
-- [ ] **패키지 설치**
+- [x] **패키지 설치** (2026-07-20)
   ```bash
   cd frontend
   npm install @capacitor/core @capacitor/cli @capacitor/android
   ```
 
-- [ ] **초기화**
+- [x] **초기화** (2026-07-20)
   ```bash
   npx cap init "미디어 다이어리" "com.mediadiary.app" --web-dir=dist
   ```
   - appId: `com.mediadiary.app` (변경 불가하니 신중히 — 사용자 확인)
   - webDir: Vite 빌드 산출물 `dist`
 
-- [ ] **capacitor.config.ts 설정**
-  ```typescript
+- [x] **capacitor.config.json 설정** (2026-07-20)
+  - 프론트엔드가 순수 JS 프로젝트라 `cap init`이 `.ts` 대신 `capacitor.config.json` 생성 (동작 동일)
+  ```json
   {
-    appId: 'com.mediadiary.app',
-    appName: '미디어 다이어리',
-    webDir: 'dist',
-    server: {
-      androidScheme: 'https'
+    "appId": "com.mediadiary.app",
+    "appName": "미디어 다이어리",
+    "webDir": "dist",
+    "server": {
+      "androidScheme": "https"
     }
   }
   ```
 
-- [ ] **Android 플랫폼 추가**
+- [x] **Android 플랫폼 추가** (2026-07-20)
   ```bash
   npm run build
   npx cap add android
   npx cap sync
   ```
+  - 세로 모드 고정: `android/app/src/main/AndroidManifest.xml`의 `<activity>`에 `android:screenOrientation="portrait"` 추가
+  - `./gradlew assembleDebug` 빌드 성공 확인 (`android/app/build/outputs/apk/debug/app-debug.apk`, 약 4.5MB)
 
 ### 11.2.2 [사용자 작업] Android Studio 설치
 
@@ -355,7 +358,15 @@
   - C) `BrowserRouter` + Capacitor Android `WebViewAssetLoader` 조합에서 중첩 경로 딥링크/프로세스 복원 시 404 위험 확인(공식 Android 문서 근거) → Stage 11.2.4에서 폴백 처리 필요
 - ROADMAP_V7.md 실제 위치가 프로젝트 루트가 아닌 `phase/` 폴더인 것을 확인, CLAUDE.md의 ROADMAP 연동 섹션에 Phase 11 항목 추가
 - Stage 11.1.1 완료 (매니페스트, 아이콘, index.html 메타 태그) — 상세는 위 체크박스 참고
-- 다음 확인 필요: 인앱 결제 플러그인 선택(B), 세로 모드 고정 여부(11.1.2)
+- Stage 11.1.2 세로 모드 고정 결정 완료 (세로 고정)
+- Stage 11.2.1 완료: Capacitor core/cli/android 설치 → `cap init` (appId `com.mediadiary.app` 확정) →
+  `capacitor.config.json`에 `server.androidScheme: https` 추가 → `npm run build` → `npx cap add android` →
+  `AndroidManifest.xml`에 `screenOrientation="portrait"` 추가 → `npx cap sync` → `./gradlew assembleDebug` 성공
+  - 환경 참고: `ANDROID_HOME`은 사용자 환경변수로 정상 등록되어 있었으나(`%LOCALAPPDATA%\Android\Sdk`),
+    이번 세션의 셸 프로세스가 VSCode 재시작 이전에 뜬 상태라 `$env:ANDROID_HOME`이 비어 있어 명령마다 직접 export 함.
+    새 터미널을 열면 정상 인식될 것으로 예상 — 이후 세션에서 재확인 필요.
+  - JAVA_HOME은 Android Studio 번들 JBR(OpenJDK 21, `C:\Program Files\Android\Android Studio\jbr`) 사용
+- 다음 확인 필요: 인앱 결제 플러그인 선택(B), Stage 11.2.2(Android Studio에서 `npx cap open android` 확인)/11.2.3(CORS)/11.2.4(뒤로가기)
 
 ---
 
