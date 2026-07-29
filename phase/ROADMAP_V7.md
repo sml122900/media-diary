@@ -279,52 +279,53 @@
 - [ ] **그래픽 자산**
   - 앱 아이콘 512x512
   - 피처 그래픽 1024x500
-  - 스크린샷 최소 2장 (권장 4~8장: 홈/복원/AI채팅/통계/연말결산)
-  - Claude Code: 스크린샷 촬영용 데모 데이터 세팅 스크립트 지원
+  - 스크린샷 최소 2장 (권장 4~8장: 홈/복원/AI채팅/통계/연말결산) — **실기기 점검 대기 목록으로 이관**
+  - Claude Code: 스크린샷 촬영용 데모 데이터 세팅 스크립트 지원 — 필요 시 별도 요청
 
-- [ ] **텍스트**
-  - 앱 이름 (30자): 미디어 다이어리 — 영화·드라마·애니 기록
-  - 짧은 설명 (80자)
-  - 자세한 설명 (4000자): 핵심 기능 + 차별점 (과거 기록 복원 강조)
-  - Claude Code: 초안 작성
+- [x] **텍스트** (2026-07-30, `phase/STORE_LISTING.md`)
+  - 앱 이름 (30자) 후보 3개, 짧은 설명 후보 2개, 자세한 설명(4000자 이내) 작성
+  - 차별점(과거 기록 복원: 큐레이션 체크·AI 대화형 기억 복원·스크린샷 인식·Letterboxd 가져오기) 강조
+  - 스크린샷 캡션 문구 8개 + 촬영 화면 리스트 준비 완료 (실촬영은 대기)
 
 ### 11.4.2 정책 필수 항목
 
-- [ ] **개인정보처리방침 URL** — 기존 /policy/privacy 사용 (Phase 9에서 작성)
-- [ ] **데이터 안전(Data Safety) 섹션 작성 가이드**
-  - 수집 데이터: 이메일, 이름, 감상 기록, 결제 정보
-  - 전송 암호화: HTTPS ✓
-  - 삭제 요청 방법 명시
-  - Claude Code: 답변 초안 작성 → 사용자가 콘솔에 입력
-- [ ] **콘텐츠 등급 설문** — 미디어 정보 서비스, 사용자 생성 콘텐츠(리뷰) 있음 주의
-- [ ] **계정 삭제 기능 확인** (Google 정책 필수!)
-  - 앱 내 계정 삭제 기능이 없다면 이번에 추가:
-    - DELETE /api/me/account (모든 데이터 CASCADE 삭제)
-    - /settings에 "계정 삭제" 버튼 + 2단계 확인
-  - 웹 삭제 URL도 Data Safety에 기재 가능
+- [x] **개인정보처리방침 URL** — `/policy/privacy` 라우트/렌더링 코드 확인 완료 (2026-07-30).
+  실제 배포 도메인은 로그인해서 접속하는 배포 사이트에서 직접 확인 필요(URL을 알 수 없어 추측하지 않음)
+- [x] **데이터 안전(Data Safety) 섹션 작성 가이드** (2026-07-30, `phase/DATA_SAFETY.md`)
+  - 수집 데이터를 실제 DB 스키마/라우트 코드 기준으로 전수 조사 (이메일·감상기록·
+    AI 대화·스크린샷 이미지·결제 이력 등), 전송 암호화(HTTPS) 확인, 삭제 요청 경로 정리
+  - 부수 발견: 기존 개인정보처리방침이 TMDB/Anthropic/Google Play 제3자 제공을
+    누락하고 있어 `PolicyPage.jsx`도 함께 업데이트함 (사용자 승인 후 반영)
+- [x] **콘텐츠 등급 설문** — 예상 답변 정리 완료 (`phase/DATA_SAFETY.md` 7절).
+  UGC(리뷰) 있음, 신고/차단 기능은 없음을 코드로 확인해 정직하게 답변하도록 명시
+- [x] **계정 삭제 기능 확인** — 이미 존재(2026-07-20 확인) + 이번 세션에 비밀번호
+  확인 2단계 확인까지 보강, 실제 삭제/CASCADE 사용자 테스트 통과
 
 ### 11.4.3 빌드 & 서명
 
-- [ ] **릴리즈 키스토어 생성** [사용자 작업, Claude Code 가이드]
-  ```bash
-  keytool -genkey -v -keystore media-diary-release.keystore \
-    -alias media-diary -keyalg RSA -keysize 2048 -validity 10000
-  ```
+- [x] **릴리즈 키스토어 생성 가이드** (2026-07-30, `phase/RELEASE_BUILD.md`) [사용자 작업]
+  - keytool 명령, 권장 옵션(validity/alias), 백업 위치 권장안 정리 — 실제 키 생성은 사용자가 진행
   - ⚠️ 키스토어 파일 + 비밀번호 분실 시 앱 업데이트 영구 불가
-  - 안전한 곳에 백업 (클라우드 + 로컬)
-  - git에 절대 커밋 금지 (.gitignore 확인)
+  - git에 커밋 방지: `android/.gitignore`에 `*.jks`/`*.keystore`/`app/keystore.properties`
+    등록 (기존 템플릿엔 주석 처리돼 있어 미적용 상태였던 것을 활성화)
 
-- [ ] **AAB 빌드**
-  - build.gradle 서명 설정
-  - `./gradlew bundleRelease` → app-release.aab
-  - versionCode / versionName 관리 규칙 정립 (1 / "1.0.0")
+- [x] **AAB 빌드** (2026-07-30)
+  - `build.gradle`에 keystore.properties 기반 서명 설정 추가 (파일 없으면 안전하게 미서명 빌드)
+  - `keystore.properties.example` 템플릿 제공
+  - versionName을 계획값 `"1.0.0"`으로 통일 (기존 `"1.0"`)
+  - `./gradlew bundleRelease` 실제 실행 검증: BUILD SUCCESSFUL, `app-release.aab` 생성 확인
+  - 서명 로직 자체도 임시 테스트 키스토어(1일 유효, scratchpad에서만 생성 후 즉시 삭제)로
+    검증 — `jarsigner -verify` "jar verified." 확인. 저장소엔 흔적 없음
+  - `npx cap sync android` 실행(Stage 11.3에서 미룬 것) — `capacitor-plugin-cdv-purchase`
+    플러그인이 네이티브 프로젝트에 정상 등록됨을 `capacitor.settings.gradle` diff로 확인
 
 ### 사용자 확인 체크리스트
 
-- [ ] 스크린샷 시안 확인
-- [ ] 설명문 검토
-- [ ] 키스토어 백업 완료
-- [ ] 계정 삭제 기능 동작 확인
+- [ ] 스크린샷 시안 확인 (실기기 점검 대기 목록)
+- [ ] 설명문 검토 (`phase/STORE_LISTING.md`)
+- [ ] 실제 릴리즈 키스토어 생성 + 백업 완료 (`phase/RELEASE_BUILD.md` 가이드대로)
+- [x] 계정 삭제 기능 동작 확인 — 사용자 테스트로 확인 완료 (2026-07-30)
+- [ ] 개인정보처리방침 배포 URL 실제 접근 확인
 
 ---
 
@@ -379,6 +380,8 @@
       다시 전달되는지 (자체 재시도 로직 대신 이 동작에 의존하고 있음)
 - [ ] 에뮬레이터/실기기 전체 흐름 (로그인 → 작품 추가 → AI 기능 → 통계) — Stage 11.2.3 잔여
 - [ ] 뒤로가기 버튼 자연스러움, 실기기(USB 디버깅) 확인 — Stage 11.2.4 잔여
+- [ ] 스토어 스크린샷 8종 촬영 — Stage 11.4.1, `phase/STORE_LISTING.md` 5절 리스트대로
+      (홈/큐레이션·기억복원/스크린샷인식/AI채팅/통계/연말결산/상세모달/공개프로필)
 
 ---
 
@@ -406,6 +409,19 @@
 - 남은 [사용자 작업]: Play Console 상품 3종 등록(11.3.1), Google 서비스 계정 JSON
   발급 후 `GOOGLE_SERVICE_ACCOUNT_JSON` 등록(11.3.4) — 둘 다 없으면 구매 흐름이
   실제로 동작하지 않음 (코드는 완성, 설정만 남음)
+- Stage 11.4(스토어 등록 준비) 실기기 없이 가능한 부분 진행:
+  - 11.4.1: `phase/STORE_LISTING.md` — 앱 이름/설명/스크린샷 캡션 초안. 실촬영은
+    실기기 점검 대기 목록으로
+  - 11.4.2: `phase/DATA_SAFETY.md` — DB 스키마·라우트 코드를 직접 읽어 수집 데이터
+    전수 조사. 스크린샷 이미지는 Claude Vision 전송 후 즉시 삭제됨을 코드로 확인.
+    기존 개인정보처리방침이 TMDB/Anthropic/Google Play 제3자 제공을 누락한 것을
+    발견 → 사용자 승인 받아 `PolicyPage.jsx` privacy 섹션 업데이트(정책별 최종
+    수정일도 분리해 terms/refund는 기존 날짜 유지하도록 수정)
+  - 11.4.3: `phase/RELEASE_BUILD.md` — keytool 가이드, `build.gradle` 서명 설정
+    (keystore.properties 있으면 서명, 없으면 안전하게 미서명 빌드), versionName을
+    `"1.0.0"`으로 통일. `npx cap sync android`로 Stage 11.3 플러그인을 네이티브
+    프로젝트에 반영. `./gradlew bundleRelease` 실제 실행해 BUILD SUCCESSFUL 확인 —
+    미서명 상태와 임시 테스트 키스토어(생성 직후 삭제)로 서명 상태 둘 다 검증
 
 ### 2026-07-20
 
@@ -435,9 +451,10 @@
 - Render CORS_ORIGINS 업데이트
 - Google 서비스 계정 JSON 등록 (여전히 대기 — 11.3.1 Play Console 상품 등록과 함께 필요)
 - [사용자 작업] Play Console 상품 3종 등록 (11.3.1)
-- 앱 아이콘/스크린샷/설명문 시안
-- 키스토어 생성 및 백업
+- 앱 아이콘/스크린샷 시안(설명문은 `phase/STORE_LISTING.md` 초안 검토 필요)
+- 키스토어 생성 및 백업 (`phase/RELEASE_BUILD.md` 가이드대로 실제 생성 필요)
 - Play Console의 개인 계정 테스트 요건 확인 결과
+- 개인정보처리방침 배포 URL 실제 접근 확인 (도메인을 알 수 없어 코드로만 검증함)
 
 ---
 
