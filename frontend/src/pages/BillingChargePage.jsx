@@ -69,13 +69,26 @@ export default function BillingChargePage() {
     setError('');
 
     try {
+      // 토스 클라이언트 키 존재 여부 확인 (환경변수 누락 시 SDK 내부에서
+      // undefined.startsWith() 오류가 발생하므로 사전에 방어)
+      const tossClientKey = import.meta.env.VITE_TOSS_CLIENT_KEY;
+      if (!tossClientKey) {
+        console.error(
+          '[BillingChargePage] VITE_TOSS_CLIENT_KEY 환경변수가 설정되지 않았습니다. ' +
+          'frontend/.env (로컬) 또는 배포 환경변수(Vercel)를 확인하세요.'
+        );
+        setError('결제 시스템 설정 오류입니다. 잠시 후 다시 시도하거나 관리자에게 문의해주세요.');
+        setLoading(false);
+        return;
+      }
+
       // 1. 서버에 주문 생성
       const res = await createCheckout(token, selected);
       const { orderId, orderName, amount, tokensToAdd, firstBonus } = res.data;
 
       // 2. 토스 SDK 로드
       const TossPayments = await loadTossSDK();
-      const tossPayments = TossPayments(import.meta.env.VITE_TOSS_CLIENT_KEY);
+      const tossPayments = TossPayments(tossClientKey);
 
       // 3. 결제창 호출 (결제 완료 시 successUrl로 리다이렉트)
       await tossPayments.requestPayment('카드', {
