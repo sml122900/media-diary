@@ -89,16 +89,30 @@ export default function BillingChargePage() {
         return;
       }
 
+      let verified;
       try {
-        const res = await verifyGooglePurchase(token, { productId, purchaseToken });
-        await transaction.finish();
-        setBalance(res.data.newBalance);
-        setSuccess({ addedTokens: res.data.addedTokens, newBalance: res.data.newBalance });
+        verified = await verifyGooglePurchase(token, { productId, purchaseToken });
       } catch (err) {
+        // 이미 처리된 구매(409)라면 토큰은 재지급하지 않되, 기기에 남은 미완료 구매는 정리해
+        // consume 실패로 인해 재구매가 막히는 상태(구매 중복 시 재구매 불가)를 방지
+        if (err.response?.status === 409) {
+          transaction.finish().catch(() => {});
+        }
         setError(err.response?.data?.message || '결제 검증에 실패했습니다. 고객센터에 문의해주세요.');
-      } finally {
         setLoading(false);
+        return;
       }
+
+      // 서버 검증 성공 시점에 토큰은 이미 충전 완료 — finish(consume)가 실패해도
+      // 충전 결과는 사용자에게 그대로 반영한다 (finish 실패는 다음 store.initialize()에서
+      // 플러그인이 미완료 트랜잭션을 다시 전달해 재시도됨)
+      setBalance(verified.data.newBalance);
+      setSuccess({ addedTokens: verified.data.addedTokens, newBalance: verified.data.newBalance });
+      setLoading(false);
+
+      transaction.finish().catch(err => {
+        console.error('[BillingChargePage] transaction.finish 실패 — 다음 실행 시 재시도됨', err);
+      });
     };
 
     store.when().approved(onApproved);
