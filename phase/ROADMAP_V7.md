@@ -174,35 +174,40 @@
 
 ### 11.3.2 플랫폼 감지 & 결제 분기
 
-- [ ] **플랫폼 감지 유틸** `frontend/src/utils/platform.js`
+- [x] **플랫폼 감지 유틸** `frontend/src/utils/platform.js` (2026-07-30)
   ```javascript
   import { Capacitor } from '@capacitor/core';
   export const isNativeApp = () => Capacitor.isNativePlatform();
   ```
 
-- [ ] **BillingChargePage 분기**
+- [x] **BillingChargePage 분기** (2026-07-30)
   - 네이티브 앱 → Google Play 결제 UI
   - 웹 → 기존 토스페이먼츠 UI
   - 패키지 카드 UI는 공유, 결제 버튼 핸들러만 분기
 
 ### 11.3.3 인앱 결제 플러그인 연동
 
-- [ ] **플러그인 선택 및 설치**
-  - 1순위: `@capacitor-community/in-app-purchases` 또는 RevenueCat
-  - 설치 전 최신 유지보수 상태 확인 후 나에게 보고 → 승인 후 진행
+- [x] **플러그인 선택 및 설치** (2026-07-30)
+  - `@capacitor-community/in-app-purchases`는 실존하지 않는 패키지로 확인됨(2026-07-20)
+  - 실제 설치: **`capacitor-plugin-cdv-purchase`** v13.18.0 (cordova-plugin-purchase의
+    Capacitor 전용 배포판, iOS StoreKit2 + Android Billing 8.3 네이티브 브릿지,
+    최근 업데이트 2026-07-16 확인 후 설치)
 
-- [ ] **구매 흐름 구현**
-  1. 상품 목록 조회 (Play Console 등록 상품)
-  2. 구매 요청 → Google 결제 시트 표시
-  3. 구매 완료 → **purchaseToken 획득**
-  4. 백엔드로 purchaseToken 전송 (검증 요청)
-  5. 서버 검증 성공 응답 → **consume(소비 처리)** 호출
-  6. 토큰 잔액 UI 갱신
+- [x] **구매 흐름 구현** (2026-07-30, 코드 레벨 — 실기기 테스트는 대기)
+  1. 상품 목록 조회 (`store.register` + `store.get(productId).getOffer()`)
+  2. 구매 요청 → `store.order(offer)`로 Google 결제 시트 표시
+  3. 구매 완료 → `store.when().approved()`에서 `transaction.parentReceipt.purchaseToken` 획득
+  4. 백엔드로 purchaseToken 전송 (`POST /api/billing/google/verify`)
+  5. 서버 검증 성공 응답 → **`transaction.finish()`(consume)** 호출
+  6. 토큰 잔액 UI 갱신 (`useTokenStore.setBalance`)
 
-- [ ] **중요: consume 처리**
-  - 소비성 상품은 consume해야 재구매 가능
-  - 서버 검증 성공 "후"에만 consume (순서 엄수)
-  - consume 실패 시 재시도 로직
+- [x] **중요: consume 처리** (2026-07-30)
+  - 서버 검증 성공 "후"에만 finish/consume 호출 (순서 엄수, 코드로 확인됨)
+  - consume 실패 시 재시도: 자체 재시도 루프 대신, 검증은 이미 성공한 것으로 처리하고
+    (잔액 갱신 정상 진행) finish 실패는 로그만 남김 — 미완료 트랜잭션은 플러그인이
+    다음 `store.initialize()` 때 로컬 영수증에서 다시 `approved`로 전달하는 방식에 의존
+  - 중복 구매(서버가 409 반환) 시에는 토큰 재지급 없이 finish()만 호출해 기기에
+    남은 미완료 구매가 재구매를 막는 상황을 방지
 
 ### 11.3.4 백엔드 영수증 검증 (보안 핵심)
 
@@ -211,33 +216,43 @@
   - JSON 키 발급 → Render 환경변수 `GOOGLE_SERVICE_ACCOUNT_JSON` 등록
   - 권한: 인앱 상품 조회
 
-- [ ] **POST /api/billing/google/verify**
+- [x] **POST /api/billing/google/verify** (2026-07-30)
   - 요청: `{ productId, purchaseToken }`
   - 처리:
     1. Google Play Developer API로 purchaseToken 검증
-       (`purchases.products.get`)
+       (`purchases.products.get`, google-auth-library JWT 인증)
     2. purchaseState === 0 (구매 완료) 확인
-    3. **중복 검증**: payment_history에 동일 purchaseToken 존재 시 거부
+    3. **중복 검증**: payment_history에 동일 purchaseToken 존재 시 거부 (사전 조회 +
+       UNIQUE 제약 이중 방어, DB 레벨 충돌은 23505로 캐치해 409 응답)
     4. 트랜잭션으로:
        - payment_history 기록 (provider: 'google', google_purchase_token)
        - users.token_balance 증가
        - 첫 충전 보너스 +20% 적용 (has_used_first_charge_bonus 체크)
     5. 응답: `{ success, addedTokens, newBalance }`
+  - GOOGLE_SERVICE_ACCOUNT_JSON 미설정 시 명확한 에러로 실패 (서비스 계정 등록 전까지는
+    코드만 완성된 상태 — 실제 검증 호출은 사용자 작업 완료 후 가능)
 
-- [ ] **payment_history 테이블 확장 마이그레이션**
+- [x] **payment_history 테이블 확장 마이그레이션** (2026-07-30, 사용자가 Supabase에서 직접 실행)
+  - 컬럼 추가 + NOT NULL 완화 블록, CHECK 제약 블록을 분리해 순서대로 실행
+    (한 배치로 실행 시 "column provider does not exist" 오류 발생 → 2블록으로 분리해 해결)
   ```sql
+  -- 블록 1
   ALTER TABLE payment_history
-    ADD COLUMN IF NOT EXISTS provider TEXT DEFAULT 'toss',
+    ADD COLUMN IF NOT EXISTS provider TEXT NOT NULL DEFAULT 'toss',
     ADD COLUMN IF NOT EXISTS google_purchase_token TEXT UNIQUE,
     ADD COLUMN IF NOT EXISTS google_order_id TEXT;
-  -- toss_payment_key, toss_order_id의 NOT NULL 제약 완화 필요 여부 확인
-  ```
-  - SQL 보여주고 사용자 승인 후 실행
+  ALTER TABLE payment_history ALTER COLUMN toss_order_id DROP NOT NULL;
+  ALTER TABLE payment_history ALTER COLUMN toss_payment_key DROP NOT NULL;
 
-- [ ] **보안 체크리스트**
+  -- 블록 2 (블록 1 확인 후 별도 실행)
+  ALTER TABLE payment_history
+    ADD CONSTRAINT chk_provider CHECK (provider IN ('toss', 'google'));
+  ```
+
+- [x] **보안 체크리스트** (2026-07-30, 코드 레벨 확인)
   - 클라이언트가 보낸 금액/토큰 수는 절대 신뢰하지 않음
     → productId 기준으로 서버에서 토큰 수 결정
-  - purchaseToken 중복 사용 차단 (UNIQUE 제약)
+  - purchaseToken 중복 사용 차단 (사전 조회 + UNIQUE 제약)
   - 검증 실패 시 토큰 미지급 + 로그 기록
 
 ### 11.3.5 환불 처리 방침
@@ -350,9 +365,47 @@
 
 ---
 
+## 📱 실기기 점검 대기 목록
+
+> 실기기가 없어 코드만 완성해둔 항목들. 실기기 확보 시 한 번에 몰아서 확인.
+> 완료된 항목은 체크만 하고 지우지 말 것 (다음 릴리즈 때도 회귀 확인용으로 누적).
+
+- [ ] Google Play 인앱결제 실제 구매 흐름 (내부 테스트 트랙, 테스트 카드)
+- [ ] 결제 후 토큰 충전이 잔액 UI에 정확히 반영되는지
+- [ ] consume(finish) 후 동일 상품 재구매 가능한지
+- [ ] 같은 purchaseToken 재전송 시 서버가 거부(409)하고, 기기에 남은 미완료 구매가
+      정리되는지 (finish 재시도 경로)
+- [ ] transaction.finish() 실패 후 앱 재시작 시 미완료 트랜잭션이 approved로
+      다시 전달되는지 (자체 재시도 로직 대신 이 동작에 의존하고 있음)
+- [ ] 에뮬레이터/실기기 전체 흐름 (로그인 → 작품 추가 → AI 기능 → 통계) — Stage 11.2.3 잔여
+- [ ] 뒤로가기 버튼 자연스러움, 실기기(USB 디버깅) 확인 — Stage 11.2.4 잔여
+
+---
+
 ## 📝 진행 로그
 
 <!-- 새 작업은 이 아래에 추가 -->
+
+### 2026-07-30
+
+- Stage 11.3.2~11.3.4 완료 (코드 레벨, 실기기 테스트는 위 목록으로 이관)
+  - 계정 삭제 기능 보안 강화 먼저 커밋: SettingsPage로 이동 + 비밀번호/문구 2단계 확인
+  - 관심사별 정리 커밋: 토스 키 누락 방어 fix, 임시 로그/스크립트 gitignore 처리,
+    ROADMAP phase/ 이동 + 미사용 문서 삭제, package-lock.json 동기화
+  - payment_history 마이그레이션을 컬럼 추가/NOT NULL 완화 블록과 CHECK 제약 블록으로
+    분리 실행 (한 배치 실행 시 컬럼 미인식 오류 발생했던 것 수정) — 사용자가 Supabase에서 실행 완료
+  - 11.3.2: `frontend/src/utils/platform.js` 신규, BillingChargePage handleCharge를
+    네이티브/웹 분기 진입점으로 리팩터 (기존 로직은 handleTossCharge로 이동)
+  - 11.3.3: 인앱결제 플러그인은 `capacitor-plugin-cdv-purchase`(cordova-plugin-purchase의
+    Capacitor 전용 배포판)로 확정 — README/타입 정의 직접 확인 후 진행. 구매 승인
+    이벤트에서 purchaseToken 추출 → 서버 검증 → 성공 시에만 finish(consume)
+  - 11.3.4: `POST /api/billing/google/verify` 구현 (google-auth-library JWT로
+    Android Publisher API 인증, purchaseState 확인, 중복 차단, 트랜잭션 처리)
+  - 리뷰 중 발견해 수정: 서버 검증 성공 후 finish()가 실패하면 이미 충전된 토큰인데도
+    에러로 표시되던 버그 → 검증 성공 시점에 바로 잔액/성공 반영, finish 실패는 로그만
+- 남은 [사용자 작업]: Play Console 상품 3종 등록(11.3.1), Google 서비스 계정 JSON
+  발급 후 `GOOGLE_SERVICE_ACCOUNT_JSON` 등록(11.3.4) — 둘 다 없으면 구매 흐름이
+  실제로 동작하지 않음 (코드는 완성, 설정만 남음)
 
 ### 2026-07-20
 
@@ -377,10 +430,11 @@
 ## ❓ 사용자 확인이 필요한 사항
 
 - appId (`com.mediadiary.app`) 확정 — 변경 불가
-- 인앱 결제 플러그인 선택 (조사 후 보고 → 승인)
-- DB 마이그레이션 (payment_history 확장)
+- ~~인앱 결제 플러그인 선택~~ — `capacitor-plugin-cdv-purchase`로 확정, 설치 완료 (2026-07-30)
+- ~~DB 마이그레이션 (payment_history 확장)~~ — 완료 (2026-07-30)
 - Render CORS_ORIGINS 업데이트
-- Google 서비스 계정 JSON 등록
+- Google 서비스 계정 JSON 등록 (여전히 대기 — 11.3.1 Play Console 상품 등록과 함께 필요)
+- [사용자 작업] Play Console 상품 3종 등록 (11.3.1)
 - 앱 아이콘/스크린샷/설명문 시안
 - 키스토어 생성 및 백업
 - Play Console의 개인 계정 테스트 요건 확인 결과
