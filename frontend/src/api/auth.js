@@ -46,13 +46,15 @@ export async function getMe(token) {
 }
 
 /**
- * 회원 탈퇴 API 호출 — users 삭제 및 연관 데이터 CASCADE 삭제
+ * 회원 탈퇴 API 호출 — 비밀번호 확인 후 users 삭제 및 연관 데이터 CASCADE 삭제
  * @param {string} token - JWT 토큰
+ * @param {string} password - 본인 확인용 비밀번호
  * @returns {Promise<{success: boolean}>}
  */
-export async function deleteAccount(token) {
+export async function deleteAccount(token, password) {
   const res = await api.delete('/api/auth/me', {
     headers: { Authorization: `Bearer ${token}` },
+    data: { password },
   });
   return res.data;
 }

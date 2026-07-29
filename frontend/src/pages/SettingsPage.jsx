@@ -10,13 +10,15 @@ import axios from 'axios';
 import useAuthStore from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
 import useTokenStore from '../store/tokenStore';
+import { deleteAccount } from '../api/auth';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
+const DELETE_CONFIRM_PHRASE = '삭제합니다';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { user, token, logout } = useAuthStore();
   const { theme, themePref, setThemePref } = useTheme();
   const { balance, fetchBalance } = useTokenStore();
 
@@ -35,6 +37,13 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  // 계정 삭제 2단계 확인
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   // 현재 프로필 불러오기
   useEffect(() => {
@@ -63,6 +72,28 @@ export default function SettingsPage() {
       setError(err.response?.data?.message || '저장에 실패했습니다');
     }
     setSaving(false);
+  };
+
+  // 계정 영구 삭제 — 비밀번호 확인 + "삭제합니다" 타이핑 모두 일치해야 실행
+  const handleDeleteAccount = async () => {
+    setDeleteError('');
+    if (deleteConfirmText !== DELETE_CONFIRM_PHRASE) {
+      setDeleteError(`"${DELETE_CONFIRM_PHRASE}"를 정확히 입력해주세요.`);
+      return;
+    }
+    if (!deletePassword) {
+      setDeleteError('비밀번호를 입력해주세요.');
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteAccount(token, deletePassword);
+      logout();
+      navigate('/login');
+    } catch (err) {
+      setDeleteError(err.response?.data?.error || '탈퇴 처리 중 오류가 발생했습니다. 다시 시도해 주세요.');
+      setDeleting(false);
+    }
   };
 
   if (loading) return (
@@ -202,6 +233,70 @@ export default function SettingsPage() {
           <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
             {saving ? '저장 중...' : '저장'}
           </button>
+        </div>
+
+        {/* 계정 삭제 */}
+        <div className="settings-section" style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid #eee' }}>
+          <div className="settings-label" style={{ color: '#c0392b' }}>계정 삭제</div>
+          <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
+            계정과 모든 기록이 영구적으로 삭제되며 복구할 수 없습니다.
+          </div>
+
+          {!deleteOpen ? (
+            <button
+              className="btn"
+              style={{ color: '#c0392b', borderColor: '#c0392b' }}
+              onClick={() => setDeleteOpen(true)}
+            >
+              계정 삭제
+            </button>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, background: '#fdf0ef', borderRadius: 8 }}>
+              <label className="settings-label" htmlFor="delete-password">비밀번호 확인</label>
+              <input
+                id="delete-password"
+                type="password"
+                className="settings-input"
+                value={deletePassword}
+                onChange={e => setDeletePassword(e.target.value)}
+                placeholder="비밀번호"
+                autoComplete="current-password"
+              />
+
+              <label className="settings-label" htmlFor="delete-confirm-text">
+                확인을 위해 "{DELETE_CONFIRM_PHRASE}"를 입력하세요
+              </label>
+              <input
+                id="delete-confirm-text"
+                className="settings-input"
+                value={deleteConfirmText}
+                onChange={e => setDeleteConfirmText(e.target.value)}
+                placeholder={DELETE_CONFIRM_PHRASE}
+              />
+
+              {deleteError && (
+                <div style={{ fontSize: 13, color: '#c0392b' }}>{deleteError}</div>
+              )}
+
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
+                <button
+                  className="btn"
+                  onClick={() => { setDeleteOpen(false); setDeletePassword(''); setDeleteConfirmText(''); setDeleteError(''); }}
+                  disabled={deleting}
+                >
+                  취소
+                </button>
+                <button
+                  className="btn"
+                  style={{ background: '#c0392b', color: '#fff', borderColor: '#c0392b' }}
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                >
+                  {deleting ? '삭제 중...' : '영구 삭제'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

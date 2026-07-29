@@ -82,10 +82,27 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
-// DELETE /api/auth/me — 회원 탈퇴 (users 삭제 시 관련 테이블 CASCADE 삭제)
+// DELETE /api/auth/me — 회원 탈퇴 (비밀번호 확인 후 users 삭제, 관련 테이블 CASCADE 삭제)
 // shared_watchlist_items.added_by 는 CASCADE 없는 FK → 먼저 수동 삭제
 router.delete('/me', authMiddleware, async (req, res) => {
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ error: '비밀번호를 입력해주세요.' });
+  }
+
   try {
+    const result = await pool.query('SELECT password FROM users WHERE id = $1', [req.user.id]);
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(404).json({ error: '유저를 찾을 수 없습니다.' });
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return res.status(401).json({ error: '비밀번호가 올바르지 않습니다.' });
+    }
+
     await pool.query('DELETE FROM shared_watchlist_items WHERE added_by = $1', [req.user.id]);
     await pool.query('DELETE FROM users WHERE id = $1', [req.user.id]);
     res.json({ success: true });

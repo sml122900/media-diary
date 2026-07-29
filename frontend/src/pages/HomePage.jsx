@@ -17,7 +17,6 @@ import QuickInputModal from '../components/QuickInputModal';
 import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
 import { useTheme } from '../hooks/useTheme';
-import { deleteAccount } from '../api/auth';
 import useTokenStore from '../store/tokenStore';
 
 export default function HomePage() {
@@ -237,16 +236,6 @@ export default function HomePage() {
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  const handleDeleteAccount = async () => {
-    if (!window.confirm('정말로 탈퇴하시겠습니까?\n모든 기록이 영구 삭제되며 복구할 수 없습니다.')) return;
-    try {
-      await deleteAccount(token);
-      logout();
-      navigate('/login');
-    } catch {
-      alert('탈퇴 처리 중 오류가 발생했습니다. 다시 시도해 주세요.');
-    }
-  };
   const tabLabels = { movie: '영화', anime: '애니메이션', drama: '드라마' };
 
   // ── 로딩 화면 ─────────────────────────────────────────────────────────────
@@ -365,9 +354,6 @@ export default function HomePage() {
                 <Link to="/settings" className="menu-item" onClick={closeMenu}>설정</Link>
                 <button className="menu-item menu-item-danger" onClick={handleLogout}>
                   로그아웃
-                </button>
-                <button className="menu-item menu-item-delete" onClick={handleDeleteAccount}>
-                  회원 탈퇴
                 </button>
               </div>
             )}
