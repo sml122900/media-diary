@@ -6,9 +6,10 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { store, ProductType, Platform } from 'capacitor-plugin-cdv-purchase';
 import useAuthStore from '../store/authStore';
 import useTokenStore from '../store/tokenStore';
-import { createCheckout } from '../api/billing';
+import { createCheckout, verifyGooglePurchase } from '../api/billing';
 import { isNativeApp } from '../utils/platform';
 
 // 토스페이먼츠 SDK CDN 동적 로드
@@ -54,19 +55,62 @@ const PACKAGES = [
 export default function BillingChargePage() {
   const navigate = useNavigate();
   const { user, token } = useAuthStore();
-  const { balance, isFirstCharge, fetchBalance } = useTokenStore();
+  const { balance, isFirstCharge, fetchBalance, setBalance } = useTokenStore();
   const [selected, setSelected] = useState('medium');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(null);
   const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
     if (token) fetchBalance(token);
   }, [token]);
 
+  // Google Play 인앱결제 상품 등록 + 구매 승인 이벤트 리스너 (네이티브 앱에서만)
+  useEffect(() => {
+    if (!isNativeApp() || !token) return;
+
+    store.register(
+      PACKAGES.map(pkg => ({
+        id: `token_${pkg.key}`,
+        type: ProductType.CONSUMABLE,
+        platform: Platform.GOOGLE_PLAY,
+      }))
+    );
+
+    // 구매 승인 → 서버 검증 성공 후에만 finish(consume) 호출 (검증 실패 시 재시도 가능하도록 미완료 상태 유지)
+    const onApproved = async (transaction) => {
+      const productId = transaction.products[0]?.id;
+      const purchaseToken = transaction.parentReceipt?.purchaseToken;
+
+      if (!productId || !purchaseToken) {
+        setError('구매 정보를 확인할 수 없습니다. 고객센터에 문의해주세요.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await verifyGooglePurchase(token, { productId, purchaseToken });
+        await transaction.finish();
+        setBalance(res.data.newBalance);
+        setSuccess({ addedTokens: res.data.addedTokens, newBalance: res.data.newBalance });
+      } catch (err) {
+        setError(err.response?.data?.error || '결제 검증에 실패했습니다. 고객센터에 문의해주세요.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    store.when().approved(onApproved);
+    store.initialize([Platform.GOOGLE_PLAY]);
+
+    return () => store.off(onApproved);
+  }, [token]);
+
   // 플랫폼 분기: 네이티브 앱은 Google Play 인앱결제, 웹은 기존 토스페이먼츠
   const handleCharge = () => {
     if (!selected || loading) return;
+    setSuccess(null);
     return isNativeApp() ? handleGooglePlayCharge() : handleTossCharge();
   };
 
@@ -115,9 +159,27 @@ export default function BillingChargePage() {
     }
   };
 
-  // Google Play 인앱결제 흐름 — Stage 11.3.3에서 구현
+  // Google Play 인앱결제 흐름 — 실제 충전 처리는 위 useEffect의 approved 리스너에서 진행
   const handleGooglePlayCharge = async () => {
-    setError('Google Play 결제는 곧 지원될 예정입니다.');
+    setLoading(true);
+    setError('');
+
+    const productId = `token_${selected}`;
+    const product = store.get(productId, Platform.GOOGLE_PLAY);
+    const offer = product?.getOffer();
+
+    if (!offer) {
+      setError('상품 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+      setLoading(false);
+      return;
+    }
+
+    const orderError = await store.order(offer);
+    if (orderError) {
+      setError(orderError.message || '결제 요청 중 오류가 발생했습니다.');
+      setLoading(false);
+    }
+    // 정상 흐름은 approved 리스너가 이어받으므로 여기서 loading을 풀지 않음
   };
 
   return (
@@ -173,6 +235,11 @@ export default function BillingChargePage() {
         })}
       </div>
 
+      {success && (
+        <p className="billing-success">
+          충전 완료! +{success.addedTokens}토큰 (현재 잔액 {success.newBalance}토큰)
+        </p>
+      )}
       {error && <p className="billing-error">{error}</p>}
 
       <div className="billing-actions">

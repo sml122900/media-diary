@@ -23,3 +23,7 @@ export const confirmPayment = (token, body) =>
 /** 결제 이력 목록 */
 export const getBillingHistory = (token) =>
   axios.get(`${API}/api/billing/history`, { headers: h(token) }).then(r => r.data);
+
+/** Google Play 인앱결제 purchaseToken 서버 검증 (Stage 11.3.4) */
+export const verifyGooglePurchase = (token, body) =>
+  axios.post(`${API}/api/billing/google/verify`, body, { headers: h(token) }).then(r => r.data);

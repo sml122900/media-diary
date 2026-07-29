@@ -15,6 +15,7 @@
     "@capacitor/cli": "^8.4.2",
     "@capacitor/core": "^8.4.2",
     "axios": "^1.15.2",
+    "capacitor-plugin-cdv-purchase": "^13.18.0",
     "html2canvas": "^1.4.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
