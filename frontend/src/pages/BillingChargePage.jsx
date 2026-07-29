@@ -9,6 +9,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import useTokenStore from '../store/tokenStore';
 import { createCheckout } from '../api/billing';
+import { isNativeApp } from '../utils/platform';
 
 // 토스페이먼츠 SDK CDN 동적 로드
 function loadTossSDK() {
@@ -63,8 +64,13 @@ export default function BillingChargePage() {
     if (token) fetchBalance(token);
   }, [token]);
 
-  const handleCharge = async () => {
+  // 플랫폼 분기: 네이티브 앱은 Google Play 인앱결제, 웹은 기존 토스페이먼츠
+  const handleCharge = () => {
     if (!selected || loading) return;
+    return isNativeApp() ? handleGooglePlayCharge() : handleTossCharge();
+  };
+
+  const handleTossCharge = async () => {
     setLoading(true);
     setError('');
 
@@ -107,6 +113,11 @@ export default function BillingChargePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Google Play 인앱결제 흐름 — Stage 11.3.3에서 구현
+  const handleGooglePlayCharge = async () => {
+    setError('Google Play 결제는 곧 지원될 예정입니다.');
   };
 
   return (
