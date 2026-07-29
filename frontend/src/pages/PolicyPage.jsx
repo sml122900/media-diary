@@ -9,6 +9,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 const POLICIES = {
   terms: {
     title: '이용약관',
+    updated: '2026년 5월 14일',
     sections: [
       {
         heading: '제1조 (목적)',
@@ -43,6 +44,7 @@ const POLICIES = {
 
   refund: {
     title: '환불 정책',
+    updated: '2026년 5월 14일',
     sections: [
       {
         heading: '환불 가능 조건',
@@ -69,10 +71,11 @@ const POLICIES = {
 
   privacy: {
     title: '개인정보처리방침',
+    updated: '2026년 7월 30일',
     sections: [
       {
         heading: '수집하는 개인정보',
-        body: '서비스 이용 과정에서 다음 정보가 수집됩니다.\n• 필수: 이메일 주소, 비밀번호(암호화 저장)\n• 서비스 이용 중 생성: 감상 기록, 별점·리뷰, AI 대화 내역\n• 결제 시: 주문 ID (결제 수단 정보는 토스페이먼츠에서 직접 처리, 서버에 저장되지 않음)',
+        body: '서비스 이용 과정에서 다음 정보가 수집됩니다.\n• 필수: 이메일 주소, 비밀번호(암호화 저장)\n• 서비스 이용 중 생성: 감상 기록, 별점·리뷰, AI 대화 내역\n• 스크린샷 인식 기능 이용 시: 업로드한 이미지 (작품 인식 처리 후 서버에서 즉시 삭제, 보관하지 않음)\n• 결제 시: 주문 ID (결제 수단 정보는 토스페이먼츠·Google Play에서 직접 처리, 서버에 저장되지 않음)',
       },
       {
         heading: '개인정보 이용 목적',
@@ -84,7 +87,7 @@ const POLICIES = {
       },
       {
         heading: '개인정보 제3자 제공',
-        body: '이용자의 개인정보는 아래 경우 외에 제3자에게 제공되지 않습니다.\n• 토스페이먼츠: 결제 처리를 위한 주문 정보 (법적 근거: 계약 이행)\n• 법령에 의한 요구가 있을 경우',
+        body: '이용자의 개인정보는 아래 경우 외에 제3자에게 제공되지 않습니다.\n• TMDB(The Movie Database): 작품 검색어·식별자 (법적 근거: 서비스 제공, 개인 식별 정보는 전송되지 않음)\n• Anthropic(Claude API): AI 채팅·검색·리포트 생성에 사용되는 감상 데이터, 스크린샷 인식 기능 이용 시 업로드 이미지 (법적 근거: 서비스 제공, 이미지는 처리 후 즉시 삭제)\n• 토스페이먼츠: 웹 결제 처리를 위한 주문 정보 (법적 근거: 계약 이행)\n• Google Play(Google): 앱 인앱결제 검증을 위한 구매 정보 (법적 근거: 계약 이행)\n• 법령에 의한 요구가 있을 경우',
       },
       {
         heading: '이용자의 권리',
@@ -127,7 +130,7 @@ export default function PolicyPage() {
           </div>
         ))}
 
-        <p className="policy-updated">최종 수정일: 2026년 5월 14일</p>
+        <p className="policy-updated">최종 수정일: {policy.updated}</p>
       </div>
     </div>
   );
