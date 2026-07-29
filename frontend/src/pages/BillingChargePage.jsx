@@ -95,7 +95,7 @@ export default function BillingChargePage() {
         setBalance(res.data.newBalance);
         setSuccess({ addedTokens: res.data.addedTokens, newBalance: res.data.newBalance });
       } catch (err) {
-        setError(err.response?.data?.error || '결제 검증에 실패했습니다. 고객센터에 문의해주세요.');
+        setError(err.response?.data?.message || '결제 검증에 실패했습니다. 고객센터에 문의해주세요.');
       } finally {
         setLoading(false);
       }
