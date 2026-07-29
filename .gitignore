@@ -4,3 +4,15 @@ node_modules/
 dist/
 .DS_Store
 .obsidian/
+
+# 임시 로그/감사 산출물 (재생성 가능, 추적 불필요)
+backend-log.txt
+frontend-log.txt
+backend/audit_issues.json
+backend/curation_all.json
+backend/scripts/check-null-posters.js
+backend/scripts/check-tmdb-ids.js
+backend/scripts/find-missing-tmdb-ids.js
+backend/scripts/reset-mcu-posters.js
+backend/scripts/test-tmdb.js
+frontend/C:Tempprofile.json
