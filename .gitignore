@@ -15,4 +15,4 @@ backend/scripts/check-tmdb-ids.js
 backend/scripts/find-missing-tmdb-ids.js
 backend/scripts/reset-mcu-posters.js
 backend/scripts/test-tmdb.js
-frontend/C:Tempprofile.json
+frontend/C*Tempprofile.json
