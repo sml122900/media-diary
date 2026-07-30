@@ -146,6 +146,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Phase 11.1.1: PWA 매니페스트 & 아이콘 (manifest.json, favicon.svg 기반 PNG 아이콘, index.html 메타 태그)
 - Phase 11.1.2: 세로 모드 고정 결정
 - Phase 11.2.1: Capacitor 프로젝트 셋업 (core/cli/android 설치, appId com.mediadiary.app, AndroidManifest screenOrientation=portrait, gradlew assembleDebug 빌드 검증)
+- 배포/검색 버그 수정 묶음 (2026-07-30): Vercel SPA 404 (vercel.json), TMDB 단일검색 페이지네이션 누락 (3페이지 병합), 검색 띄어쓰기 미스매치 (내 목록 정규화 + TMDB 공백 삽입 fallback), 토큰 잔액 🪙 이모지 tofu 렌더링 → SVG 아이콘(TokenIcon) 교체
 
 **진행 중:** Phase 11 (Google Play Store 출시) — Stage 11.2 Capacitor 셋업
 
@@ -279,6 +280,10 @@ CREATE TABLE user_media (
 | 2026-05-14 | byFeature 동적 집계 (하드코딩 제거) | 신규 feature 추가 시 코드 변경 없이 자동 포함 | 기능 추가 시마다 수동 등록 |
 | 2026-07-20 | Capacitor 네이티브 래핑 채택 (WebView + Bridge, 번들 모드) | 기존 웹 자산 재사용으로 Google Play 출시, 코드 재작성 불필요 | React Native 재작성, PWA만 유지 |
 | 2026-07-20 | AndroidManifest screenOrientation=portrait 고정 | 카드 그리드·모달 중심 UX라 세로 전용이 자연스러움 | 양방향 지원 후 반응형 처리 |
+| 2026-07-30 | Vercel SPA fallback rewrite (frontend/vercel.json) | 클라이언트 라우팅 경로 직접 접근 시 404 방지, Play Console 제출용 URL 필요 | 서버사이드 라우팅 전환 |
+| 2026-07-30 | TMDB 단일 검색 결과 최대 3페이지(60개) 병합 | 결과 많은 작품(프랜차이즈)이 1페이지로 잘리는 문제 해결 | 프론트 무한스크롤 페이지네이션 UI |
+| 2026-07-30 | 공백 1개 삽입 검색 fallback (선형, 길이-1개 변형) | TMDB가 붙여쓴 한글 쿼리를 공백 기준 토큰 매칭 → 결과 3개 미만일 때만 트리거, 조합 폭발 없이 실사용 대부분 커버 | 검색 팁 안내 문구만 제공 |
+| 2026-07-30 | 이모지 대신 인라인 SVG 아이콘(TokenIcon) 사용 | 🪙(Unicode 13.0)가 구형 Android WebView에서 tofu로 깨짐, Capacitor 배포 대비 | lucide-react 라이브러리 추가 |
 
 ---
 
@@ -301,6 +306,10 @@ CREATE TABLE user_media (
 | 2026-05-14 | 가장 따뜻한 색, 블루 수정 오류 (152584→129575 → 재수정) | 칸 리스트의 129575가 오류였는데 world-cinema의 정상값 152584를 대신 수정 → 재역전 처리 |
 | 2026-05-14 | BillingSuccessPage auth race condition | useEffect가 token=null 상태에서 실행 → isLoading 의존성 추가로 auth 초기화 완료 후 실행 |
 | 2026-07-20 | ANDROID_HOME이 VSCode 재시작 후에도 세션에 미반영 | 레지스트리엔 정상 등록됐으나 세션 셸 프로세스가 예전 환경 스냅샷 유지 → 명령마다 export로 우회 (근본 해결은 재부팅 필요) |
+| 2026-07-30 | Vercel 배포에서 /policy/privacy 직접 접근 시 404 | vercel.json 부재로 SPA fallback 미설정 → rewrites로 모든 경로를 index.html로 전달 |
+| 2026-07-30 | "짱구는 못말려" 검색 시 극장판 10개 안팎만 표시 (실제 32편) | searchTmdb가 TMDB page=1만 조회 → 최대 3페이지(60개) 병합 + dedupe로 수정 |
+| 2026-07-30 | "다크나이트"(붙여쓰기) 검색 시 "다크 나이트" 결과 누락 | TMDB가 한글 쿼리를 공백 기준 토큰 매칭 → 결과 3개 미만일 때 공백 1개 삽입 변형(최대 12개)으로 fallback 검색 |
+| 2026-07-30 | 🪙 이모지가 구형 Android WebView에서 빈 네모(tofu)로 표시 | Unicode 13.0(2020) 신규 이모지라 폰트 미지원 → stroke 기반 인라인 SVG(TokenIcon)로 교체 |
 
 ---
 
