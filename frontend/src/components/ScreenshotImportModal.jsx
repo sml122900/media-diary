@@ -7,6 +7,7 @@
 import { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import InsufficientTokensModal from './InsufficientTokensModal';
+import TokenIcon from './TokenIcon';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -261,7 +262,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
           OTT 시청 목록, 영화관 앱 관람 내역 스크린샷을 올리면 작품을 자동 인식합니다 (최대 10장)
         </p>
         <div style={{ fontSize: 12, color: '#a78bfa', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 4 }}>
-          🪙 <strong>5토큰</strong> 차감 · Sonnet 고정밀 인식
+          <TokenIcon size={13} /> <strong>5토큰</strong> 차감 · Sonnet 고정밀 인식
         </div>
 
         {/* OTT 종류 선택 */}

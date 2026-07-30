@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import TokenIcon from '../components/TokenIcon';
 
 const BASE = import.meta.env.VITE_API_URL;
 const h = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -149,7 +150,7 @@ export default function DiscoverPage() {
             "오늘 기분에 맞는 영화" "넷플릭스 볼 거 추천" —
             대화하며 딱 맞는 작품을 찾아보세요
           </div>
-          <div className="discover-ai-cost">🪙 2토큰/회</div>
+          <div className="discover-ai-cost"><TokenIcon size={12} /> 2토큰/회</div>
         </div>
         <span className="discover-ai-arrow">→</span>
       </div>

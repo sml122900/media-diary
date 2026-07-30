@@ -8,6 +8,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import InsufficientTokensModal from '../components/InsufficientTokensModal';
+import TokenIcon from '../components/TokenIcon';
 import useTokenStore from '../store/tokenStore';
 
 const BASE = import.meta.env.VITE_API_URL;
@@ -263,7 +264,7 @@ export default function DiscoverChatPage() {
             </button>
           </div>
           <div className="dc-header-title">🎬 AI 큐레이터</div>
-          <div className="dc-header-token">🪙 {balance ?? '···'}</div>
+          <div className="dc-header-token"><TokenIcon size={12} /> {balance ?? '···'}</div>
         </div>
 
         {/* 메시지 영역 */}
@@ -288,7 +289,7 @@ export default function DiscoverChatPage() {
                   </button>
                 ))}
               </div>
-              <div className="dc-cost-note">🪙 2토큰/회</div>
+              <div className="dc-cost-note"><TokenIcon size={11} /> 2토큰/회</div>
             </div>
           )}
 

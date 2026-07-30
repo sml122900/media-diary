@@ -5,6 +5,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import TokenIcon from './TokenIcon';
 
 /**
  * @param {{ required: number, balance: number, onClose: () => void }} props
@@ -21,7 +22,7 @@ export default function InsufficientTokensModal({ required, balance, onClose }) 
   return (
     <div className="backdrop" onClick={onClose}>
       <div className="modal token-shortage-modal" onClick={e => e.stopPropagation()}>
-        <div className="token-shortage-icon">🪙</div>
+        <div className="token-shortage-icon"><TokenIcon size={40} /></div>
         <h3 className="token-shortage-title">토큰이 부족해요</h3>
         <p className="token-shortage-desc">
           이 기능을 사용하려면 <strong>{required}토큰</strong>이 필요해요.

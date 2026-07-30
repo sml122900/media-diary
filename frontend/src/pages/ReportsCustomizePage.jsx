@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import InsufficientTokensModal from '../components/InsufficientTokensModal';
+import TokenIcon from '../components/TokenIcon';
 import useTokenStore from '../store/tokenStore';
 
 const BASE = import.meta.env.VITE_API_URL;
@@ -127,7 +128,7 @@ export default function ReportsCustomizePage() {
       <div className="rc-header">
         <button className="btn" onClick={() => navigate('/reports')}>← 돌아가기</button>
         <h2>{editId ? '템플릿 수정' : '새 템플릿 만들기'}</h2>
-        <div className="rc-token">🪙 {balance ?? '···'}</div>
+        <div className="rc-token"><TokenIcon size={12} /> {balance ?? '···'}</div>
       </div>
 
       {/* AI 자동 선택 */}

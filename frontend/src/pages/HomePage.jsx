@@ -14,6 +14,7 @@ import CsvImportModal from '../components/CsvImportModal';
 import AiSearchModal from '../components/AiSearchModal';
 import ScreenshotImportModal from '../components/ScreenshotImportModal';
 import QuickInputModal from '../components/QuickInputModal';
+import TokenIcon from '../components/TokenIcon';
 import { useMediaList } from '../hooks/useMediaList';
 import { usePosterCache } from '../hooks/usePosterCache';
 import { useTheme } from '../hooks/useTheme';
@@ -286,7 +287,7 @@ export default function HomePage() {
             onClick={() => navigate('/billing/charge')}
             title="토큰 충전하기"
           >
-            🪙 {balance !== null ? `${balance}` : '···'}
+            <TokenIcon size={14} /> {balance !== null ? `${balance}` : '···'}
           </button>
 
           {/* ── 드롭다운 메뉴 ── */}
@@ -330,7 +331,7 @@ export default function HomePage() {
                 {/* 토큰 */}
                 <div className="menu-section-title">토큰</div>
                 <Link to="/billing/charge" className="menu-item" onClick={closeMenu}>
-                  🪙 충전하기 {balance !== null && <span className="menu-token-balance">{balance}토큰</span>}
+                  <TokenIcon size={14} /> 충전하기 {balance !== null && <span className="menu-token-balance">{balance}토큰</span>}
                 </Link>
                 <Link to="/billing/history" className="menu-item" onClick={closeMenu}>결제 이력</Link>
                 <Link to="/billing/usage" className="menu-item" onClick={closeMenu}>사용량 통계</Link>

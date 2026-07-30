@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InsufficientTokensModal from '../components/InsufficientTokensModal';
+import TokenIcon from '../components/TokenIcon';
 import useTokenStore from '../store/tokenStore';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api/restore`;
@@ -301,7 +302,7 @@ export default function MemoryChatPage() {
               🤖 AI 기억 복원
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-secondary, #888)' }}>
-              🪙 잔액: {tokenBalance !== null ? `${tokenBalance}토큰` : '...'}
+              <TokenIcon size={11} /> 잔액: {tokenBalance !== null ? `${tokenBalance}토큰` : '...'}
             </div>
           </div>
         </div>
