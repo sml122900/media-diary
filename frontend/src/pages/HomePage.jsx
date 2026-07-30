@@ -121,7 +121,13 @@ export default function HomePage() {
     let result = items.filter(i => i.type === tab);
     if (searchQ) {
       const q = searchQ.toLowerCase();
-      result = result.filter(i => i.title.toLowerCase().includes(q) || String(i.year).includes(q));
+      const qNoSpace = q.replace(/\s+/g, '');
+      result = result.filter(i => {
+        const title = i.title.toLowerCase();
+        return title.includes(q)
+          || (qNoSpace && title.replace(/\s+/g, '').includes(qNoSpace))
+          || String(i.year).includes(q);
+      });
     }
     if (directorFilter.trim()) {
       const q = directorFilter.toLowerCase();

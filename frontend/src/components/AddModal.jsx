@@ -145,7 +145,16 @@ export default function AddModal({ onClose, onAdd, existingItems, currentTab }) 
             </div>
             <div className="result-list">
               {singleSearching && <div className="searching">검색 중...</div>}
-              {!singleSearching && singleResults.length === 0 && singleQ && <div className="searching">결과 없음</div>}
+              {!singleSearching && singleResults.length === 0 && singleQ && (
+                <div className="searching">
+                  결과 없음
+                  {!singleQ.includes(' ') && /^[가-힣]{2,12}$/.test(singleQ.trim()) && (
+                    <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
+                      💡 띄어쓰기를 다르게 시도해보세요 (예: "다크 나이트")
+                    </div>
+                  )}
+                </div>
+              )}
               {singleResults.map(r => {
                 const title = r.title || r.name || '';
                 const year = (r.release_date || r.first_air_date || '').slice(0, 4);
