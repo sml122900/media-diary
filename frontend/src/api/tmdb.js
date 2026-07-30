@@ -87,15 +87,28 @@ export async function searchTmdbPoster(title, year, preferType) {
 
 /**
  * TMDB 키워드 검색 (단건 추가·포스터 교체용)
+ * 결과가 20개(1페이지) 넘게 존재하면 최대 3페이지까지 병합해 반환
+ * (예: "짱구는 못말려" 극장판 32편처럼 페이지 하나로 안 잡히는 시리즈 대응)
  * @param {string} query
  * @param {'movie'|'tv'} type
- * @returns {Promise<Array>} TMDB 결과 배열 (최대 8개)
+ * @returns {Promise<Array>} TMDB 결과 배열 (관련도순, 최대 60개)
  */
 export async function searchTmdb(query, type) {
   if (!query.trim()) return [];
   try {
-    const data = await tmdbGet(`/search/${type}`, { query, language: 'ko-KR' });
-    return (data?.results || []).slice(0, 8);
+    const page1 = await tmdbGet(`/search/${type}`, { query, language: 'ko-KR', page: 1 });
+    let results = page1?.results || [];
+    const totalPages = Math.min(page1?.total_pages || 1, 3);
+    if (totalPages > 1) {
+      const extraPages = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) =>
+          tmdbGet(`/search/${type}`, { query, language: 'ko-KR', page: i + 2 })
+        )
+      );
+      for (const p of extraPages) results = results.concat(p?.results || []);
+    }
+    const seen = new Set();
+    return results.filter(r => !seen.has(r.id) && seen.add(r.id)).slice(0, 60);
   } catch { return []; }
 }
 
