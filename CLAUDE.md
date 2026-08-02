@@ -147,15 +147,21 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Phase 11.1.2: 세로 모드 고정 결정
 - Phase 11.2.1: Capacitor 프로젝트 셋업 (core/cli/android 설치, appId com.mediadiary.app, AndroidManifest screenOrientation=portrait, gradlew assembleDebug 빌드 검증)
 - 배포/검색 버그 수정 묶음 (2026-07-30): Vercel SPA 404 (vercel.json), TMDB 단일검색 페이지네이션 누락 (3페이지 병합), 검색 띄어쓰기 미스매치 (내 목록 정규화 + TMDB 공백 삽입 fallback), 토큰 잔액 🪙 이모지 tofu 렌더링 → SVG 아이콘(TokenIcon) 교체
+- 모바일 메뉴 오버레이 드로어 전환 (2026-08-02): 600px 이하에서 헤더 드롭다운이 뷰포트를 −6px 이탈해 항목 첫 글자가 잘리던 문제를 `position: fixed` 우측 드로어 + 백드롭으로 해결, 데스크톱 무변경. 실기기(갤럭시) APK 설치로 동작 확인 완료
 
-**진행 중:** Phase 11 (Google Play Store 출시) — Stage 11.2 Capacitor 셋업
+**진행 중:** Phase 11 (Google Play Store 출시) — Stage 11.2 Capacitor 셋업 (실기기 빌드·설치·동작 확인까지 완료)
 
 **예정:**
 - Phase 9 운영 전환 (사업자 등록 → 토스 정식 계약 → 운영 키 교체)
 - 배포 (Render 백엔드 + Vercel 프론트엔드) — VITE_TOSS_CLIENT_KEY, TOSS_SECRET_KEY 환경변수 추가 필요
 - 브라우저 UI 결제 플로우 테스트 (결제 취소 시나리오)
-- 모바일 실기기 UI 점검 (Phase 6+7+9+10 포함)
+- 모바일 실기기 UI 점검 (Phase 6+7+9+10 포함) — 메뉴 드로어는 2026-08-02 확인 완료, 나머지 화면 미점검
 - Letterboxd CSV 실제 파일로 파싱 검증
+
+**후속 조치 (2026-08-02 세션에서 발생):**
+- Adoptium Temurin 21 설치 + `JAVA_HOME` 전환 → 플래그 없이 `gradlew assembleDebug` 통과하는지 검증 (사용자 진행 예정)
+- `~/.android/debug.keystore` 백업 (사용자 진행 예정)
+- 릴리스 keystore는 Stage 11.4 생성 시 클라우드+로컬 이중 백업
 
 **블로킹 이슈:** 없음
 
