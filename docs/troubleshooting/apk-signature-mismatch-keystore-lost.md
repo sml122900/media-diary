@@ -71,11 +71,22 @@ adb install -r app-debug.apk       → Success
 
 ## 재발 방지
 
-- **debug keystore 백업** — 이 keystore가 또 사라지면 동일한 사고가 반복된다.
+- **debug keystore 백업 — 완료.** 이 keystore가 또 사라지면 동일한 사고가 반복된다.
   파일 하나(2.6KB)이므로 백업 비용이 사실상 없다.
 - **릴리스 keystore는 훨씬 중요** — Stage 11.4에서 생성 시 클라우드+로컬 이중 백업 예정.
   릴리스 keystore를 분실하면 Play Store에 올린 앱의 **업데이트가 영구히 불가능**해진다
   (Play App Signing 미사용 시). debug와 달리 "지우고 다시 깔면 되는" 복구 경로가 없다.
+- 등급별 백업 강도를 나눈 근거는 [`docs/decisions/keystore-backup-policy.md`](../decisions/keystore-backup-policy.md) 참고.
+
+## 사후 확인
+
+같은 세션에서 JDK 21 전환 후 재빌드·재설치할 때 **제거 없이 `adb install -r`만으로 성공**했다.
+keystore가 유지되면 서명이 일치해 이 사고가 재발하지 않는다는 것이 확인됐다.
+
+```
+adb install -r app-debug.apk → Success   (uninstall 불필요)
+lastUpdateTime=2026-08-02 23:33:49
+```
 
 ## 이력서 소재 한 줄
 

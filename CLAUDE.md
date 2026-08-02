@@ -160,8 +160,8 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 **후속 조치 (2026-08-02 세션에서 발생):**
 - ~~Adoptium Temurin 21 설치 + `JAVA_HOME` 전환~~ → **완료.** 플래그 없이 `assembleDebug` 성공(27초), 실기기 재설치까지 검증
-- `~/.android/debug.keystore` 백업 (사용자 진행 예정)
-- 릴리스 keystore는 Stage 11.4 생성 시 클라우드+로컬 이중 백업
+- ~~`~/.android/debug.keystore` 백업~~ → **완료**
+- 릴리스 keystore는 Stage 11.4 생성 시 클라우드+로컬 이중 백업 (**생성 직후·첫 업로드 이전**에 수행)
 
 **블로킹 이슈:** 없음
 
