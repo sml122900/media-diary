@@ -301,6 +301,9 @@ export default function HomePage() {
               ≡ 메뉴
             </button>
 
+            {/* 모바일: 메인을 덮는 백드롭 (탭하면 닫힘, 데스크톱에선 CSS로 숨김) */}
+            {menuOpen && <div className="menu-backdrop" onClick={closeMenu} />}
+
             {menuOpen && (
               <div className="menu-dropdown" role="menu">
                 {/* 사용자 정보 */}
