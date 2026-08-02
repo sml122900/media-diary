@@ -66,12 +66,31 @@ Gradle 8.14.3의 공식 지원 상한이 Java 24라 JDK 25 데몬이 거부될 �
 다른 PC에서 깨짐 ③ Android Studio 업데이트마다 JBR 버전이 또 움직임 — 세 이유로 기각했다.
 자세한 트레이드오프는 [`docs/decisions/android-build-jdk21.md`](../decisions/android-build-jdk21.md) 참고.
 
-## 남은 이슈
+## 검증 완료 (같은 세션)
 
-- Temurin 21 설치 및 `JAVA_HOME` 전환은 사용자가 직접 진행 예정
-- 전환 후 플래그 없이 `.\gradlew.bat assembleDebug`가 통과하는지 검증 필요
-- 검증 시 주의: 2026-07-20 기록대로 Windows에서는 환경변수를 바꿔도 실행 중인 상위 프로세스가
-  예전 스냅샷을 물고 있어 새 셸에 반영되지 않을 수 있다. `java -version`이 21로 안 잡히면 재부팅
+사용자가 Adoptium Temurin 21을 설치하고 `JAVA_HOME`을 전환한 뒤 플래그 없이 재빌드했다.
+
+```
+JAVA_HOME = C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot\
+openjdk version "21.0.12" 2026-07-21 LTS (Temurin-21.0.12+8)
+
+.\gradlew.bat assembleDebug        ← -Dorg.gradle.java.home 없음
+→ BUILD SUCCESSFUL in 27s
+```
+
+APK를 실기기에 `adb install -r`로 재설치했고, 이번에는 제거 없이 덮어쓰기가 됐다
+(오늘 생성된 debug keystore가 유지되어 서명 일치).
+
+**검증 중 재현된 주의점**: 2026-07-20에 기록한 환경변수 스냅샷 문제가 그대로 나타났다.
+`JAVA_HOME`은 레지스트리 Machine 레벨에 정상 등록됐지만 이미 실행 중이던 셸은 여전히 JDK 17을
+물고 있었다. 확인·우회 방법은 동일하다.
+
+```powershell
+[Environment]::GetEnvironmentVariable("JAVA_HOME","Machine")   # 레지스트리 실제 값 조회
+$env:JAVA_HOME = [Environment]::GetEnvironmentVariable("JAVA_HOME","Machine")  # 새 셸에 적용
+```
+
+`java -version`이 21로 잡히지 않으면 셸을 새로 띄우거나 재부팅하면 된다.
 
 ## 이력서 소재 한 줄
 

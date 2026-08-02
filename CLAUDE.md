@@ -159,7 +159,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Letterboxd CSV 실제 파일로 파싱 검증
 
 **후속 조치 (2026-08-02 세션에서 발생):**
-- Adoptium Temurin 21 설치 + `JAVA_HOME` 전환 → 플래그 없이 `gradlew assembleDebug` 통과하는지 검증 (사용자 진행 예정)
+- ~~Adoptium Temurin 21 설치 + `JAVA_HOME` 전환~~ → **완료.** 플래그 없이 `assembleDebug` 성공(27초), 실기기 재설치까지 검증
 - `~/.android/debug.keystore` 백업 (사용자 진행 예정)
 - 릴리스 keystore는 Stage 11.4 생성 시 클라우드+로컬 이중 백업
 
@@ -320,8 +320,8 @@ CREATE TABLE user_media (
 | 2026-07-30 | "다크나이트"(붙여쓰기) 검색 시 "다크 나이트" 결과 누락 | TMDB가 한글 쿼리를 공백 기준 토큰 매칭 → 결과 3개 미만일 때 공백 1개 삽입 변형(최대 12개)으로 fallback 검색 |
 | 2026-07-30 | 🪙 이모지가 구형 Android WebView에서 빈 네모(tofu)로 표시 | Unicode 13.0(2020) 신규 이모지라 폰트 미지원 → stroke 기반 인라인 SVG(TokenIcon)로 교체 |
 | 2026-08-02 | 모바일에서 메뉴 항목 첫 글자 잘림 + 메인 위에 백드롭 없이 겹침 | `right:0` absolute 드롭다운이 wrap된 버튼 기준으로 왼쪽 160px 뻗어 뷰포트 밖(-6px) 이탈 → 600px 이하에서 fixed 우측 오버레이 드로어 + 백드롭으로 전환 |
-| 2026-08-02 | `gradlew assembleDebug` 실패 — `invalid source release: 21` (`:capacitor-android:compileDebugJavaWithJavac`) | `JAVA_HOME`이 JDK 17인데 Capacitor 8은 Java 21+ 요구. 임시로 `-Dorg.gradle.java.home="C:\Program Files\Android\Android Studio\jbr"`(JDK 25)로 우회 빌드 성공 → 항구 해결은 Temurin 21 설치 후 `JAVA_HOME` 전환 |
-| 2026-08-02 | `adb install` 실패 — `INSTALL_FAILED_UPDATE_INCOMPATIBLE: signatures do not match` | 7/31 설치본을 서명한 `~/.android/debug.keystore`가 소실돼 빌드 시 Gradle이 새 keystore를 생성 → 서명 불일치. 기존 앱 `adb uninstall` 후 재설치로 해결(로컬 로그인 세션만 소실, 기록은 Supabase에 보존). 재발 방지로 debug keystore 백업 |
+| 2026-08-02 | `gradlew assembleDebug` 실패 — `invalid source release: 21` (`:capacitor-android:compileDebugJavaWithJavac`) | **Capacitor 8은 Java 21+ 필요한데 `JAVA_HOME`이 JDK 17이었음.** 임시로 `-Dorg.gradle.java.home=...\Android Studio\jbr`(JDK 25) 우회 → **해결: Adoptium Temurin 21 설치 + `JAVA_HOME` 전환**. 전환 후 플래그 없이 `BUILD SUCCESSFUL in 27s` 검증 완료. 단 환경변수는 Machine 레벨에 등록돼도 실행 중인 셸에는 반영 안 됨(2026-07-20 항목과 동일 현상) → 새 셸/재부팅 필요 |
+| 2026-08-02 | `adb install` 실패 — `INSTALL_FAILED_UPDATE_INCOMPATIBLE: signatures do not match` | 7/31 설치본을 서명한 `~/.android/debug.keystore`가 소실돼 빌드 시 Gradle이 새 keystore를 자동 생성(mtime=빌드 시각) → 서명 불일치. 원본 복구 불가라 `adb uninstall` 후 재설치로 해결(로컬 로그인 세션·화면모드 설정만 소실, 기록은 Supabase 보존). **`~/.android/debug.keystore` 백업 권장 — 분실 시 기존 앱을 제거해야만 재설치 가능.** 릴리스 keystore는 분실 시 Play Store 업데이트가 영구 불가하므로 Stage 11.4에서 클라우드+로컬 이중 백업 |
 
 ---
 

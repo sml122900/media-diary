@@ -49,13 +49,24 @@
 
 ## Result (결과)
 
-> 이번 세션에서는 일회성 플래그로 APK 빌드·설치를 완료했고, Temurin 21 설치와 `JAVA_HOME` 전환은
-> 사용자가 직접 진행하기로 했다. 전환 후에는 플래그 없이 `.\gradlew.bat assembleDebug`가
-> 통과하는지 검증이 필요하다.
+> 일회성 플래그로 먼저 APK 빌드·설치를 완료했고, 이어서 사용자가 Adoptium Temurin 21을 설치하고
+> `JAVA_HOME`을 전환했다. **같은 세션에서 검증까지 마쳤다.**
 >
-> 검증 시 주의점: 2026-07-20에 기록된 것처럼 Windows에서는 환경변수를 바꿔도
-> 실행 중인 상위 프로세스가 예전 환경 스냅샷을 물고 있어 새 셸에도 반영되지 않을 수 있다.
-> `java -version`이 21로 잡히지 않으면 재부팅이 확실한 방법이다.
+> ```
+> JAVA_HOME = C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot\
+> openjdk version "21.0.12" 2026-07-21 LTS (Temurin-21.0.12+8)
+>
+> .\gradlew.bat assembleDebug        ← 플래그 없음
+> → BUILD SUCCESSFUL in 27s
+> ```
+>
+> 빌드된 APK를 실기기에 설치할 때는 이번엔 제거 없이 `adb install -r`만으로 덮어써졌다.
+> 오늘 생성된 debug keystore가 그대로 유지되어 서명이 일치했기 때문이다.
+>
+> 검증 중 확인된 주의점: 2026-07-20에 기록된 현상이 재현됐다. `JAVA_HOME`이 레지스트리
+> Machine 레벨에는 정상 등록(`[Environment]::GetEnvironmentVariable("JAVA_HOME","Machine")`)됐지만,
+> 이미 실행 중이던 셸 프로세스는 여전히 JDK 17을 물고 있었다. 새 셸에서 레지스트리 값을 다시 읽어
+> 적용해야 했다 — 환경변수 전환 후에는 셸을 새로 띄우거나 재부팅해야 한다.
 
 **교훈**: 빌드 환경을 IDE 번들 런타임(Android Studio JBR)에 의존시키면, IDE 업데이트가
 곧 빌드 환경 변경이 된다. "지난번엔 됐는데 지금 안 된다"는 상황에서는 코드 변경 이력뿐 아니라
