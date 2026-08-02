@@ -283,6 +283,8 @@ CREATE TABLE user_media (
 | 2026-07-30 | Vercel SPA fallback rewrite (frontend/vercel.json) | 클라이언트 라우팅 경로 직접 접근 시 404 방지, Play Console 제출용 URL 필요 | 서버사이드 라우팅 전환 |
 | 2026-07-30 | TMDB 단일 검색 결과 최대 3페이지(60개) 병합 | 결과 많은 작품(프랜차이즈)이 1페이지로 잘리는 문제 해결 | 프론트 무한스크롤 페이지네이션 UI |
 | 2026-07-30 | 공백 1개 삽입 검색 fallback (선형, 길이-1개 변형) | TMDB가 붙여쓴 한글 쿼리를 공백 기준 토큰 매칭 → 결과 3개 미만일 때만 트리거, 조합 폭발 없이 실사용 대부분 커버 | 검색 팁 안내 문구만 제공 |
+| 2026-08-02 | Android 빌드 JDK를 Adoptium Temurin 21로 통일 (`JAVA_HOME` 전환) | Capacitor 8이 Java 21+ 요구, Android Studio 번들 JBR 25는 Gradle 8.14.3 공식 지원 상한(24) 초과 + 경로 하드코딩으로 PC 이식성 상실 | `gradle.properties`에 `org.gradle.java.home` 고정, Gradle wrapper 9.x 상향 |
+| 2026-08-02 | keystore 백업 정책 — debug는 로컬 백업, 릴리스는 Stage 11.4 생성 시 클라우드+로컬 이중 백업 | debug keystore 소실로 기존 설치본 업데이트 불가 사고 발생, 릴리스 keystore 분실 시 Play Store 앱 업데이트 영구 불가 | 백업 없이 진행 |
 | 2026-08-02 | 모바일 메뉴는 오버레이 드로어(fixed + 백드롭), 데스크톱은 기존 드롭다운 유지 | 좁은 화면에서 absolute 드롭다운은 버튼 위치에 따라 뷰포트를 벗어남, 미디어쿼리 분기로 데스크톱 회귀 위험 제거 | 드롭다운 위치만 보정(clamp), 전 해상도 드로어 통일 |
 | 2026-07-30 | 이모지 대신 인라인 SVG 아이콘(TokenIcon) 사용 | 🪙(Unicode 13.0)가 구형 Android WebView에서 tofu로 깨짐, Capacitor 배포 대비 | lucide-react 라이브러리 추가 |
 
@@ -312,6 +314,8 @@ CREATE TABLE user_media (
 | 2026-07-30 | "다크나이트"(붙여쓰기) 검색 시 "다크 나이트" 결과 누락 | TMDB가 한글 쿼리를 공백 기준 토큰 매칭 → 결과 3개 미만일 때 공백 1개 삽입 변형(최대 12개)으로 fallback 검색 |
 | 2026-07-30 | 🪙 이모지가 구형 Android WebView에서 빈 네모(tofu)로 표시 | Unicode 13.0(2020) 신규 이모지라 폰트 미지원 → stroke 기반 인라인 SVG(TokenIcon)로 교체 |
 | 2026-08-02 | 모바일에서 메뉴 항목 첫 글자 잘림 + 메인 위에 백드롭 없이 겹침 | `right:0` absolute 드롭다운이 wrap된 버튼 기준으로 왼쪽 160px 뻗어 뷰포트 밖(-6px) 이탈 → 600px 이하에서 fixed 우측 오버레이 드로어 + 백드롭으로 전환 |
+| 2026-08-02 | `gradlew assembleDebug` 실패 — `invalid source release: 21` (`:capacitor-android:compileDebugJavaWithJavac`) | `JAVA_HOME`이 JDK 17인데 Capacitor 8은 Java 21+ 요구. 임시로 `-Dorg.gradle.java.home="C:\Program Files\Android\Android Studio\jbr"`(JDK 25)로 우회 빌드 성공 → 항구 해결은 Temurin 21 설치 후 `JAVA_HOME` 전환 |
+| 2026-08-02 | `adb install` 실패 — `INSTALL_FAILED_UPDATE_INCOMPATIBLE: signatures do not match` | 7/31 설치본을 서명한 `~/.android/debug.keystore`가 소실돼 빌드 시 Gradle이 새 keystore를 생성 → 서명 불일치. 기존 앱 `adb uninstall` 후 재설치로 해결(로컬 로그인 세션만 소실, 기록은 Supabase에 보존). 재발 방지로 debug keystore 백업 |
 
 ---
 
