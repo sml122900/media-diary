@@ -278,7 +278,7 @@ function PersonSearch() {
                 {p.profile_path
                   ? <img src={`${PROF_BASE}${p.profile_path}`} alt={p.name}
                       style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                  : <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#e0e0e0',
+                  : <div className="placeholder-box" style={{ width: 36, height: 36, borderRadius: '50%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>👤</div>
                 }
                 <div style={{ minWidth: 0 }}>
@@ -389,8 +389,8 @@ function PersonSearch() {
       )}
 
       {toast && (
-        <div style={{ marginTop: 10, padding: '8px 14px', background: '#e8f5e9', borderRadius: 8,
-          fontSize: 13, color: '#2e7d32', fontWeight: 600 }}>
+        <div className="chip-success" style={{ marginTop: 10, padding: '8px 14px', borderRadius: 8,
+          fontSize: 13, fontWeight: 600 }}>
           ✓ {toast}
         </div>
       )}
@@ -434,14 +434,14 @@ function LetterboxdSection() {
         </div>
       </div>
       {result && (
-        <div style={{ padding: '8px 12px', background: '#e8f5e9', borderRadius: 8, marginBottom: 10,
-          fontSize: 13, color: '#2e7d32' }}>
+        <div className="chip-success" style={{ padding: '8px 12px', borderRadius: 8, marginBottom: 10,
+          fontSize: 13 }}>
           ✓ {result.added}편 추가 {result.skipped > 0 ? `· ${result.skipped}편 중복 스킵` : ''}
           {result.failed > 0 ? ` · ${result.failed}편 실패` : ''} (총 {result.total}편)
         </div>
       )}
-      {error && <div style={{ padding: '8px 12px', background: '#fce4ec', borderRadius: 8, marginBottom: 10,
-        fontSize: 13, color: '#c62828' }}>{error}</div>}
+      {error && <div className="chip-error" style={{ padding: '8px 12px', borderRadius: 8, marginBottom: 10,
+        fontSize: 13 }}>{error}</div>}
       <button onClick={() => fileRef.current?.click()} disabled={uploading}
         style={{ padding: '10px 20px', fontSize: 13, fontWeight: 700, border: 'none',
           borderRadius: 8, cursor: uploading ? 'not-allowed' : 'pointer',

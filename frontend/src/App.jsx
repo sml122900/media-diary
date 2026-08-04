@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import useAuthStore from './store/authStore';
 import { useAndroidBackButton } from './hooks/useAndroidBackButton';
+import { useTheme } from './hooks/useTheme';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
@@ -62,6 +63,11 @@ function AndroidBackButtonListener() {
  */
 function App() {
   const { init } = useAuthStore();
+
+  // 루트에서 한 번 호출해 어떤 경로로 진입하든 data-theme이 항상 설정되게 한다.
+  // 기존엔 페이지별로 호출해서 /discover 등 미호출 페이지를 직접 열면
+  // data-theme이 없어 테마 규칙이 하나도 적용되지 않았다.
+  useTheme();
 
   // 앱 초기화 시 토큰 복원
   useEffect(() => {

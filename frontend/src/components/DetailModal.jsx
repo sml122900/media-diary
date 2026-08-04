@@ -266,13 +266,13 @@ export default function DetailModal({
                       value={editFields[key]}
                       onChange={e => setEditFields(f => ({ ...f, [key]: e.target.value }))}
                       placeholder={placeholder}
-                      style={{ width: '100%', padding: '5px 8px', fontSize: key === 'title' ? 14 : 13, border: '1px solid #ddd', borderRadius: 6, marginBottom: 6, fontFamily: 'inherit', background: '#fff', color: 'inherit' }}
+                      style={{ width: '100%', padding: '5px 8px', fontSize: key === 'title' ? 14 : 13, border: '1px solid #ddd', borderRadius: 6, marginBottom: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
                     />
                   ))}
                   <select
                     value={editFields.type}
                     onChange={e => setEditFields(f => ({ ...f, type: e.target.value }))}
-                    style={{ width: '100%', padding: '5px 8px', fontSize: 13, border: '1px solid #ddd', borderRadius: 6, marginBottom: 6, fontFamily: 'inherit', background: '#fff', color: 'inherit' }}
+                    style={{ width: '100%', padding: '5px 8px', fontSize: 13, border: '1px solid #ddd', borderRadius: 6, marginBottom: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
                   >
                     <option value="movie">영화</option>
                     <option value="anime">애니메이션</option>
@@ -308,7 +308,7 @@ export default function DetailModal({
                   {friendsActivity.avg_rating && ` · 평균 ★${friendsActivity.avg_rating}`}
                   <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
                     {friendsActivity.friends.slice(0, 5).map((f, i) => (
-                      <span key={i} style={{ fontSize: 11, padding: '1px 6px', background: '#f0f0ee', borderRadius: 10, color: '#555' }}>
+                      <span key={i} className="chip-neutral" style={{ fontSize: 11, padding: '1px 6px', borderRadius: 10 }}>
                         {f.username || f.name} {f.rating > 0 ? '★'.repeat(f.rating) : ''}
                       </span>
                     ))}

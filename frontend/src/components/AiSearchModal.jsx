@@ -104,9 +104,9 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
 
         {/* 검색 해석 */}
         {explanation && (
-          <div style={{
+          <div className="surface-muted" style={{
             fontSize: 12, color: '#888', marginBottom: 12, padding: '6px 10px',
-            background: '#f8f8f6', borderRadius: 8, border: '1px solid #eee',
+            borderRadius: 8,
           }}>
             ✨ AI 해석: <strong>{explanation}</strong>
           </div>
@@ -114,9 +114,9 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
 
         {/* 에러 */}
         {error && (
-          <div style={{
-            fontSize: 13, color: '#c0392b', marginBottom: 12, padding: '8px 12px',
-            background: '#fdf0ef', borderRadius: 8, border: '1px solid #e0b4b0',
+          <div className="surface-error" style={{
+            fontSize: 13, marginBottom: 12, padding: '8px 12px',
+            borderRadius: 8,
           }}>
             {error}
           </div>

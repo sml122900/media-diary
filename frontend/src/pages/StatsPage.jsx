@@ -13,8 +13,11 @@ import {
 import { fetchUserMedia } from '../api/userMedia';
 import { useTheme } from '../hooks/useTheme';
 
-// 파이차트 색상
-const PIE_COLORS = { movie: '#1a1a1a', anime: '#4a90d9', drama: '#e07a3f' };
+// 파이차트 색상 — movie는 다크에서 카드 배경(#1c1c1c)에 묻혀 테마별로 분기
+const PIE_COLORS = {
+  light: { movie: '#1a1a1a', anime: '#4a90d9', drama: '#e07a3f' },
+  dark:  { movie: '#e8e8e8', anime: '#4a90d9', drama: '#e07a3f' },
+};
 const TYPE_LABEL = { movie: '영화', anime: '애니메이션', drama: '드라마' };
 
 // 연대별 바 색상 — 다크에서 #1a1a1a가 카드 배경(#1c1c1c)에 묻혀 테마별로 분기
@@ -300,7 +303,7 @@ export default function StatsPage() {
                 label={PieLabel}
               >
                 {typeData.map(entry => (
-                  <Cell key={entry.type} fill={PIE_COLORS[entry.type] || '#888'} />
+                  <Cell key={entry.type} fill={(PIE_COLORS[theme] || PIE_COLORS.light)[entry.type] || '#888'} />
                 ))}
               </Pie>
               <Legend formatter={(value) => value} />

@@ -89,8 +89,8 @@ export default function QuickInputModal({ onClose, onAdd, onSaved }) {
       onClick={e => e.target === e.currentTarget && onClose()}
       style={{ zIndex: 2000 }}
     >
-      <div style={{
-        background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480,
+      <div className="modal" style={{
+        borderRadius: 16, width: '100%', maxWidth: 480,
         boxShadow: '0 20px 60px rgba(0,0,0,.2)', overflow: 'hidden',
       }}>
         {/* 헤더 */}
@@ -126,15 +126,14 @@ export default function QuickInputModal({ onClose, onAdd, onSaved }) {
                 return (
                   <div
                     key={r.id}
+                    className="hover-row"
                     onClick={() => handleSelect(r)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12, padding: '8px 4px',
                       cursor: 'pointer', borderRadius: 8, transition: 'background .15s',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#f8f8f8'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   >
-                    <div style={{ width: 36, height: 54, borderRadius: 4, overflow: 'hidden', background: '#f0f0ee', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="placeholder-box" style={{ width: 36, height: 54, borderRadius: 4, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {r.poster_path
                         ? <img src={IMG_BASE + r.poster_path} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         : <span style={{ fontSize: 16, opacity: .3 }}>🎬</span>
@@ -155,7 +154,7 @@ export default function QuickInputModal({ onClose, onAdd, onSaved }) {
         {step === 'rate' && selected && (
           <div style={{ padding: 20 }}>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginBottom: 20 }}>
-              <div style={{ width: 54, height: 80, borderRadius: 6, overflow: 'hidden', background: '#f0f0ee', flexShrink: 0 }}>
+              <div className="placeholder-box" style={{ width: 54, height: 80, borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
                 {selected.poster_url
                   ? <img src={selected.poster_url} alt={selected.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 20, opacity: .3 }}>🎬</div>

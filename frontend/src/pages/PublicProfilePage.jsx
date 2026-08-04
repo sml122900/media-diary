@@ -35,7 +35,7 @@ export default function PublicProfilePage() {
   if (notFound) return (
     <div className="mdb-container" style={{ textAlign: 'center', paddingTop: '4rem' }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>🤷</div>
-      <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>
+      <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
         @{username} 를 찾을 수 없습니다
       </div>
       <button className="btn btn-primary" onClick={() => navigate('/')} style={{ marginTop: 16 }}>홈으로</button>
@@ -75,9 +75,9 @@ export default function PublicProfilePage() {
 
       {/* 비공개 프로필 안내 */}
       {!profile.is_profile_public && (
-        <div style={{
+        <div className="surface-muted" style={{
           textAlign: 'center', padding: '3rem', color: '#aaa',
-          background: '#f8f8f6', borderRadius: 16, border: '1px solid #eee',
+          borderRadius: 16,
         }}>
           <div style={{ fontSize: 36, marginBottom: 12 }}>🔒</div>
           이 프로필은 비공개입니다

@@ -135,7 +135,7 @@ export default function FeedPage() {
                       style={{ width: 44, height: 66, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>{item.title}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{item.title}</div>
                     <div style={{ fontSize: 12, color: '#999' }}>{item.year} · {TYPE_LABEL[item.type] || item.type}</div>
                     {item.rating > 0 && (
                       <div style={{ fontSize: 14, color: '#f0a500', marginTop: 2 }}>{'★'.repeat(item.rating)}</div>
@@ -181,7 +181,7 @@ export default function FeedPage() {
                   <div className="feed-avatar-ph">👤</div>
                 )}
                 <div style={{ flex: 1 }}>
-                  <Link to={`/u/${u.username}`} style={{ fontWeight: 600, color: '#1a1a1a', fontSize: 14 }}>
+                  <Link to={`/u/${u.username}`} style={{ fontWeight: 600, fontSize: 14 }}>
                     {u.username || u.name}
                   </Link>
                   <div style={{ fontSize: 12, color: '#888' }}>{u.name}</div>
@@ -219,7 +219,7 @@ export default function FeedPage() {
                 <div className="feed-avatar-ph">👤</div>
               )}
               <div style={{ flex: 1 }}>
-                <Link to={`/u/${u.username}`} style={{ fontWeight: 600, color: '#1a1a1a', fontSize: 14 }}>
+                <Link to={`/u/${u.username}`} style={{ fontWeight: 600, fontSize: 14 }}>
                   {u.username || u.name}
                 </Link>
                 <div style={{ fontSize: 12, color: '#888' }}>{u.name}</div>

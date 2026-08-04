@@ -53,7 +53,7 @@ export default function ComparePage() {
       </div>
 
       {/* 비교 대상 정보 */}
-      <div style={{ display: 'flex', gap: 20, alignItems: 'center', background: '#f8f8f6', borderRadius: 14, padding: '16px 20px', marginBottom: 24, border: '1px solid #eee' }}>
+      <div className="surface-muted" style={{ display: 'flex', gap: 20, alignItems: 'center', borderRadius: 14, padding: '16px 20px', marginBottom: 24 }}>
         <div style={{ textAlign: 'center', flex: 1 }}>
           <div style={{ fontSize: 15, fontWeight: 700 }}>나</div>
         </div>

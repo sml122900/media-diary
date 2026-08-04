@@ -214,12 +214,12 @@ export default function SettingsPage() {
 
         {/* 피드백 */}
         {message && (
-          <div style={{ fontSize: 13, color: '#27ae60', padding: '8px 12px', background: '#e8f5e9', borderRadius: 8 }}>
+          <div className="chip-success" style={{ fontSize: 13, padding: '8px 12px', borderRadius: 8 }}>
             {message}
           </div>
         )}
         {error && (
-          <div style={{ fontSize: 13, color: '#c0392b', padding: '8px 12px', background: '#fdf0ef', borderRadius: 8 }}>
+          <div className="chip-error" style={{ fontSize: 13, padding: '8px 12px', borderRadius: 8 }}>
             {error}
           </div>
         )}
@@ -251,7 +251,7 @@ export default function SettingsPage() {
               계정 삭제
             </button>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, background: '#fdf0ef', borderRadius: 8 }}>
+            <div className="chip-error" style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, borderRadius: 8 }}>
               <label className="settings-label" htmlFor="delete-password">비밀번호 확인</label>
               <input
                 id="delete-password"

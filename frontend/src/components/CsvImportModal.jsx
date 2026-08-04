@@ -157,7 +157,7 @@ export default function CsvImportModal({ onClose, onAdd, existingItems, onImport
                     <div style={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.title}</div>
                     <div style={{ fontSize: 11, color: '#999' }}>{r.year} · {TYPE_LABEL[r.type] || r.type}{r.rating > 0 ? ` · ★${r.rating}` : ''}</div>
                   </div>
-                  {r.isDuplicate && <span style={{ fontSize: 11, padding: '2px 6px', background: '#fff3cd', color: '#856404', borderRadius: 4, flexShrink: 0 }}>중복</span>}
+                  {r.isDuplicate && <span className="chip-warn" style={{ fontSize: 11, padding: '2px 6px', borderRadius: 4, flexShrink: 0 }}>중복</span>}
                 </div>
               ))}
             </div>

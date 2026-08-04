@@ -143,7 +143,7 @@ export default function ReportsPage() {
       {/* 리포트 생성 버튼 */}
       <div className="report-gen-bar">
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>
+          <div style={{ fontSize: 14, fontWeight: 600 }}>
             {periodLabel(currentPeriod)} 리포트
           </div>
           <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
@@ -162,9 +162,9 @@ export default function ReportsPage() {
 
       {/* 에러 */}
       {genError && (
-        <div style={{
-          fontSize: 13, color: '#c0392b', padding: '10px 14px',
-          background: '#fdf0ef', border: '1px solid #e0b4b0', borderRadius: 10, marginBottom: 16
+        <div className="surface-error" style={{
+          fontSize: 13, padding: '10px 14px',
+          borderRadius: 10, marginBottom: 16
         }}>
           {genError}
         </div>
@@ -174,8 +174,8 @@ export default function ReportsPage() {
       {generating && (
         <div style={{
           padding: '2rem', textAlign: 'center', fontSize: 14, color: '#888',
-          background: '#f8f8f6', borderRadius: 12, marginBottom: 16, border: '1px solid #eee'
-        }}>
+          borderRadius: 12, marginBottom: 16
+        }} className="surface-muted">
           <div style={{ fontSize: 32, marginBottom: 10 }}>✨</div>
           Claude가 감상 기록을 분석하고 있습니다...
         </div>

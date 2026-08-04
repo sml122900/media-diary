@@ -200,12 +200,12 @@ export default function AddModal({ onClose, onAdd, existingItems, currentTab }) 
               {bulkItems.map((item, i) => {
                 if (!item.result) return (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: '1px solid #eee', borderRadius: 8, opacity: .5 }}>
-                    <div style={{ width: 32, height: 48, background: '#f0f0ee', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>?</div>
+                    <div className="placeholder-box" style={{ width: 32, height: 48, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>?</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#999' }}>{item.inputTitle}</div>
                       <div style={{ fontSize: 11, color: '#bbb' }}>검색 결과 없음</div>
                     </div>
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: '#f5f5f5', color: '#bbb' }}>미발견</span>
+                    <span className="chip-muted" style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4 }}>미발견</span>
                   </div>
                 );
                 const r = item.result;
@@ -216,7 +216,7 @@ export default function AddModal({ onClose, onAdd, existingItems, currentTab }) 
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', border: `1px solid ${chk ? '#1a1a1a' : '#eee'}`, borderRadius: 8, cursor: dupl ? 'default' : 'pointer', opacity: dupl ? .6 : 1 }}
                     onClick={() => toggleBulk(i)}
                   >
-                    <div style={{ width: 32, height: 48, borderRadius: 4, overflow: 'hidden', flexShrink: 0, background: '#f0f0ee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, position: 'relative' }}>
+                    <div className="placeholder-box" style={{ width: 32, height: 48, borderRadius: 4, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, position: 'relative' }}>
                       {r.poster ? <img src={r.poster} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => e.target.remove()} alt={r.title} /> : '🎬'}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -225,7 +225,7 @@ export default function AddModal({ onClose, onAdd, existingItems, currentTab }) 
                       {r.title !== item.inputTitle && <div style={{ fontSize: 11, color: '#aaa' }}>"{item.inputTitle}" 검색결과</div>}
                     </div>
                     {dupl
-                      ? <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, background: '#e8f5e9', color: '#2e7d32', flexShrink: 0 }}>이미 추가됨</span>
+                      ? <span className="chip-success" style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, flexShrink: 0 }}>이미 추가됨</span>
                       : <div style={{ width: 18, height: 18, borderRadius: 4, border: `1.5px solid ${chk ? '#1a1a1a' : '#ccc'}`, background: chk ? '#1a1a1a' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           {chk && <span style={{ color: '#fff', fontSize: 12, lineHeight: 1 }}>✓</span>}
                         </div>

@@ -5,7 +5,9 @@ body {
   font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
   background-color: #f0f2f5; color: #1a1a1a; line-height: 1.6;
 }
-a { color: #1a1a1a; text-decoration: none; }
+/* body 색을 상속받아 테마를 따라간다 (라이트 #1a1a1a / 다크 #e8e8e8).
+   [data-theme="dark"] a 로 덮으면 클래스 지정 색까지 이겨버려 inherit 사용 */
+a { color: inherit; text-decoration: none; }
 input, select, textarea, button { font-family: inherit; font-size: 14px; }
 
 /* ── 컨테이너 ── */
@@ -396,7 +398,7 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .feed-item-user { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .feed-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
 .feed-avatar-ph { width: 32px; height: 32px; border-radius: 50%; background: #f0f0ee; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-.feed-username { font-size: 13px; font-weight: 600; color: #1a1a1a; text-decoration: none; }
+.feed-username { font-size: 13px; font-weight: 600; color: inherit; text-decoration: none; }
 .feed-username:hover { text-decoration: underline; }
 .feed-time { font-size: 11px; color: #aaa; }
 .feed-item-content { display: flex; gap: 12px; align-items: flex-start; }
@@ -745,6 +747,7 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .settings-toggle-knob { background: #888; }
   .settings-toggle.on .settings-toggle-knob { background: #1a1a1a; }
   .profile-card { background: #1c1c1c; border-color: #2e2e2e; }
+  .profile-avatar { background: #2a2a2a; }
   .profile-name { color: #e8e8e8; }
   .profile-bio { color: #aaa; }
   .profile-stat-card { background: #1c1c1c; border-color: #2e2e2e; }
@@ -1553,3 +1556,96 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 }
 .rc-confirm-msg  { font-size: 14px; color: #ddd; line-height: 1.6; margin-bottom: 20px; }
 .rc-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ══════════════════════════════════════════════════════════════
+   상태 칩 / 서피스 유틸리티 (Phase 11 다크모드 대응)
+   기존에 JSX 인라인으로 박혀 있던 밝은 배경색을 클래스로 옮긴 것.
+   인라인 스타일은 CSS 테마를 못 따라가 다크에서 그대로 밝게 튀었음.
+   ══════════════════════════════════════════════════════════════ */
+.chip-success  { background: #e8f5e9; color: #2e7d32; }
+.chip-error    { background: #fdf0ef; color: #c0392b; }
+.chip-warn     { background: #fff3cd; color: #856404; }
+.chip-neutral  { background: #f0f0ee; color: #555; }
+.chip-muted    { background: #f5f5f5; color: #bbb; }
+
+/* 밝은 배경 패널 (안내 박스, 프로필 요약 등) */
+.surface-muted { background: #f8f8f6; border: 1px solid #eee; }
+.surface-error { background: #fdf0ef; border: 1px solid #e0b4b0; color: #c0392b; }
+
+/* 포스터/아바타 플레이스홀더 */
+.placeholder-box { background: #f0f0ee; }
+
+/* 목록 행 hover (기존엔 JS로 인라인 배경을 넣어 다크에서 흰색이 번쩍였음) */
+.hover-row:hover { background: #f8f8f8; }
+
+[data-theme="dark"] {
+  .chip-success  { background: #16301f; color: #7ee2a8; }
+  .chip-error    { background: #3a1f1e; color: #f5928a; }
+  .chip-warn     { background: #3a3016; color: #ffd166; }
+  .chip-neutral  { background: #2a2a2a; color: #bbb; }
+  .chip-muted    { background: #262626; color: #777; }
+
+  .surface-muted { background: #1c1c1c; border-color: #2e2e2e; }
+  .surface-error { background: #3a1f1e; border-color: #6b3a36; color: #f5928a; }
+
+  .placeholder-box { background: #2a2a2a; }
+  .hover-row:hover { background: #262626; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Phase 10 화면(추천 / AI 채팅 / 리포트 커스터마이징) 라이트 모드
+   위 정의들은 다크 전제(#1e1e1e, #eee 등)로 작성돼 라이트에서
+   어두운 카드가 그대로 나왔다. 기존 규칙은 다크용으로 두고
+   라이트일 때만 덮는다. useTheme이 data-theme을 항상 명시하므로 안전.
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  /* ── 추천 페이지 ── */
+  .discover-ai-card   { background: linear-gradient(135deg, #f5efff, #eef2ff); }
+  .discover-ai-title  { color: #6d28d9; }
+  .discover-ai-cost,
+  .discover-ai-arrow,
+  .discover-card-reason { color: #7c3aed; }
+  .discover-genre-tag { color: #6d28d9; }
+  .discover-card      { background: #fff; border-color: #e8e8e6; }
+  .discover-card-poster { background: #f0f0ee; }
+  .discover-btn-wish  { background: #f0f0ee; color: #555; border-color: #e8e8e6; }
+  .discover-btn-wish.done { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
+  .discover-curation-banner { background: #fff; border-color: #e8e8e6; }
+
+  /* ── AI 채팅 ── */
+  .dc-sidebar         { background: #fff; border-right-color: #e8e8e6; }
+  .dc-sidebar-header  { border-bottom-color: #e8e8e6; }
+  .dc-session-item:hover { background: #f0f0ee; }
+  .dc-session-preview { color: #444; }
+  .dc-header          { background: #fff; border-bottom-color: #e8e8e6; }
+  .dc-sidebar-toggle:hover { color: #444; background: #f0f0ee; }
+  .dc-header-title    { color: #6d28d9; }
+  .dc-header-token    { color: #7c3aed; }
+  .dc-starter-btn     { background: #fff; border-color: #e8e8e6; color: #444; }
+  .dc-starter-btn:hover { background: #f5f5f5; }
+  .dc-bubble-left     { background: #fff; border-color: #e8e8e6; color: #1a1a1a; }
+  .dc-typing span     { background: #aaa; }
+  .dc-work-card       { background: #fff; border-color: #e8e8e6; }
+  .dc-work-poster     { background: #f0f0ee; }
+  .dc-work-reason     { color: #7c3aed; }
+  .dc-btn-wish        { background: #f0f0ee; color: #666; border-color: #e8e8e6; }
+  .dc-input-bar       { background: #fff; border-top-color: #e8e8e6; }
+  .dc-input           { background: #fff; border-color: #e8e8e6; color: #1a1a1a; }
+  .dc-send-btn:disabled { background: #ccc; }
+
+  /* ── 리포트 커스터마이징 ── */
+  .report-tmpl-select { background: #fff; border-color: #e8e8e6; color: #1a1a1a; }
+  .rc-token, .rc-cost { color: #7c3aed; }
+  .rc-ai-section      { background: #f5efff; }
+  .rc-ai-label        { color: #6d28d9; }
+  .rc-ai-input        { background: #fff; border-color: #e8e8e6; color: #1a1a1a; }
+  .rc-item            { background: #fff; border-color: #e8e8e6; }
+  .rc-name-input      { background: #fff; border-color: #e8e8e6; color: #1a1a1a; }
+  .rc-error           { color: #c0392b; }
+  .rc-preview         { background: #fff; border-color: #e8e8e6; }
+  .rc-preview-title   { color: #6d28d9; }
+  .rc-preview-item    { color: #444; }
+  .rc-preview-item strong { color: #1a1a1a; }
+  .rc-confirm-box     { background: #fff; border-color: #e8e8e6; }
+  .rc-confirm-msg     { color: #444; }
+}

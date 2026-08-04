@@ -30,9 +30,9 @@ const OTT_OPTIONS = [
 
 /** 신뢰도에 따른 색상 */
 function ConfidenceBadge({ confidence }) {
-  if (confidence >= 0.7) return <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6, background: '#e8f5e9', color: '#2e7d32' }}>✓ 높음</span>;
-  if (confidence >= 0.5) return <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6, background: '#fff8e1', color: '#f57f17' }}>△ 보통</span>;
-  return <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6, background: '#fce4ec', color: '#c62828' }}>✗ 낮음</span>;
+  if (confidence >= 0.7) return <span className="chip-success" style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6 }}>✓ 높음</span>;
+  if (confidence >= 0.5) return <span className="chip-warn" style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6 }}>△ 보통</span>;
+  return <span className="chip-error" style={{ fontSize: 10, padding: '2px 6px', borderRadius: 6 }}>✗ 낮음</span>;
 }
 
 /** 실패 항목 수동 재검색 인라인 컴포넌트 */
@@ -394,8 +394,8 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
                       </div>
 
                       {/* 포스터 */}
-                      <div style={{ width: 32, height: 48, borderRadius: 4, overflow: 'hidden',
-                        background: '#f0f0ee', flexShrink: 0 }}>
+                      <div className="placeholder-box" style={{ width: 32, height: 48, borderRadius: 4, overflow: 'hidden',
+                        flexShrink: 0 }}>
                         {r?.poster_url && (
                           <img src={r.poster_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={r?.title} />
                         )}
@@ -426,8 +426,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
                       {/* 우측 버튼/배지 */}
                       <div style={{ flexShrink: 0, display: 'flex', gap: 4, alignItems: 'center' }}>
                         {isAdded ? (
-                          <span style={{ fontSize: 11, padding: '2px 8px', background: '#e8f5e9',
-                            color: '#2e7d32', borderRadius: 6 }}>
+                          <span className="chip-success" style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6 }}>
                             {r.in_my_list ? '이미 있음' : '추가됨'}
                           </span>
                         ) : (

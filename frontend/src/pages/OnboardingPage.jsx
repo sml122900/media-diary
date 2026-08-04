@@ -268,8 +268,8 @@ function ScreenshotStep({ onAddedCount, onSkip }) {
       </p>
 
       {addedN > 0 && (
-        <div style={{ padding: '12px 16px', background: '#e8f5e9', borderRadius: 10, marginBottom: 16,
-          fontSize: 14, color: '#2e7d32', fontWeight: 600 }}>
+        <div className="chip-success" style={{ padding: '12px 16px', borderRadius: 10, marginBottom: 16,
+          fontSize: 14, fontWeight: 600 }}>
           ✓ 스크린샷에서 {addedN}편 추가됨
         </div>
       )}
