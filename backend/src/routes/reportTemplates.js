@@ -273,7 +273,13 @@ ${componentInstructions}
       output_tokens: message.usage?.output_tokens,
     }).catch(err => console.error('토큰 차감 실패 (preview):', err.message));
 
-    res.json({ success: true, data: { content: message.content[0].text } });
+    res.json({
+      success: true,
+      data: {
+        content: message.content[0].text,
+        token_balance: req.tokenInfo.balance - req.tokenInfo.required,
+      },
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -329,7 +335,13 @@ ${codeList}
       selected = Object.keys(REPORT_COMPONENTS).slice(0, 5);
     }
 
-    res.json({ success: true, data: { components: selected } });
+    res.json({
+      success: true,
+      data: {
+        components: selected,
+        token_balance: req.tokenInfo.balance - req.tokenInfo.required,
+      },
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
 import InsufficientTokensModal from '../components/InsufficientTokensModal';
+import useTokenStore from '../store/tokenStore';
 
 const API = import.meta.env.VITE_API_URL;
 const BASE = `${API}/api`;
@@ -36,6 +37,7 @@ function previewText(content) {
 export default function ReportsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const setBalance = useTokenStore(s => s.setBalance);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState(null); // 현재 열린 리포트
@@ -88,6 +90,8 @@ export default function ReportsPage() {
         { headers: headers() }
       );
       const report = res.data.data;
+      // 차감 후 잔액을 헤더 배지에 즉시 반영
+      if (res.data.meta?.token_balance !== undefined) setBalance(res.data.meta.token_balance);
       // 목록 갱신 (이미 있으면 replace, 없으면 prepend)
       setReports(prev => {
         const idx = prev.findIndex(r => r.period === report.period);

@@ -8,6 +8,7 @@ import { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import InsufficientTokensModal from './InsufficientTokensModal';
 import TokenIcon from './TokenIcon';
+import useTokenStore from '../store/tokenStore';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -126,6 +127,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
   const [reSearchIdx, setReSearchIdx] = useState(null); // 재검색 중인 항목 index
   const [dragOver, setDragOver] = useState(false);
   const [tokenError, setTokenError] = useState(null);
+  const setBalance = useTokenStore(s => s.setBalance);
   const fileInputRef = useRef(null);
 
   /** 파일 추가 처리 (중복 제거, 최대 10장) */
@@ -175,6 +177,8 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
       const data = res.data.data || [];
       setResults(data);
       if (res.data.message) setMessage(res.data.message);
+      // 차감 후 잔액을 헤더 배지에 즉시 반영 (결과가 비어도 토큰은 이미 차감됨)
+      if (res.data.meta?.token_balance !== undefined) setBalance(res.data.meta.token_balance);
 
       // 내 목록에 없고 신뢰도 50% 이상인 항목 자동 선택
       const autoSelected = new Set(

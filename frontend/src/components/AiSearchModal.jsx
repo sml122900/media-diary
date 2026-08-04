@@ -8,6 +8,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import InsufficientTokensModal from './InsufficientTokensModal';
 import { findExistingMedia } from '../utils/mediaMatch';
+import useTokenStore from '../store/tokenStore';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -27,6 +28,7 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
   const [error, setError] = useState('');
   const [addedIds, setAddedIds] = useState(new Set());
   const [tokenError, setTokenError] = useState(null);
+  const setBalance = useTokenStore(s => s.setBalance);
 
   const handleSearch = async () => {
     if (!query.trim() || searching) return;
@@ -43,6 +45,8 @@ export default function AiSearchModal({ onClose, onAdd, existingItems }) {
       );
       setResults(res.data.data || []);
       setExplanation(res.data.meta?.explanation || '');
+      // 차감 후 잔액을 헤더 배지에 즉시 반영
+      if (res.data.meta?.token_balance !== undefined) setBalance(res.data.meta.token_balance);
     } catch (err) {
       if (err.response?.status === 402) {
         setTokenError(err.response.data);

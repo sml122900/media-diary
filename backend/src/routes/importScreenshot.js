@@ -229,10 +229,12 @@ router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10
     }
 
     if (allExtracted.length === 0) {
+      // 이 시점에 이미 토큰이 차감됐으므로 잔액도 함께 내려준다
       return res.json({
         success: true,
         data: [],
         message: '이미지에서 작품 제목을 찾지 못했습니다. OTT 시청 목록이나 작품 썸네일 화면을 사용해보세요.',
+        meta: { token_balance: req.tokenInfo.balance - req.tokenInfo.required },
       });
     }
 
@@ -278,7 +280,11 @@ router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10
     // 신뢰도 내림차순 정렬
     results.sort((a, b) => b.confidence - a.confidence);
 
-    res.json({ success: true, data: results });
+    res.json({
+      success: true,
+      data: results,
+      meta: { token_balance: req.tokenInfo.balance - req.tokenInfo.required },
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   } finally {

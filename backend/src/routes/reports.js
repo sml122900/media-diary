@@ -204,7 +204,12 @@ ${componentInstructions}
       [req.user.id, period, content]
     );
 
-    res.json({ success: true, data: saved[0], cached: false });
+    res.json({
+      success: true,
+      data: saved[0],
+      cached: false,
+      meta: { token_balance: req.tokenInfo.balance - req.tokenInfo.required },
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
