@@ -82,4 +82,21 @@ async function deductTokens(userId, tokenInfo, claudeUsage = {}) {
   }
 }
 
-module.exports = { requireTokens, deductTokens };
+/**
+ * 토큰 차감 없이 사용 로그만 남긴다.
+ * AI 호출은 했지만 사용자에게 돌려줄 결과가 하나도 없어 과금하지 않는 경우에 쓴다.
+ * 집계 쿼리가 모두 SUM(tokens_used) 기반이라 0은 어떤 수치도 왜곡하지 않으면서
+ * 발생 빈도는 metadata로 추적할 수 있다 (남용 여부 판단용).
+ * @param {number} userId
+ * @param {string} feature
+ * @param {object} metadata
+ */
+async function logZeroUsage(userId, feature, metadata = {}) {
+  await pool.query(
+    `INSERT INTO token_usage_log (user_id, feature, tokens_used, metadata)
+     VALUES ($1, $2, 0, $3)`,
+    [userId, feature, JSON.stringify(metadata)]
+  );
+}
+
+module.exports = { requireTokens, deductTokens, logZeroUsage };

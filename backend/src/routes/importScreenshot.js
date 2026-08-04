@@ -12,7 +12,7 @@ const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
-const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
+const { requireTokens, deductTokens, logZeroUsage } = require('../middleware/tokenCheck');
 const { getExtractionPrompt } = require('../services/screenshotPrompts');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -210,11 +210,6 @@ router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10
       })
     );
 
-    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
-    deductTokens(req.user.id, req.tokenInfo, {
-      metadata: { image_count: files.length },
-    }).catch(err => console.error('토큰 차감 실패 (screenshot):', err.message));
-
     // 전체 추출 결과 병합 + 제목 기준 중복 제거
     const seenTitles = new Set();
     const allExtracted = [];
@@ -228,15 +223,28 @@ router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10
       }
     }
 
+    // 한 장도 인식하지 못했으면 사용자에게 줄 결과가 없으므로 차감하지 않는다.
+    // (차감 후 환급하는 방식은 deductTokens가 fire-and-forget이라 환급이 먼저
+    //  커밋되면 잔액이 늘어나는 레이스가 생겨, 애초에 차감하지 않는 쪽을 택했다)
     if (allExtracted.length === 0) {
-      // 이 시점에 이미 토큰이 차감됐으므로 잔액도 함께 내려준다
+      logZeroUsage(req.user.id, 'screenshot', {
+        image_count: files.length,
+        empty_result: true,
+      }).catch(err => console.error('빈 결과 로그 기록 실패 (screenshot):', err.message));
+
       return res.json({
         success: true,
         data: [],
         message: '이미지에서 작품 제목을 찾지 못했습니다. OTT 시청 목록이나 작품 썸네일 화면을 사용해보세요.',
-        meta: { token_balance: req.tokenInfo.balance - req.tokenInfo.required },
+        meta: { token_balance: req.tokenInfo.balance },  // 차감 없음 → 원래 잔액
       });
     }
+
+    // 결과가 하나라도 있으면 차감 (실패해도 사용자 응답은 정상 반환)
+    // 일부 이미지만 인식된 경우도 결과가 있으므로 요청당 5토큰을 정상 차감한다
+    deductTokens(req.user.id, req.tokenInfo, {
+      metadata: { image_count: files.length, extracted_count: allExtracted.length },
+    }).catch(err => console.error('토큰 차감 실패 (screenshot):', err.message));
 
     // 각 추출 작품을 TMDB로 매칭 (병렬)
     const results = await Promise.all(
