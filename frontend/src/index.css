@@ -332,6 +332,9 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .chart-card {
   background: #fff; border: 1px solid #e8e8e6; border-radius: 12px;
   padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  /* 그리드 아이템 기본값 min-width:auto면 캘린더(약 793px)의 min-content만큼 트랙이 벌어져
+     ResponsiveContainer가 그 폭을 측정·고정 → 페이지 전체가 가로로 넘침 */
+  min-width: 0;
 }
 .chart-card-wide { grid-column: 1 / -1; }
 .chart-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 16px; }

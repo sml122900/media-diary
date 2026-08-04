@@ -17,6 +17,17 @@ import { useTheme } from '../hooks/useTheme';
 const PIE_COLORS = { movie: '#1a1a1a', anime: '#4a90d9', drama: '#e07a3f' };
 const TYPE_LABEL = { movie: '영화', anime: '애니메이션', drama: '드라마' };
 
+// 연대별 바 색상 — 다크에서 #1a1a1a가 카드 배경(#1c1c1c)에 묻혀 테마별로 분기
+const BAR_COLOR = { light: '#1a1a1a', dark: '#a78bfa' };
+
+// 감상 활동 캘린더 색 단계 (0편 → 5편 이상)
+// 다크는 GitHub 다크 잔디색 + 빈 셀만 카드 테두리 톤(#2e2e2e)으로 맞춤
+// (GitHub 원본 #161b22는 카드 배경 #1c1c1c보다 어두워 셀이 안 보임)
+const CALENDAR_SCALE = {
+  light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
+  dark:  ['#2e2e2e', '#0e4429', '#006d32', '#26a641', '#39d353'],
+};
+
 /** 커스텀 파이차트 라벨 */
 function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) {
   if (percent < 0.05) return null;
@@ -33,6 +44,9 @@ function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, name })
 
 /** GitHub 잔디 스타일 감상 활동 캘린더 */
 function ActivityCalendar({ items }) {
+  const { theme } = useTheme();
+  const scale = CALENDAR_SCALE[theme] || CALENDAR_SCALE.light;
+
   // 최근 52주 날짜 생성
   const weeks = useMemo(() => {
     const today = new Date();
@@ -62,11 +76,11 @@ function ActivityCalendar({ items }) {
   }, [items]);
 
   const getColor = (count) => {
-    if (count === 0) return '#ebedf0';
-    if (count === 1) return '#9be9a8';
-    if (count === 2) return '#40c463';
-    if (count <= 4) return '#30a14e';
-    return '#216e39';
+    if (count === 0) return scale[0];
+    if (count === 1) return scale[1];
+    if (count === 2) return scale[2];
+    if (count <= 4) return scale[3];
+    return scale[4];
   };
 
   const DAY_LABELS = ['일', '', '화', '', '목', '', '토'];
@@ -88,7 +102,7 @@ function ActivityCalendar({ items }) {
               return (
                 <div
                   key={di}
-                  style={{ width: 12, height: 12, borderRadius: 2, background: day ? getColor(day.count) : '#ebedf0' }}
+                  style={{ width: 12, height: 12, borderRadius: 2, background: day ? getColor(day.count) : scale[0] }}
                   title={day ? `${day.date}: ${day.count}편` : ''}
                 />
               );
@@ -98,7 +112,7 @@ function ActivityCalendar({ items }) {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, justifyContent: 'flex-end' }}>
         <span style={{ fontSize: 11, color: '#888' }}>적음</span>
-        {['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'].map(c => (
+        {scale.map(c => (
           <div key={c} style={{ width: 12, height: 12, borderRadius: 2, background: c }} />
         ))}
         <span style={{ fontSize: 11, color: '#888' }}>많음</span>
@@ -159,10 +173,12 @@ export default function StatsPage() {
     items.forEach(i => {
       if (!i.year || i.year < 1900) return;
       const decade = Math.floor(i.year / 10) * 10;
-      const key = `${decade}s`;
-      counts[key] = (counts[key] || 0) + 1;
+      counts[decade] = (counts[decade] || 0) + 1;
     });
-    return Object.entries(counts).sort(([a], [b]) => Number(a) - Number(b)).map(([name, count]) => ({ name, count }));
+    // 연대 숫자로 오름차순 정렬 (기존엔 '1980s' 문자열을 Number()로 변환해 NaN → 정렬 무효화)
+    return Object.entries(counts)
+      .map(([decade, count]) => ({ decade: Number(decade), name: `${decade}s`, count }))
+      .sort((a, b) => a.decade - b.decade);
   }, [items]);
 
   // 별점 분포 바 차트
@@ -314,7 +330,7 @@ export default function StatsPage() {
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip formatter={(v) => [`${v}편`]} />
-              <Bar dataKey="count" fill="#1a1a1a" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" fill={BAR_COLOR[theme] || BAR_COLOR.light} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
