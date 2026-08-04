@@ -149,19 +149,27 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - 배포/검색 버그 수정 묶음 (2026-07-30): Vercel SPA 404 (vercel.json), TMDB 단일검색 페이지네이션 누락 (3페이지 병합), 검색 띄어쓰기 미스매치 (내 목록 정규화 + TMDB 공백 삽입 fallback), 토큰 잔액 🪙 이모지 tofu 렌더링 → SVG 아이콘(TokenIcon) 교체
 - 모바일 메뉴 오버레이 드로어 전환 (2026-08-02): 600px 이하에서 헤더 드롭다운이 뷰포트를 −6px 이탈해 항목 첫 글자가 잘리던 문제를 `position: fixed` 우측 드로어 + 백드롭으로 해결, 데스크톱 무변경. 실기기(갤럭시) APK 설치로 동작 확인 완료
 
+- 실기기 전수 테스트 + 발견 이슈 수정 (2026-08-05): 갤럭시 SM-S942N(Android 16)에서 7개 항목 점검 → 통계 페이지 가로 깨짐(`.chart-card min-width:0`), 연대별 정렬 NaN, 다크모드 하드코딩 색상 일괄 정리, Phase 10 라이트 모드 지원(`useTheme` 루트 호출), 모달 뒤로가기, 토큰 배지 즉시 갱신, 스크린샷 빈 결과 무차감. 커밋 `0a037e2`·`060ae76`·`aebed00`·`af041c2`
+
 **진행 중:** Phase 11 (Google Play Store 출시) — Stage 11.2 Capacitor 셋업 (실기기 빌드·설치·동작 확인까지 완료)
 
 **예정:**
 - Phase 9 운영 전환 (사업자 등록 → 토스 정식 계약 → 운영 키 교체)
 - 배포 (Render 백엔드 + Vercel 프론트엔드) — VITE_TOSS_CLIENT_KEY, TOSS_SECRET_KEY 환경변수 추가 필요
 - 브라우저 UI 결제 플로우 테스트 (결제 취소 시나리오)
-- 모바일 실기기 UI 점검 (Phase 6+7+9+10 포함) — 메뉴 드로어는 2026-08-02 확인 완료, 나머지 화면 미점검
+- ~~모바일 실기기 UI 점검~~ → 2026-08-05에 홈·메뉴·검색·AI 검색·통계·뒤로가기·이모지 점검 완료. **피드/프로필/위시리스트/리스트/온보딩/결제 화면은 여전히 미점검**
 - Letterboxd CSV 실제 파일로 파싱 검증
 
 **후속 조치 (2026-08-02 세션에서 발생):**
 - ~~Adoptium Temurin 21 설치 + `JAVA_HOME` 전환~~ → **완료.** 플래그 없이 `assembleDebug` 성공(27초), 실기기 재설치까지 검증
-- ~~`~/.android/debug.keystore` 백업~~ → **완료**
+- ~~`~/.android/debug.keystore` 백업~~ → **완료** (2026-08-05 재설치 6회 모두 `install -r`로 처리되어 효과 확인)
 - 릴리스 keystore는 Stage 11.4 생성 시 클라우드+로컬 이중 백업 (**생성 직후·첫 업로드 이전**에 수행)
+
+**후속 조치 (2026-08-05 세션에서 발생):**
+- **배포 후 4개 경로 검증 필요** — 이번 백엔드 변경분(스크린샷·리포트 `token_balance`, 빈 결과 무차감)은 Render 배포 전이라 미검증. AI 검색 / 스크린샷 정상 인식 / **스크린샷 빈 결과(배지 유지 확인)** / 리포트 생성·미리보기
+- **C. AI 검색 결과 매칭 오류** — AI 해석은 정확한데 TMDB 제목 매칭이 엉뚱한 동명 작품을 반환(예: "우주 배경의 잔잔한 SF" → *The Arrival*(2017), *Arrival*(2013, 산악자전거 다큐)). 줄거리도 영문으로 내려옴
+- **종료 확인 다이얼로그 영문 버튼** — 네이티브 `confirm()`이라 CANCEL/OK가 영문. Play 출시 전 커스텀 다이얼로그 권장
+- 빈 결과 남용 여부는 `token_usage_log`의 `metadata.empty_result` 누적치를 보고 판단 (일일 상한은 현재 미도입)
 
 **블로킹 이슈:** 없음
 
@@ -293,6 +301,15 @@ CREATE TABLE user_media (
 | 2026-08-02 | keystore 백업 정책 — debug는 로컬 백업, 릴리스는 Stage 11.4 생성 시 클라우드+로컬 이중 백업 | debug keystore 소실로 기존 설치본 업데이트 불가 사고 발생, 릴리스 keystore 분실 시 Play Store 앱 업데이트 영구 불가 | 백업 없이 진행 |
 | 2026-08-02 | 모바일 메뉴는 오버레이 드로어(fixed + 백드롭), 데스크톱은 기존 드롭다운 유지 | 좁은 화면에서 absolute 드롭다운은 버튼 위치에 따라 뷰포트를 벗어남, 미디어쿼리 분기로 데스크톱 회귀 위험 제거 | 드롭다운 위치만 보정(clamp), 전 해상도 드로어 통일 |
 | 2026-07-30 | 이모지 대신 인라인 SVG 아이콘(TokenIcon) 사용 | 🪙(Unicode 13.0)가 구형 Android WebView에서 tofu로 깨짐, Capacitor 배포 대비 | lucide-react 라이브러리 추가 |
+| 2026-08-05 | 스크린샷 인식 0건 시 **환급이 아니라 차감 시점을 뒤로 이동** | `deductTokens`가 fire-and-forget이라 환급 트랜잭션이 먼저 커밋되면 잔액이 오히려 늘어나는 레이스 발생. 환급하려면 `await`로 바꿔야 하는데 "차감 실패해도 응답은 정상 반환" 의도가 깨짐. 되돌릴 일을 안 만들면 트랜잭션·정합성·남용 문제가 모두 소멸 | 차감 후 환급(트랜잭션 + 음수 보정 로그) |
+| 2026-08-05 | 빈 결과 일일 환급 상한 생략, `metadata.empty_result` 0토큰 로그로 대체 | 상한은 "N회 초과 시 빈 결과인데 차감"이라는 설명하기 어려운 UX를 만듦. 집계가 전부 `SUM(tokens_used)` 기반이라 0토큰 행은 수치를 왜곡하지 않으면서 발생 빈도만 남김 → 출시 후 실데이터로 판단 | 일일 5회 상한 즉시 도입 |
+| 2026-08-05 | 링크색은 `a { color: inherit }`, 다크 오버라이드 미사용 | `[data-theme="dark"] a`는 특정도 (0,1,1)이라 클래스 규칙 (0,1,0)을 이겨 클래스 지정 색까지 덮어버림. `inherit`은 라이트 값이 기존과 동일해 회귀도 없음 | `[data-theme="dark"] a { color: #e8e8e8 }` 추가 |
+| 2026-08-05 | `useTheme()`을 App 루트에서 호출 | 페이지별 호출이라 미호출 페이지(/discover 등)를 직접 열면 `data-theme`이 없어 테마 규칙이 하나도 적용 안 됨 — Phase 10 화면이 다크로 하드코딩된 근본 원인 | 각 페이지에 개별 추가 |
+| 2026-08-05 | Phase 10 라이트 대응은 `[data-theme="light"]` 오버라이드 블록 추가 | 기존 다크 정의(~50개 규칙)가 이미 올바르게 동작 중이라, 값을 라이트로 바꾸고 다크를 다시 얹으면 회귀 위험이 큼 | 기존 규칙을 라이트 기본값으로 재작성 + 다크 오버라이드 |
+| 2026-08-05 | 캘린더 다크 빈 셀은 `#2e2e2e` (GitHub 원본 `#161b22` 미사용) | 원본은 카드 배경 `#1c1c1c`보다 어두워 셀이 아예 안 보임. `#2e2e2e`는 이 프로젝트가 다크 테두리에 이미 쓰는 톤이라 자연스럽게 이어짐 | GitHub 다크 팔레트 그대로 사용 |
+| 2026-08-05 | 안드로이드 뒤로가기는 최상단 백드롭 `click()` 재사용 | 오버레이 11곳이 모두 `onClick={e => e.target === e.currentTarget && onClose()}` 동일 구조 → "뒤로가기 = 바깥 탭"으로 의미 통일, 1파일 수정으로 신규 모달까지 자동 커버 | 오버레이 스택 등록(11파일 수정, 신규 모달이 등록 누락 시 앱 종료) |
+| 2026-08-05 | `.chart-card { min-width: 0 }` | 그리드 아이템 기본값 `min-width:auto`가 캘린더 min-content(793px)만큼 트랙을 벌리고, ResponsiveContainer가 그 폭을 인라인으로 고정해 되돌아오지 않음 | 캘린더 폭 축소, ResponsiveContainer 제거 |
+| 2026-08-05 | 실기기 테스트는 관찰 전용, 좌표 탭 금지 | 앱이 백그라운드인 줄 모르고 보낸 `input tap`이 개인 메신저·Play Store·금융 앱으로 새어 들어감(송금 버튼 노출). 화면 캡처·CDP 읽기는 안전하나 맹목적 입력은 위험 | 포그라운드 검증 후 좌표 탭 계속 사용 |
 
 ---
 
@@ -322,6 +339,15 @@ CREATE TABLE user_media (
 | 2026-08-02 | 모바일에서 메뉴 항목 첫 글자 잘림 + 메인 위에 백드롭 없이 겹침 | `right:0` absolute 드롭다운이 wrap된 버튼 기준으로 왼쪽 160px 뻗어 뷰포트 밖(-6px) 이탈 → 600px 이하에서 fixed 우측 오버레이 드로어 + 백드롭으로 전환 |
 | 2026-08-02 | `gradlew assembleDebug` 실패 — `invalid source release: 21` (`:capacitor-android:compileDebugJavaWithJavac`) | **Capacitor 8은 Java 21+ 필요한데 `JAVA_HOME`이 JDK 17이었음.** 임시로 `-Dorg.gradle.java.home=...\Android Studio\jbr`(JDK 25) 우회 → **해결: Adoptium Temurin 21 설치 + `JAVA_HOME` 전환**. 전환 후 플래그 없이 `BUILD SUCCESSFUL in 27s` 검증 완료. 단 환경변수는 Machine 레벨에 등록돼도 실행 중인 셸에는 반영 안 됨(2026-07-20 항목과 동일 현상) → 새 셸/재부팅 필요 |
 | 2026-08-02 | `adb install` 실패 — `INSTALL_FAILED_UPDATE_INCOMPATIBLE: signatures do not match` | 7/31 설치본을 서명한 `~/.android/debug.keystore`가 소실돼 빌드 시 Gradle이 새 keystore를 자동 생성(mtime=빌드 시각) → 서명 불일치. 원본 복구 불가라 `adb uninstall` 후 재설치로 해결(로컬 로그인 세션·화면모드 설정만 소실, 기록은 Supabase 보존). **`~/.android/debug.keystore` 백업 권장 — 분실 시 기존 앱을 제거해야만 재설치 가능.** 릴리스 keystore는 분실 시 Play Store 업데이트가 영구 불가하므로 Stage 11.4에서 클라우드+로컬 이중 백업 |
+| 2026-08-05 | `/stats` 페이지 폭이 411 → 850 CSS px로 늘어나 차트가 화면 밖으로 잘림 | 캘린더 min-content(793px) → `.chart-card`가 그리드 아이템인데 `min-width:auto`라 트랙이 벌어짐 → ResponsiveContainer가 그 폭을 측정해 `.recharts-wrapper`에 인라인 `width:793px` 고정 → 이후 되돌아오지 않음(사후 `min-width:0`·`resize` 모두 무효). `.chart-card { min-width: 0 }`으로 해결 (scrollWidth 850→411, 차트 793→338px) |
+| 2026-08-05 | 연대별 분포 x축이 `1980s…2020s, 1970s` 순으로 1970s가 맨 뒤 | 키가 `'1980s'` 문자열이라 `Number('1980s')`가 **NaN** → 비교 함수가 항상 NaN을 반환해 정렬이 무효화(삽입 순서 유지). 연대 숫자를 키로 집계 후 `a.decade - b.decade` 정렬 |
+| 2026-08-05 | 다크모드에서 연대별 막대·파이 영화 슬라이스가 안 보임 | `fill: #1a1a1a`가 카드 배경 `#1c1c1c`와 대비 1.02. 영화가 전체의 85%라 도넛 대부분이 사라짐 → `BAR_COLOR`/`PIE_COLORS` 테마 분기 |
+| 2026-08-05 | `/discover`, `/discover/chat`, `/reports/customize`가 라이트 모드에서 어두운 카드로 표시 | `useTheme()`이 페이지별 호출인데 이 세 페이지는 미호출 → 직접 열면 `data-theme`이 `undefined`라 테마 규칙이 하나도 적용 안 됨(다크 블록조차). 그래서 값이 다크로 하드코딩돼 있었음 → `App.jsx` 루트에서 `useTheme()` 호출 + `[data-theme="light"]` 오버라이드 추가 |
+| 2026-08-05 | 모달이 열린 상태에서 뒤로가기 → 모달이 안 닫히고 앱 종료 확인으로 직행 | `useAndroidBackButton`이 `location.pathname`만 보고 오버레이 상태를 모름 → 최상단 백드롭을 `click()`해 "바깥 탭"과 동일 처리 후 `return` |
+| 2026-08-05 | AI 기능 사용 후 헤더 토큰 배지가 새로고침 전까지 이전 값 유지 | 차감 지점 대부분이 응답에 잔액을 안 실어 보냄 → 4개 라우트에 `token_balance` 추가 + 프론트 3곳에 `setBalance` 연결. `ReportsCustomizePage`는 `setBalance`를 호출 중이었으나 백엔드가 값을 안 줘 무동작이었음 |
+| 2026-08-05 | 스크린샷 인식 0건인데 5토큰 차감 | `deductTokens`가 빈 결과 체크보다 먼저 호출됨 → 차감 시점을 분기 이후로 이동(환급 아님, 레이스 회피). 기존 피해 이력은 `token_usage_log` 조회 결과 0건 |
+| 2026-08-05 | CDP(`Runtime.evaluate`)가 응답 없이 멈춤 — 크래시로 오인 | ① 앱이 백그라운드로 내려가면 삼성 Freecess가 프로세스를 freeze(`D ActivityManager: freezing <pid>`) ② JS `confirm()` 다이얼로그가 렌더러를 블록. ①은 `am start`로 포그라운드 복귀 후 `adb forward` 재설정, ②는 `Page.enable` + `Page.handleJavaScriptDialog`로 해제 |
+| 2026-08-05 | `adb shell input tap`이 다른 앱(개인 메신저·Play Store·금융 앱)으로 들어감 | 앱이 백그라운드인 줄 모르고 좌표 탭 전송. 금융 앱 송금 버튼이 노출된 화면이라 위험했음 → 탭 전 `topResumedActivity` 검증 필수, 이후 좌표 탭 전면 금지·관찰 전용으로 전환 |
 
 ---
 
