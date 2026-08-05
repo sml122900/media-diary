@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import useAuthStore from './store/authStore';
+import useTokenStore from './store/tokenStore';
 import { useAndroidBackButton } from './hooks/useAndroidBackButton';
 import { useTheme } from './hooks/useTheme';
 import ExitConfirmDialog from './components/ExitConfirmDialog';
@@ -64,7 +65,8 @@ function AndroidBackButtonListener() {
  * 앱 시작 시 localStorage 토큰으로 인증 상태 복원
  */
 function App() {
-  const { init } = useAuthStore();
+  const { init, token } = useAuthStore();
+  const fetchBalance = useTokenStore(s => s.fetchBalance);
 
   // 루트에서 한 번 호출해 어떤 경로로 진입하든 data-theme이 항상 설정되게 한다.
   // 기존엔 페이지별로 호출해서 /discover 등 미호출 페이지를 직접 열면
@@ -75,6 +77,14 @@ function App() {
   useEffect(() => {
     init();
   }, [init]);
+
+  // 잔액도 같은 이유로 루트에서 한 번만 조회한다.
+  // 페이지별로 호출하니 미호출 페이지(/discover/chat 등)를 직접 열면
+  // 잔액 배지가 '···'로 비어 보였다. 차감·충전 후 갱신은 각 화면이
+  // setBalance로 처리하므로 여기서는 최초 1회(로그인 시점)면 충분하다
+  useEffect(() => {
+    if (token) fetchBalance(token);
+  }, [token, fetchBalance]);
 
   return (
     <BrowserRouter>

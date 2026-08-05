@@ -62,6 +62,8 @@ export default function BillingChargePage() {
   const [success, setSuccess] = useState(null);
   const [agreed, setAgreed] = useState(false);
 
+  // 결제 직전 화면이라 App 루트 조회와 별개로 한 번 더 최신 잔액을 받는다
+  // (다른 기기·탭에서 충전했을 수 있어 여기서만은 최신값이 중요하다)
   useEffect(() => {
     if (token) fetchBalance(token);
   }, [token]);

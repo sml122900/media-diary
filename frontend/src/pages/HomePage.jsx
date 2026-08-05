@@ -21,10 +21,10 @@ import { useTheme } from '../hooks/useTheme';
 import useTokenStore from '../store/tokenStore';
 
 export default function HomePage() {
-  const { user, token, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const { balance, fetchBalance } = useTokenStore();
+  const { balance } = useTokenStore();
 
   // 미디어 데이터 + CRUD 훅
   const {
@@ -55,10 +55,7 @@ export default function HomePage() {
   const [toast, setToast] = useState(null); // { text: string }
   const menuRef = useRef(null);
 
-  // 토큰 잔액 초기 로딩
-  useEffect(() => {
-    if (token) fetchBalance(token);
-  }, [token]);
+  // 토큰 잔액 초기 로딩은 App 루트에서 한 번 처리한다
 
   // 메뉴 외부 클릭 시 닫기
   useEffect(() => {

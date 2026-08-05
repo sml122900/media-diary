@@ -20,12 +20,8 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   const { user, token, logout } = useAuthStore();
   const { theme, themePref, setThemePref } = useTheme();
-  const { balance, fetchBalance } = useTokenStore();
-
-  useEffect(() => {
-    const t = localStorage.getItem('token');
-    if (t) fetchBalance(t);
-  }, []);
+  const { balance } = useTokenStore();
+  // 토큰 잔액 초기 로딩은 App 루트에서 한 번 처리한다
 
   const [form, setForm] = useState({
     username: '',

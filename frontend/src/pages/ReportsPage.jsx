@@ -38,7 +38,7 @@ function previewText(content) {
 export default function ReportsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const { balance, fetchBalance, setBalance } = useTokenStore();
+  const { balance, setBalance } = useTokenStore();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState(null); // 현재 열린 리포트
@@ -52,12 +52,6 @@ export default function ReportsPage() {
   // 현재 연월 (기본 생성 대상)
   const now = new Date();
   const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-  // 헤더 잔액 배지 초기 로딩 (홈을 거치지 않고 바로 진입하는 경우 대비)
-  useEffect(() => {
-    const t = localStorage.getItem('token');
-    if (t) fetchBalance(t);
-  }, []);
 
   useEffect(() => {
     axios.get(`${BASE}/me/reports`, { headers: headers() })
@@ -93,7 +87,12 @@ export default function ReportsPage() {
     try {
       const res = await axios.post(
         `${BASE}/me/reports/generate`,
-        { period: currentPeriod, templateId: selectedTmpl || undefined },
+        {
+          period: currentPeriod,
+          templateId: selectedTmpl || undefined,
+          // 이미 있는 기간이면 재생성 요청 — 없으면 서버가 기존 것을 그대로 돌려준다
+          regenerate: hasCurrentReport,
+        },
         { headers: headers() }
       );
       const report = res.data.data;
@@ -167,7 +166,9 @@ export default function ReportsPage() {
             {periodLabel(currentPeriod)} 리포트
           </div>
           <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
-            {hasCurrentReport ? '이미 생성된 리포트가 있습니다. 다시 생성하면 덮어씁니다.' : 'Claude AI가 이달 감상 기록을 분석합니다'}
+            {hasCurrentReport
+              ? '이미 생성된 리포트가 있습니다. 다시 생성하면 덮어쓰고 5토큰이 차감됩니다.'
+              : 'Claude AI가 이달 감상 기록을 분석합니다 · 5토큰 차감'}
           </div>
         </div>
         <button

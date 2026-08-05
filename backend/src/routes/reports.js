@@ -71,14 +71,16 @@ router.get('/:period', auth, async (req, res) => {
 
 /**
  * POST /api/me/reports/generate
- * 리포트 생성 (이미 있으면 기존 반환)
- * body: { period?: "YYYY-MM" }  (없으면 이번 달)
+ * 리포트 생성. 이미 있으면 기존 것을 그대로 반환한다(0토큰).
+ * regenerate: true 면 캐시를 무시하고 새로 만들어 덮어쓴다(5토큰 차감).
+ * body: { period?: "YYYY-MM", templateId?: number, regenerate?: boolean }
  */
 router.post('/generate', auth, requireTokens(5, 'report'), async (req, res) => {
   const now = new Date();
   const defaultPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const period     = req.body.period || defaultPeriod;
   const templateId = req.body.templateId || null; // 선택된 템플릿 ID
+  const regenerate = req.body.regenerate === true; // 캐시 무시하고 다시 생성
 
   // 기간 형식 검증
   if (!/^\d{4}-\d{2}$/.test(period)) {
@@ -86,13 +88,18 @@ router.post('/generate', auth, requireTokens(5, 'report'), async (req, res) => {
   }
 
   try {
-    // 이미 생성된 리포트 확인
-    const { rows: existing } = await pool.query(
-      'SELECT * FROM ai_reports WHERE user_id = $1 AND period = $2',
-      [req.user.id, period]
-    );
-    if (existing[0]) {
-      return res.json({ success: true, data: existing[0], cached: true });
+    // 이미 생성된 리포트 확인 — 캐시 조회는 Claude를 부르지 않으므로 0토큰이다.
+    // 재생성 요청이면 이 조기 반환을 건너뛰어야 아래 INSERT의
+    // ON CONFLICT DO UPDATE(덮어쓰기)에 도달한다. 건너뛰지 않으면
+    // "다시 생성" 버튼이 기존 리포트를 그대로 돌려주기만 한다
+    if (!regenerate) {
+      const { rows: existing } = await pool.query(
+        'SELECT * FROM ai_reports WHERE user_id = $1 AND period = $2',
+        [req.user.id, period]
+      );
+      if (existing[0]) {
+        return res.json({ success: true, data: existing[0], cached: true });
+      }
     }
 
     // 해당 기간 감상 항목 조회 (watched_at 기준)
