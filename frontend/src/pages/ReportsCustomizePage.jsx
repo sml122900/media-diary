@@ -114,9 +114,15 @@ export default function ReportsCustomizePage() {
       const res = await axios.post(`${BASE}/api/reports/customize-chat`,
         { description: aiInput }, { headers: h() });
       const codes = res.data.data?.components || [];
-      setSelected(new Set(codes));
       if (res.data.data?.token_balance !== undefined) setBalance(res.data.data.token_balance);
-      setAiInput('');
+      if (codes.length > 0) {
+        setSelected(new Set(codes));
+        setMessage('');
+        setAiInput('');
+      } else {
+        // 빈 결과 — 기존 선택을 덮어써 지우지 않는다. 입력도 그대로 두어 바로 고쳐 쓸 수 있게 한다
+        setMessage(res.data.message || '설명에 맞는 항목을 찾지 못했습니다. 다르게 표현해보세요.');
+      }
     } catch (err) {
       if (err.response?.status === 402) setTokenError(err.response.data);
     }

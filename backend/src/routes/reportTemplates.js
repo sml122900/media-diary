@@ -14,7 +14,7 @@ const router = express.Router();
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
-const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
+const { requireTokens, deductTokens, logZeroUsage } = require('../middleware/tokenCheck');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -319,12 +319,6 @@ ${codeList}
       }],
     });
 
-    // AI 호출 성공 → 토큰 차감
-    deductTokens(req.user.id, req.tokenInfo, {
-      input_tokens: message.usage?.input_tokens,
-      output_tokens: message.usage?.output_tokens,
-    }).catch(err => console.error('토큰 차감 실패 (report_chat):', err.message));
-
     let selected = [];
     try {
       const text = message.content[0].text.trim();
@@ -334,6 +328,32 @@ ${codeList}
     } catch {
       selected = Object.keys(REPORT_COMPONENTS).slice(0, 5);
     }
+
+    // 유효한 항목이 하나도 안 남으면 사용자에게 줄 결과가 없으므로 차감하지 않는다.
+    // (파싱 자체가 실패한 경우는 위 catch에서 기본 5개로 폴백하므로 여기 오지 않는다.
+    //  즉 0건은 AI가 우리 코드 목록에 없는 값을 돌려준 경우 — 우리 쪽 실패다)
+    // 검색·스크린샷과 동일하게 환급이 아니라 차감 시점을 뒤로 미루는 방식이다.
+    if (selected.length === 0) {
+      logZeroUsage(req.user.id, 'report_chat', {
+        description: description.trim().slice(0, 100),  // 실패 입력 추적용
+        empty_result: true,
+      }).catch(err => console.error('빈 결과 로그 기록 실패 (report_chat):', err.message));
+
+      return res.json({
+        success: true,
+        data: {
+          components: [],
+          token_balance: req.tokenInfo.balance,  // 차감 없음 → 원래 잔액
+        },
+        message: '설명에 맞는 항목을 찾지 못했습니다. 다르게 표현해보세요.',
+      });
+    }
+
+    // 결과가 있으면 차감 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: message.usage?.input_tokens,
+      output_tokens: message.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (report_chat):', err.message));
 
     res.json({
       success: true,

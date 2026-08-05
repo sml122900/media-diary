@@ -1,0 +1,23 @@
+# 줄바꿈 정책 — Gradle / Capacitor 생성 파일은 LF 고정
+#
+# 이 저장소는 core.autocrlf=true 인 Windows 환경에서 개발한다.
+# git이 체크아웃하며 이 파일들을 CRLF로 되돌려 놓으면, capacitor sync와
+# gradle이 같은 파일을 다시 LF로 덮어써서 "내용은 같은데 modified" 상태가
+# 반복된다. 실제 변경을 놓치기 쉬워 LF로 못 박는다.
+*.gradle           text eol=lf
+gradle.properties  text eol=lf
+gradlew            text eol=lf
+
+# Windows 배치 스크립트는 CRLF여야 실행된다
+gradlew.bat        text eol=crlf
+*.bat              text eol=crlf
+
+# 바이너리 — 줄바꿈 변환 금지
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.webp     binary
+*.jar      binary
+*.keystore binary
+*.apk      binary
+*.aab      binary
