@@ -10,20 +10,42 @@ const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
 const { requireTokens, deductTokens, logZeroUsage } = require('../middleware/tokenCheck');
-
-const TMDB_BASE = 'https://api.themoviedb.org/3';
-const TMDB_KEY = process.env.TMDB_API_KEY;
-const IMG_BASE = 'https://image.tmdb.org/t/p/w300';
+const { matchWork } = require('../utils/tmdbMatch');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-/** TMDB API GET 요청 — path 경로로 GET 요청 후 JSON 반환 */
-async function tmdbGet(path, params = {}) {
-  const qs = new URLSearchParams({ ...params, api_key: TMDB_KEY }).toString();
-  const res = await fetch(`${TMDB_BASE}${path}?${qs}`);
-  if (!res.ok) return null;
-  return res.json();
-}
+/**
+ * Claude가 반드시 호출해야 하는 도구.
+ * 예전엔 텍스트로 JSON을 요청하고 정규식으로 뽑았는데, 스키마 강제가 없어
+ * "Hong Kong noir 1990s"(장르 설명어)나 "Christopher Nolan"(인물명) 같은
+ * 검색 불가능한 값이 그대로 내려왔다. TMDB는 제목 색인이라 그런 값은 0건이 된다.
+ * 연도·원제를 required로 받아야 TMDB 매칭을 검증할 기준도 생긴다.
+ */
+const SUGGEST_TOOL = {
+  name: 'suggest_works',
+  description: '검색어에 맞는 실제 작품 목록을 제안한다',
+  input_schema: {
+    type: 'object',
+    properties: {
+      explanation: { type: 'string', description: '검색 해석 (한국어 15자 이내)' },
+      works: {
+        type: 'array',
+        description: '실제로 존재하는 작품 3~8개',
+        items: {
+          type: 'object',
+          properties: {
+            title:          { type: 'string',  description: '한국어 제목 (없으면 통용 표기)' },
+            original_title: { type: 'string',  description: '원제' },
+            year:           { type: 'integer', description: '개봉·방영 연도' },
+            tmdb_type:      { type: 'string',  enum: ['movie', 'tv'] },
+          },
+          required: ['title', 'original_title', 'year', 'tmdb_type'],
+        },
+      },
+    },
+    required: ['explanation', 'works'],
+  },
+};
 
 /**
  * POST /api/search/natural
@@ -38,78 +60,54 @@ router.post('/natural', auth, requireTokens(1, 'search'), async (req, res) => {
 
   try {
     // Claude API로 검색 의도 분석
-    // TMDB는 제목 기반 검색이므로, 설명형 쿼리는 대표 작품명으로 변환해야 함
+    // TMDB는 제목 기반 검색이므로, 설명형 쿼리를 실제 작품명으로 변환해야 한다.
+    // 예시로 실제 작품명을 들면 AI가 그 예시를 그대로 답으로 뱉는 회차가 있어
+    // (사용자가 본 Arrival 결과가 그 사례로 보인다) 예시는 형식만 보여준다.
     const message = await claude.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
+      max_tokens: 600,
       messages: [{
         role: 'user',
-        content: `영화/드라마/애니 검색 도우미입니다. TMDB는 제목으로 검색하므로 구체적인 작품명이 필요합니다.
+        content: `영화/드라마/애니 검색 도우미입니다.
 
 검색어: "${query}"
 
-다음 JSON만 출력하세요 (마크다운 없이, 설명 없이):
-{"keywords":"영어 작품 제목 또는 핵심 단어 (TMDB에서 검색될 실제 제목, 예: Arrival, Parasite)","korean_keywords":"한국어 작품 제목 또는 키워드","type":"movie 또는 tv 또는 both","explanation":"검색 해석 (한국어 15자 이내)"}`,
+이 검색어에 해당하는 **실제로 존재하는 작품**을 3~8개 제안하세요.
+장르명·감독명·분위기 설명이 아니라 반드시 개별 작품의 제목이어야 합니다.
+(예: "홍콩 느와르"가 아니라 그 장르의 실제 작품 제목들)
+각 작품의 원제와 개봉 연도를 정확히 채우세요.
+suggest_works 도구로만 답하세요.`,
       }],
+      tools: [SUGGEST_TOOL],
+      tool_choice: { type: 'any' }, // 반드시 도구 호출
     });
 
-    // Claude 응답 파싱
-    let parsed;
-    try {
-      const text = message.content[0].text.trim();
-      // JSON 블록만 추출
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
-    } catch {
-      // 파싱 실패 시 원본 쿼리로 fallback
-      parsed = { keywords: query, korean_keywords: query, type: 'both', explanation: query };
+    const toolUse = message.content.find(b => b.type === 'tool_use');
+    if (!toolUse) {
+      throw new Error('Claude가 도구를 호출하지 않았습니다.');
     }
 
-    const { keywords, korean_keywords, type, explanation } = parsed;
+    const { explanation, works: rawWorks } = toolUse.input;
 
-    // 쉼표 구분 키워드를 개별 검색어로 분리
-    const kwList = keywords.split(',').map(k => k.trim()).filter(Boolean).slice(0, 4);
-    const koKwList = korean_keywords
-      ? korean_keywords.split(',').map(k => k.trim()).filter(Boolean).slice(0, 4)
-      : [];
+    // 각 작품을 TMDB에서 검증 — 매칭에 실패한 항목은 결과에서 뺀다.
+    // 엉뚱한 동명 작품을 보여주느니 빼는 편이 낫다
+    const matched = await Promise.all((rawWorks || []).slice(0, 8).map(w => matchWork(w)));
 
-    const searchType = type === 'movie' ? ['movie'] : type === 'tv' ? ['tv'] : ['movie', 'tv'];
     const seen = new Set();
-    const allResults = [];
-
-    // 각 키워드를 개별 TMDB 검색 (영어+한국어)
-    const searchTasks = [];
-    for (const t of searchType) {
-      for (const kw of kwList) {
-        searchTasks.push(tmdbGet(`/search/${t}`, { query: kw, language: 'en-US' }));
-      }
-      for (const kw of koKwList) {
-        searchTasks.push(tmdbGet(`/search/${t}`, { query: kw, language: 'ko-KR' }));
-      }
+    const results = [];
+    for (const m of matched) {
+      if (!m || seen.has(m.tmdb_id)) continue;
+      seen.add(m.tmdb_id);
+      results.push({
+        tmdb_id: m.tmdb_id,
+        title: m.title,
+        year: m.year,
+        type: m.type,
+        poster_url: m.poster_url,
+        overview: m.overview,
+        vote_average: m.vote_average,
+      });
     }
-
-    const searchResults = await Promise.all(searchTasks);
-
-    for (const data of searchResults) {
-      for (const r of (data?.results || [])) {
-        if (seen.has(r.id)) continue;
-        seen.add(r.id);
-        allResults.push({
-          tmdb_id: r.id,
-          title: r.title || r.name || '',
-          year: parseInt((r.release_date || r.first_air_date || '').slice(0, 4)) || 0,
-          type: r.title ? 'movie' : 'drama',
-          poster_url: r.poster_path ? IMG_BASE + r.poster_path : '',
-          overview: r.overview || '',
-          vote_average: r.vote_average || 0,
-        });
-      }
-    }
-
-    // 평점 순 정렬, 최대 8개
-    const results = allResults
-      .sort((a, b) => b.vote_average - a.vote_average)
-      .slice(0, 8);
 
     // 한 건도 못 찾았으면 사용자에게 줄 결과가 없으므로 차감하지 않는다.
     // 0건은 작품이 없어서가 아니라 TMDB 제목 매칭이 실패해서 나는 경우가 있어,
