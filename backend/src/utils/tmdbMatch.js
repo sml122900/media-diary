@@ -31,6 +31,12 @@ const SCORE_THRESHOLD = 0.5;
  */
 const YEAR_QUERY_BONUS = 0.5;
 
+/** 이 미만이면 "제목이 안 닮았다"고 본다 */
+const MIN_TITLE_SIMILARITY = 0.3;
+
+/** 제목이 안 닮은 매칭을 그래도 믿어주려면 필요한 최소 표수 */
+const MIN_VOTES_WITHOUT_TITLE = 100;
+
 /**
  * 제목 정규화 — 시즌/회차/괄호연도 제거
  * "기묘한 이야기 시즌 4" → "기묘한 이야기"
@@ -56,7 +62,13 @@ function titleSimilarity(a, b) {
   const nb = String(b || '').toLowerCase().replace(/\s+/g, '');
   if (!na || !nb) return 0;
   if (na === nb) return 1.0;
-  if (na.includes(nb) || nb.includes(na)) return 0.85;
+  // 포함 관계는 길이 비율로 깎는다. 그냥 0.85를 주면 짧은 제목이 긴 제목에
+  // 우연히 들어가는 것만으로 높은 점수를 받는다 — "Snowpiercer"가
+  // "Snowpiercer International Special Animation"에 포함돼 설국열차 대신
+  // 표 1개짜리 특별판 애니가 뽑히던 사례가 그것이다
+  if (na.includes(nb) || nb.includes(na)) {
+    return 0.85 * (Math.min(na.length, nb.length) / Math.max(na.length, nb.length));
+  }
   const setA = new Set(na.split(''));
   const common = nb.split('').filter(c => setA.has(c)).length;
   return common / Math.max(na.length, nb.length, 1);
@@ -96,6 +108,16 @@ function resultYear(r) {
  * @returns {number}
  */
 function scoreCandidate(work, r) {
+  return evaluateCandidate(work, r).score;
+}
+
+/**
+ * 후보 1건을 평가해 점수와 판단 근거를 함께 돌려준다.
+ * 채택 여부를 점수만으로 정하면 제목이 전혀 다른 후보가 연도 가산점만으로
+ * 통과하므로, 호출 측이 근거(sim, yearExact, voteCount)를 보고 거를 수 있게 한다.
+ * @returns {{score: number, sim: number, yearExact: boolean, voteCount: number}}
+ */
+function evaluateCandidate(work, r) {
   const title = r.title || r.name || '';
   const original = r.original_title || r.original_name || '';
 
@@ -109,6 +131,7 @@ function scoreCandidate(work, r) {
 
   let yearScore = 0;
   const y = resultYear(r);
+  const yearExact = !!(work.year && y && work.year === y);
   if (work.year && y) {
     const diff = Math.abs(work.year - y);
     yearScore = diff === 0 ? 0.3 : diff === 1 ? 0.15 : -0.3;
@@ -118,7 +141,7 @@ function scoreCandidate(work, r) {
   const vc = r.vote_count || 0;
   const voteScore = vc >= 1000 ? 0.2 : vc >= 100 ? 0.12 : vc >= 10 ? 0.05 : 0;
 
-  return sim + yearScore + voteScore;
+  return { score: sim + yearScore + voteScore, sim, yearExact, voteCount: vc };
 }
 
 /**
@@ -160,25 +183,40 @@ async function matchWork(work) {
   );
 
   // 같은 작품이 여러 전략에서 나올 수 있으므로 후보별 최고점을 남긴다
-  const scores = new Map(); // id → { r, score }
+  const scores = new Map(); // id → { r, score, ev }
   for (const { hadYear, results } of batches) {
     for (const r of results) {
-      const score = scoreCandidate(work, r) + (hadYear ? YEAR_QUERY_BONUS : 0);
+      const ev = evaluateCandidate(work, r);
+      const score = ev.score + (hadYear ? YEAR_QUERY_BONUS : 0);
       const prev = scores.get(r.id);
-      if (!prev || score > prev.score) scores.set(r.id, { r, score });
+      if (!prev || score > prev.score) scores.set(r.id, { r, score, ev });
     }
   }
 
   let best = null;
   let bestScore = -Infinity;
-  for (const { r, score } of scores.values()) {
+  let bestEv = null;
+  for (const { r, score, ev } of scores.values()) {
     if (score > bestScore) {
       bestScore = score;
       best = r;
+      bestEv = ev;
     }
   }
 
   if (!best || bestScore < SCORE_THRESHOLD) return null;
+
+  // 제목이 전혀 안 닮았는데 연도 가산점만으로 통과하는 것을 막는다.
+  // 원제가 원어라 유사도가 무력해지는 경우(Сталкер)를 살리려고 연도 가산점을
+  // 뒀는데, 그 탓에 무명작(표 2~11개)이 홍콩 느와르 결과로 섞여 들어왔다.
+  // 이름이 안 맞는 매칭은 "연도가 정확히 맞고 TMDB가 알려진 작품을 줬을 때"만 믿는다
+  if (bestEv.sim < MIN_TITLE_SIMILARITY && !(bestEv.yearExact && bestEv.voteCount >= MIN_VOTES_WITHOUT_TITLE)) {
+    return null;
+  }
+
+  // 연도도 표도 없는 항목은 TMDB 스텁이라 화면에 "(0)"으로 뜨고 줄거리도 없다.
+  // 제목이 정확히 같아도 사용자에게 보여줄 게 없으므로 뺀다
+  if (!resultYear(best) && !bestEv.voteCount) return null;
 
   const overview = await fillOverview(tmdbType, best.id, best.overview || '');
 
