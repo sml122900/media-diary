@@ -15,6 +15,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
 const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
+const { matchWork } = require('../utils/tmdbMatch');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -65,33 +66,12 @@ const SUGGEST_TOOL = {
 };
 
 /**
- * TMDB 제목+연도 검색 — 첫 번째 결과의 id, poster_path 반환
+ * TMDB 매칭 — id, poster_path 반환 (검증은 tmdbMatch가 담당)
  */
-async function searchTmdb(title, year, tmdbType) {
-  const endpoint = tmdbType === 'tv' ? '/search/tv' : '/search/movie';
-  const yearParam = tmdbType === 'tv' ? `&first_air_date_year=${year}` : `&year=${year}`;
-  const query = encodeURIComponent(title);
-
-  try {
-    const res = await fetch(
-      `${TMDB_BASE}${endpoint}?api_key=${TMDB_KEY}&query=${query}${yearParam}&language=ko-KR`
-    );
-    const data = await res.json();
-    if (data.results?.length) {
-      const r = data.results[0];
-      return { tmdb_id: r.id, poster_path: r.poster_path || null };
-    }
-    // 연도 없이 재시도
-    const res2 = await fetch(
-      `${TMDB_BASE}${endpoint}?api_key=${TMDB_KEY}&query=${query}&language=ko-KR`
-    );
-    const data2 = await res2.json();
-    if (data2.results?.length) {
-      const r = data2.results[0];
-      return { tmdb_id: r.id, poster_path: r.poster_path || null };
-    }
-  } catch (_) {}
-  return { tmdb_id: 0, poster_path: null };
+async function searchTmdb(title, year, tmdbType, originalTitle) {
+  const m = await matchWork({ title, original_title: originalTitle, year, tmdb_type: tmdbType });
+  // 매칭 실패는 tmdb_id 0으로 돌려준다 — 후보 자체는 그대로 보여주고 포스터만 빠진다
+  return m ? { tmdb_id: m.tmdb_id, poster_path: m.poster_path } : { tmdb_id: 0, poster_path: null };
 }
 
 /**
@@ -168,9 +148,8 @@ ${existingList || '(없음)'}`;
     // 각 작품을 TMDB에서 검색해 tmdb_id / poster_path 보강
     const enrichedWorks = await Promise.all(
       rawWorks.map(async (w) => {
-        // original_title이 있으면 TMDB 검색에 우선 사용
-        const searchTitle = w.original_title || w.title;
-        const { tmdb_id, poster_path } = await searchTmdb(searchTitle, w.year, w.tmdb_type);
+        // 한국어 제목과 원제를 함께 넘긴다 — matchWork가 둘을 교차 비교해 후보를 고른다
+        const { tmdb_id, poster_path } = await searchTmdb(w.title, w.year, w.tmdb_type, w.original_title);
         return {
           title: w.title,
           year: w.year,

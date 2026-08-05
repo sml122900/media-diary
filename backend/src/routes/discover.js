@@ -13,11 +13,9 @@ const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
 const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
+const { matchWork } = require('../utils/tmdbMatch');
 
 const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-const TMDB_BASE = 'https://api.themoviedb.org/3';
-const TMDB_KEY  = process.env.TMDB_API_KEY;
 
 // 추천 작품 제안 도구 (restore.js와 동일 구조)
 const SUGGEST_TOOL = {
@@ -51,31 +49,11 @@ const SUGGEST_TOOL = {
   },
 };
 
-/** TMDB 제목 검색 — 포스터 + ID 반환 */
-async function searchTmdb(title, year, tmdbType) {
-  const type = tmdbType === 'tv' ? 'tv' : 'movie';
-  const yearParam = type === 'tv' ? 'first_air_date_year' : 'year';
-  try {
-    const qs = new URLSearchParams({
-      api_key: TMDB_KEY, query: title, language: 'ko-KR',
-      ...(year ? { [yearParam]: year } : {}),
-    });
-    const res  = await fetch(`${TMDB_BASE}/search/${type}?${qs}`);
-    const data = await res.json();
-    if (data.results?.length) {
-      const r = data.results[0];
-      return { tmdb_id: r.id, poster_path: r.poster_path || null };
-    }
-    // 연도 없이 재시도
-    const qs2  = new URLSearchParams({ api_key: TMDB_KEY, query: title, language: 'ko-KR' });
-    const res2 = await fetch(`${TMDB_BASE}/search/${type}?${qs2}`);
-    const d2   = await res2.json();
-    if (d2.results?.length) {
-      const r = d2.results[0];
-      return { tmdb_id: r.id, poster_path: r.poster_path || null };
-    }
-  } catch (_) {}
-  return { tmdb_id: 0, poster_path: null };
+/** TMDB 매칭 — 포스터 + ID 반환 (검증은 tmdbMatch가 담당) */
+async function searchTmdb(title, year, tmdbType, originalTitle) {
+  const m = await matchWork({ title, original_title: originalTitle, year, tmdb_type: tmdbType });
+  // 매칭 실패는 tmdb_id 0으로 돌려준다 — 추천 자체는 그대로 보여주고 포스터만 빠진다
+  return m ? { tmdb_id: m.tmdb_id, poster_path: m.poster_path } : { tmdb_id: 0, poster_path: null };
 }
 
 /**
@@ -159,8 +137,8 @@ router.post('/chat', auth, requireTokens(2, 'discover_chat'), async (req, res) =
     // TMDB 검색으로 포스터·ID 보강
     const enrichedWorks = await Promise.all(
       (rawWorks || []).map(async (w) => {
-        const searchTitle = w.original_title || w.title;
-        const { tmdb_id, poster_path } = await searchTmdb(searchTitle, w.year, w.tmdb_type);
+        // 한국어 제목과 원제를 함께 넘긴다 — matchWork가 둘을 교차 비교해 후보를 고른다
+        const { tmdb_id, poster_path } = await searchTmdb(w.title, w.year, w.tmdb_type, w.original_title);
         return {
           title: w.title, year: w.year,
           tmdb_type: w.tmdb_type, media_type: w.media_type,
