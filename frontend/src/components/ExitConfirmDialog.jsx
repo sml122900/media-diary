@@ -24,7 +24,7 @@ export default function ExitConfirmDialog({ onCancel, onExit }) {
         <p className="exit-title" id="exit-dialog-title">앱을 종료할까요?</p>
         <p className="exit-msg">기록한 내용은 저장되어 있어요.</p>
         <div className="exit-actions">
-          <button className="btn" onClick={onCancel} autoFocus>취소</button>
+          <button className="btn" onClick={onCancel}>취소</button>
           <button className="btn btn-primary" onClick={onExit}>종료</button>
         </div>
       </div>
