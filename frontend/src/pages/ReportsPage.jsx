@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
 import InsufficientTokensModal from '../components/InsufficientTokensModal';
+import TokenIcon from '../components/TokenIcon';
 import useTokenStore from '../store/tokenStore';
 
 const API = import.meta.env.VITE_API_URL;
@@ -37,7 +38,7 @@ function previewText(content) {
 export default function ReportsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const setBalance = useTokenStore(s => s.setBalance);
+  const { balance, fetchBalance, setBalance } = useTokenStore();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState(null); // 현재 열린 리포트
@@ -51,6 +52,12 @@ export default function ReportsPage() {
   // 현재 연월 (기본 생성 대상)
   const now = new Date();
   const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  // 헤더 잔액 배지 초기 로딩 (홈을 거치지 않고 바로 진입하는 경우 대비)
+  useEffect(() => {
+    const t = localStorage.getItem('token');
+    if (t) fetchBalance(t);
+  }, []);
 
   useEffect(() => {
     axios.get(`${BASE}/me/reports`, { headers: headers() })
@@ -119,6 +126,15 @@ export default function ReportsPage() {
         <h1 className="mdb-title">취향 리포트</h1>
         <div className="mdb-controls">
           <button className="btn" onClick={() => navigate('/')}>← 돌아가기</button>
+
+          {/* 토큰 잔액 칩 — 리포트 생성이 5토큰이라 잔액을 여기서도 보여준다 */}
+          <button
+            className="token-chip"
+            onClick={() => navigate('/billing/charge')}
+            title="토큰 충전하기"
+          >
+            <TokenIcon size={14} /> {balance !== null ? `${balance}` : '···'}
+          </button>
         </div>
       </div>
 

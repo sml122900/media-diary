@@ -9,7 +9,7 @@ const router = express.Router();
 const Anthropic = require('@anthropic-ai/sdk');
 const pool = require('../db');
 const auth = require('../middleware/auth');
-const { requireTokens, deductTokens } = require('../middleware/tokenCheck');
+const { requireTokens, deductTokens, logZeroUsage } = require('../middleware/tokenCheck');
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const TMDB_KEY = process.env.TMDB_API_KEY;
@@ -52,12 +52,6 @@ router.post('/natural', auth, requireTokens(1, 'search'), async (req, res) => {
 {"keywords":"영어 작품 제목 또는 핵심 단어 (TMDB에서 검색될 실제 제목, 예: Arrival, Parasite)","korean_keywords":"한국어 작품 제목 또는 키워드","type":"movie 또는 tv 또는 both","explanation":"검색 해석 (한국어 15자 이내)"}`,
       }],
     });
-
-    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
-    deductTokens(req.user.id, req.tokenInfo, {
-      input_tokens: message.usage?.input_tokens,
-      output_tokens: message.usage?.output_tokens,
-    }).catch(err => console.error('토큰 차감 실패 (search):', err.message));
 
     // Claude 응답 파싱
     let parsed;
@@ -116,6 +110,30 @@ router.post('/natural', auth, requireTokens(1, 'search'), async (req, res) => {
     const results = allResults
       .sort((a, b) => b.vote_average - a.vote_average)
       .slice(0, 8);
+
+    // 한 건도 못 찾았으면 사용자에게 줄 결과가 없으므로 차감하지 않는다.
+    // 0건은 작품이 없어서가 아니라 TMDB 제목 매칭이 실패해서 나는 경우가 있어,
+    // 우리 쪽 실패를 과금하지 않는다는 뜻이다.
+    // (스크린샷과 동일하게 환급이 아니라 차감 시점을 뒤로 미루는 방식 — deductTokens가
+    //  fire-and-forget이라 환급 트랜잭션이 먼저 커밋되면 잔액이 늘어나는 레이스가 생긴다)
+    if (results.length === 0) {
+      logZeroUsage(req.user.id, 'search', {
+        query: query.trim().slice(0, 100),  // 매칭 실패 쿼리 추적용
+        empty_result: true,
+      }).catch(err => console.error('빈 결과 로그 기록 실패 (search):', err.message));
+
+      return res.json({
+        success: true,
+        data: [],
+        meta: { explanation, token_balance: req.tokenInfo.balance },  // 차감 없음 → 원래 잔액
+      });
+    }
+
+    // 결과가 있으면 차감 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: message.usage?.input_tokens,
+      output_tokens: message.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (search):', err.message));
 
     res.json({
       success: true,
