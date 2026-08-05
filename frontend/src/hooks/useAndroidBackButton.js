@@ -6,7 +6,7 @@
  * 웹(브라우저)에서는 네이티브 플랫폼이 아니므로 아무 동작도 하지 않음
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -16,8 +16,11 @@ import { App as CapacitorApp } from '@capacitor/app';
  * 프로젝트의 모든 오버레이는 백드롭 자기 자신을 클릭하면 닫히는 구조라
  * (onClick={e => e.target === e.currentTarget && onClose()})
  * 뒤로가기를 "바깥 탭"과 동일하게 처리한다.
+ * 종료 확인 다이얼로그(.exit-overlay)도 포함해, 열린 상태에서 뒤로가기를
+ * 한 번 더 누르면 종료가 아니라 취소가 되게 한다.
  */
-const BACKDROP_SELECTOR = '.backdrop, .menu-backdrop, .dc-overlay, .rc-confirm-overlay';
+const BACKDROP_SELECTOR =
+  '.backdrop, .menu-backdrop, .dc-overlay, .rc-confirm-overlay, .exit-overlay';
 
 /** 열려 있는 최상단 오버레이를 닫는다. 닫았으면 true */
 function closeTopOverlay() {
@@ -27,9 +30,15 @@ function closeTopOverlay() {
   return true;
 }
 
+/**
+ * 뒤로가기 리스너를 등록하고, 종료 확인 다이얼로그의 표시 상태를 돌려준다.
+ * 다이얼로그 자체는 호출부(App)에서 렌더링한다 — 훅은 UI를 그리지 않는다.
+ * @returns {{ exitConfirmOpen: boolean, cancelExit: () => void, confirmExit: () => void }}
+ */
 export function useAndroidBackButton() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [exitConfirmOpen, setExitConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
@@ -40,8 +49,8 @@ export function useAndroidBackButton() {
       }
       if (location.pathname !== '/') {
         navigate(-1);
-      } else if (window.confirm('앱을 종료하시겠습니까?')) {
-        CapacitorApp.exitApp();
+      } else {
+        setExitConfirmOpen(true);
       }
     });
 
@@ -49,4 +58,10 @@ export function useAndroidBackButton() {
       listenerPromise.then((listener) => listener.remove());
     };
   }, [location, navigate]);
+
+  return {
+    exitConfirmOpen,
+    cancelExit: () => setExitConfirmOpen(false),
+    confirmExit: () => CapacitorApp.exitApp(),
+  };
 }

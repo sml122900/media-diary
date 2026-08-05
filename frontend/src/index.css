@@ -1557,6 +1557,22 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 .rc-confirm-msg  { font-size: 14px; color: #ddd; line-height: 1.6; margin-bottom: 20px; }
 .rc-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
+/* 앱 종료 확인 다이얼로그 (Android 뒤로가기) — 네이티브 confirm() 대체.
+   다른 오버레이 위에 떠야 하므로 z-index를 rc-confirm(9999)보다 높게 잡는다 */
+.exit-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10000; padding: 24px;
+}
+.exit-box {
+  background: #1e1e1e; border: 1px solid #333; border-radius: 14px;
+  padding: 24px 24px 20px; max-width: 320px; width: 100%;
+}
+.exit-title { font-size: 16px; font-weight: 600; color: #f0f0f0; margin: 0 0 8px; }
+.exit-msg   { font-size: 13px; color: #999; line-height: 1.6; margin: 0 0 20px; }
+.exit-actions { display: flex; gap: 10px; }
+.exit-actions .btn { flex: 1; }
+
 /* ══════════════════════════════════════════════════════════════
    상태 칩 / 서피스 유틸리티 (Phase 11 다크모드 대응)
    기존에 JSX 인라인으로 박혀 있던 밝은 배경색을 클래스로 옮긴 것.
@@ -1648,4 +1664,7 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .rc-preview-item strong { color: #1a1a1a; }
   .rc-confirm-box     { background: #fff; border-color: #e8e8e6; }
   .rc-confirm-msg     { color: #444; }
+  .exit-box           { background: #fff; border-color: #e8e8e6; }
+  .exit-title         { color: #1a1a1a; }
+  .exit-msg           { color: #666; }
 }

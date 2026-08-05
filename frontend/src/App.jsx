@@ -9,6 +9,7 @@ import './App.css';
 import useAuthStore from './store/authStore';
 import { useAndroidBackButton } from './hooks/useAndroidBackButton';
 import { useTheme } from './hooks/useTheme';
+import ExitConfirmDialog from './components/ExitConfirmDialog';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
@@ -49,12 +50,13 @@ function PrivateRoute({ children }) {
 }
 
 /**
- * Android 하드웨어 뒤로가기 버튼 리스너
+ * Android 하드웨어 뒤로가기 버튼 리스너 + 종료 확인 다이얼로그
  * useAndroidBackButton이 react-router 컨텍스트를 필요로 해 BrowserRouter 내부에 배치
  */
 function AndroidBackButtonListener() {
-  useAndroidBackButton();
-  return null;
+  const { exitConfirmOpen, cancelExit, confirmExit } = useAndroidBackButton();
+  if (!exitConfirmOpen) return null;
+  return <ExitConfirmDialog onCancel={cancelExit} onExit={confirmExit} />;
 }
 
 /**
