@@ -189,12 +189,6 @@ ${componentInstructions}
 
     const content = message.content[0].text;
 
-    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
-    deductTokens(req.user.id, req.tokenInfo, {
-      input_tokens: message.usage?.input_tokens,
-      output_tokens: message.usage?.output_tokens,
-    }).catch(err => console.error('토큰 차감 실패 (report):', err.message));
-
     // DB 저장
     const { rows: saved } = await pool.query(
       `INSERT INTO ai_reports (user_id, period, content, created_at)
@@ -203,6 +197,14 @@ ${componentInstructions}
        RETURNING *`,
       [req.user.id, period, content]
     );
+
+    // 리포트 저장까지 끝난 뒤에 차감한다.
+    // 차감 후에도 INSERT가 남아 있으면 저장이 터졌을 때 500을 받으면서
+    // 토큰만 빠진다 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: message.usage?.input_tokens,
+      output_tokens: message.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (report):', err.message));
 
     res.json({
       success: true,

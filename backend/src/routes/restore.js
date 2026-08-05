@@ -163,12 +163,6 @@ ${existingList || '(없음)'}`;
       throw new Error('Claude가 도구를 호출하지 않았습니다.');
     }
 
-    // AI 호출 성공 → 토큰 차감 (실패해도 사용자 응답은 정상 반환)
-    deductTokens(req.user.id, req.tokenInfo, {
-      input_tokens: claudeRes.usage?.input_tokens,
-      output_tokens: claudeRes.usage?.output_tokens,
-    }).catch(err => console.error('토큰 차감 실패 (chat):', err.message));
-
     const { message: aiMessage, works: rawWorks } = toolUse.input;
 
     // 각 작품을 TMDB에서 검색해 tmdb_id / poster_path 보강
@@ -199,6 +193,14 @@ ${existingList || '(없음)'}`;
        VALUES ($1, 'assistant', $2, $3::jsonb)`,
       [req.user.id, aiMessage, JSON.stringify(enrichedWorks)]
     );
+
+    // 사용자에게 돌려줄 응답이 확정된 뒤에 차감한다.
+    // 차감 후에도 TMDB 보강·대화 저장이 남아 있으면 거기서 터졌을 때
+    // 500을 받으면서 토큰만 빠진다 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: claudeRes.usage?.input_tokens,
+      output_tokens: claudeRes.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (chat):', err.message));
 
     res.json({
       success: true,

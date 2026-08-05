@@ -240,12 +240,6 @@ router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10
       });
     }
 
-    // 결과가 하나라도 있으면 차감 (실패해도 사용자 응답은 정상 반환)
-    // 일부 이미지만 인식된 경우도 결과가 있으므로 요청당 5토큰을 정상 차감한다
-    deductTokens(req.user.id, req.tokenInfo, {
-      metadata: { image_count: files.length, extracted_count: allExtracted.length },
-    }).catch(err => console.error('토큰 차감 실패 (screenshot):', err.message));
-
     // 각 추출 작품을 TMDB로 매칭 (병렬)
     const results = await Promise.all(
       allExtracted.map(async (extracted) => {
@@ -287,6 +281,13 @@ router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10
 
     // 신뢰도 내림차순 정렬
     results.sort((a, b) => b.confidence - a.confidence);
+
+    // 결과가 확정된 뒤에 차감 (실패해도 사용자 응답은 정상 반환).
+    // 차감 후에도 TMDB 매칭이 남아 있으면 거기서 터졌을 때 500을 받으면서
+    // 토큰만 빠진다. 일부 이미지만 인식된 경우도 결과가 있으므로 요청당 5토큰을 차감한다
+    deductTokens(req.user.id, req.tokenInfo, {
+      metadata: { image_count: files.length, extracted_count: allExtracted.length },
+    }).catch(err => console.error('토큰 차감 실패 (screenshot):', err.message));
 
     res.json({
       success: true,

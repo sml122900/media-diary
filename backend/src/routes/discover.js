@@ -170,12 +170,6 @@ router.post('/chat', auth, requireTokens(2, 'discover_chat'), async (req, res) =
       })
     );
 
-    // AI 호출 성공 → 토큰 차감
-    deductTokens(req.user.id, req.tokenInfo, {
-      input_tokens: claudeRes.usage?.input_tokens,
-      output_tokens: claudeRes.usage?.output_tokens,
-    }).catch(err => console.error('토큰 차감 실패 (discover_chat):', err.message));
-
     // 대화 저장
     await pool.query(
       `INSERT INTO discovery_chats (user_id, role, content, session_id)
@@ -188,6 +182,14 @@ router.post('/chat', auth, requireTokens(2, 'discover_chat'), async (req, res) =
        VALUES ($1, 'assistant', $2, $3::jsonb, $4)`,
       [req.user.id, aiMessage, JSON.stringify(enrichedWorks), sessionId]
     );
+
+    // 사용자에게 돌려줄 응답이 확정된 뒤에 차감한다.
+    // 차감 후에도 대화 저장이 남아 있으면 INSERT가 터졌을 때
+    // 500을 받으면서 토큰만 빠진다 (실패해도 사용자 응답은 정상 반환)
+    deductTokens(req.user.id, req.tokenInfo, {
+      input_tokens: claudeRes.usage?.input_tokens,
+      output_tokens: claudeRes.usage?.output_tokens,
+    }).catch(err => console.error('토큰 차감 실패 (discover_chat):', err.message));
 
     res.json({
       success: true,
