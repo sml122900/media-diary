@@ -173,6 +173,25 @@ function normalizeRating(rating) {
 }
 
 /**
+ * 동시성 제한 병렬 map (Phase 12.3) — 워커 풀 방식, 순서 보존
+ * @param {Array} items
+ * @param {number} limit 동시 실행 개수
+ * @param {(item: any, index: number) => Promise<any>} fn
+ */
+async function mapWithLimit(items, limit, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await fn(items[i], i);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
+}
+
+/**
  * Claude Vision으로 이미지에서 작품 목록 추출 (구조화 JSON)
  */
 async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplayName) {
@@ -272,9 +291,13 @@ router.post('/', auth, screenshotTokenGate, upload.array('images', 10), async (r
       });
     }
 
-    // 각 추출 작품을 TMDB로 매칭 (병렬)
-    const results = await Promise.all(
-      allExtracted.map(async (extracted) => {
+    // 각 추출 작품을 TMDB로 매칭 — 동시 4개로 제한 병렬 처리 (Phase 12.3)
+    // 항목 내부(searchTmdb)가 이미 최대 5단계 순차 요청이라, 동시 4개면 TMDB로
+    // 나가는 순간 동시 요청은 최대 4건 — 별도 문서화된 rate limit은 없지만
+    // 40개 항목을 한 번에 무제한 병렬로 쏘던 기존 방식보다 여유 있게 안전한 값
+    const results = await mapWithLimit(allExtracted, 4, async (extracted) => {
+      // 개별 항목에서 예외가 나도 이 항목만 매칭 실패로 처리 — 전체 배치 중단 금지
+      try {
         const match = await searchTmdb(extracted.title, extracted.year, extracted.type);
 
         if (!match) {
@@ -309,8 +332,15 @@ router.post('/', auth, screenshotTokenGate, upload.array('images', 10), async (r
             rating: normalizeRating(extracted.rating),
           },
         };
-      })
-    );
+      } catch (err) {
+        return {
+          inputTitle: extracted.title,
+          extractedYear: extracted.year,
+          result: null,
+          confidence: 0,
+        };
+      }
+    });
 
     // 신뢰도 내림차순 정렬
     results.sort((a, b) => b.confidence - a.confidence);
