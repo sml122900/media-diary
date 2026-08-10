@@ -103,6 +103,7 @@ android/        Capacitor 네이티브 프로젝트
 | 날짜 | 항목 | 내용 |
 |------|------|------|
 | 2026-08-11 | `companion_names` 프론트 입력 UI 미구현 | DB 컬럼(`user_media.companion_names`)과 백엔드 PUT 라우트(`userMedia.js`)는 존재하나, DetailModal "시청 컨텍스트" 섹션은 `watched_with`(누구와, 프리셋 칩)까지만 노출하고 동반자 실명 자유 텍스트 입력창은 없음. 보류 결정(2026-08-11) — 추가 여부는 별도 기획 필요 |
+| 2026-08-11 | 백엔드 테스트 프레임워크 부재 | vitest 등 테스트 프레임워크 미설치, config 없음, `backend/package.json`의 `test` 스크립트는 자리표시자(`echo "Error: no test specified"`). 도입 보류(2026-08-11). 도입 시 전제: 운영 DB(Supabase) 접속 금지 — 로컬 postgres 또는 별도 테스트용 Supabase 프로젝트로 분리할 것 |
 
 ---
 
