@@ -516,10 +516,6 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   overflow: hidden; display: flex; flex-direction: column;
   box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
-.daily-rec-card.skeleton {
-  height: 160px; background: #f0f0ee; animation: pulse 1.4s ease infinite;
-}
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
 .daily-rec-poster {
   width: 100%; aspect-ratio: 3/2; background: #f0f0ee;
   display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
@@ -762,7 +758,6 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .report-content h2, .report-content h3, .report-content strong { color: #e8e8e8; }
   .report-content p, .report-content li { color: #ccc; }
   .daily-rec-card { background: #1c1c1c; border-color: #2e2e2e; }
-  .daily-rec-card.skeleton { background: #222; }
   .daily-rec-poster, .daily-rec-genre-tag { background: #2a2a2a; }
   .daily-rec-item-title { color: #e8e8e8; }
   .public-reviews-section { border-color: #2e2e2e; }
@@ -1212,8 +1207,6 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 /* 섹션 */
 .discover-section { margin-bottom: 2.5rem; }
 .discover-section-title { font-size: 16px; font-weight: 700; }
-
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
 /* 큐레이션 배너 */
 .discover-curation-banner {
