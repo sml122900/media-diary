@@ -98,6 +98,14 @@ android/        Capacitor 네이티브 프로젝트
 
 ---
 
+## 기술 부채
+
+| 날짜 | 항목 | 내용 |
+|------|------|------|
+| 2026-08-11 | `companion_names` 프론트 입력 UI 미구현 | DB 컬럼(`user_media.companion_names`)과 백엔드 PUT 라우트(`userMedia.js`)는 존재하나, DetailModal "시청 컨텍스트" 섹션은 `watched_with`(누구와, 프리셋 칩)까지만 노출하고 동반자 실명 자유 텍스트 입력창은 없음. 보류 결정(2026-08-11) — 추가 여부는 별도 기획 필요 |
+
+---
+
 ## 트러블슈팅 로그
 
 2026-07-30 이전 항목은 `docs/troubleshooting/log-archive.md`. 개별 상세는 `docs/troubleshooting/`.
