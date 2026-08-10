@@ -216,18 +216,26 @@ router.post('/:id/rewatch', auth, async (req, res) => {
 });
 
 /**
- * GET /api/user-media/history/:tmdbId
- * 특정 TMDB 작품의 내 시청 이력 전체 (재시청 포함)
+ * GET /api/user-media/:id/history
+ * 특정 항목과 같은 작품(title+year)의 내 시청 이력 전체 (재시청 포함)
+ * tmdb_id 대신 소유권이 확인된 행의 title+year를 조회 축으로 사용 —
+ * tmdb_id=0(미매칭)인 서로 다른 작품끼리 이력이 섞이는 문제 방지
  */
-router.get('/history/:tmdbId', auth, async (req, res) => {
+router.get('/:id/history', auth, async (req, res) => {
   try {
+    const { rows: orig } = await pool.query(
+      'SELECT title, year FROM user_media WHERE id=$1 AND user_id=$2',
+      [req.params.id, req.user.id]
+    );
+    if (!orig[0]) return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
+
     const { rows } = await pool.query(
       `SELECT id, rating, review_text, review_date, watched_at, rewatch_count,
               watched_with, watched_at_place, mood, companion_names
        FROM user_media
-       WHERE user_id=$1 AND tmdb_id=$2
+       WHERE user_id=$1 AND title=$2 AND year=$3
        ORDER BY rewatch_count ASC`,
-      [req.user.id, req.params.tmdbId]
+      [req.user.id, orig[0].title, orig[0].year]
     );
     res.json({ success: true, data: rows });
   } catch (err) {
