@@ -280,6 +280,9 @@ async function initDB() {
   await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS mood TEXT DEFAULT NULL`);
   await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS companion_names TEXT DEFAULT NULL`);
 
+  // 시청 시기 태그 컬럼 (Phase 6.5.1 — NULL 허용, 자유 텍스트)
+  await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS life_period TEXT DEFAULT NULL`);
+
   console.log('Database tables ready');
 }
 
