@@ -8,7 +8,6 @@ import axios from 'axios';
 import TmdbInfoPanel from './TmdbInfoPanel';
 import StarRating from './StarRating';
 import PosterPicker from './PosterPicker';
-import SimilarRecommendations from './SimilarRecommendations';
 import { fetchTmdbDetail, searchTmdbPoster } from '../api/tmdb';
 import { AWARDS } from '../utils/constants';
 
@@ -32,7 +31,6 @@ const BASE = `${import.meta.env.VITE_API_URL}/api`;
 export default function DetailModal({
   item, posterUrl, tmdbUrlCache, tmdbIdCache, tmdbDetailCache,
   onClose, onSave, onDeleteReview, onDeleteItem, onEditItem, onUpdatePoster,
-  onAdd, existingItems,
 }) {
   const [rating, setRating] = useState(item.rating || 0);
   const [reviewText, setReviewText] = useState(item.review_text || '');
@@ -589,15 +587,6 @@ export default function DetailModal({
                   </div>
                 ))}
               </div>
-            )}
-
-            {/* 비슷한 작품 추천 (tmdb_id 있는 작품만) */}
-            {item.tmdb_id > 0 && onAdd && (
-              <SimilarRecommendations
-                mediaId={item.id}
-                onAdd={onAdd}
-                existingItems={existingItems || []}
-              />
             )}
           </div>
         </div>

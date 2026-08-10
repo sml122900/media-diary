@@ -587,8 +587,6 @@ export default function HomePage() {
           onDeleteItem={handleDeleteItem}
           onEditItem={handleEditItemAndUpdate}
           onUpdatePoster={handleUpdatePosterAndCache}
-          onAdd={handleAddAndExpandYear}
-          existingItems={items}
         />
       )}
 
