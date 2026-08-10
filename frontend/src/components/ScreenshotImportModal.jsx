@@ -128,6 +128,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
   const [dragOver, setDragOver] = useState(false);
   const [tokenError, setTokenError] = useState(null);
   const setBalance = useTokenStore(s => s.setBalance);
+  const importFree = useTokenStore(s => s.importFree);
   const fileInputRef = useRef(null);
 
   /** 파일 추가 처리 (중복 제거, 최대 10장) */
@@ -266,7 +267,9 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
           OTT 시청 목록, 영화관 앱 관람 내역 스크린샷을 올리면 작품을 자동 인식합니다 (최대 10장)
         </p>
         <div style={{ fontSize: 12, color: '#a78bfa', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <TokenIcon size={13} /> <strong>5토큰</strong> 차감 · Sonnet 고정밀 인식
+          {importFree
+            ? <><strong>무료</strong> (프로모션 기간) · Sonnet 고정밀 인식</>
+            : <><TokenIcon size={13} /> <strong>5토큰</strong> 차감 · Sonnet 고정밀 인식</>}
         </div>
 
         {/* OTT 종류 선택 */}

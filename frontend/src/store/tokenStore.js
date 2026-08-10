@@ -9,6 +9,7 @@ import { getTokenBalance } from '../api/billing';
 const useTokenStore = create((set) => ({
   balance: null,      // null = 미조회
   isFirstCharge: false,
+  importFree: true,   // 임포트(스크린샷) 무료화 플래그 — 서버 응답 오기 전 기본값 (Phase 12.3)
 
   /** 서버에서 최신 잔액 조회 */
   fetchBalance: async (token) => {
@@ -17,6 +18,7 @@ const useTokenStore = create((set) => ({
       set({
         balance: res.data.balance,
         isFirstCharge: !res.data.has_used_first_charge_bonus,
+        importFree: res.data.import_free ?? true,
       });
     } catch {
       // 조회 실패 시 무시 (기존 값 유지)

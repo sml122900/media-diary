@@ -20,6 +20,24 @@ const TMDB_BASE = 'https://api.themoviedb.org/3';
 const TMDB_KEY = process.env.TMDB_API_KEY;
 const IMG_BASE = 'https://image.tmdb.org/t/p/w300';
 
+// 임포트 무료화 플래그 (Phase 12.3) — 기본 무료, Render 환경변수 IMPORT_TOKEN_FREE=false로 유료 전환
+const importTokenFree = () => process.env.IMPORT_TOKEN_FREE !== 'false';
+
+/**
+ * 임포트 토큰 게이트 — 무료 기간에는 잔액 부족이어도 통과시키고 req.tokenInfo.required=0으로 표시.
+ * 유료 전환 시(IMPORT_TOKEN_FREE=false)는 기존 requireTokens(5, 'screenshot')과 동일하게 동작.
+ */
+async function screenshotTokenGate(req, res, next) {
+  if (!importTokenFree()) return requireTokens(5, 'screenshot')(req, res, next);
+  try {
+    const { rows } = await pool.query('SELECT token_balance FROM users WHERE id = $1', [req.user.id]);
+    req.tokenInfo = { required: 0, feature: 'import', balance: rows[0]?.token_balance ?? 0 };
+    next();
+  } catch (err) {
+    res.status(500).json({ success: false, message: '토큰 확인 중 오류가 발생했습니다.' });
+  }
+}
+
 // 임시 업로드 디렉토리
 const UPLOAD_DIR = path.join(__dirname, '../../uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -180,8 +198,8 @@ async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplay
  * 멀티 이미지 업로드 → 구조화 추출 → TMDB 매칭 → 신뢰도 포함 반환
  * body (multipart): images[] + ott_type (optional)
  */
-// Sonnet 업그레이드로 5토큰으로 조정 (Phase 10.3)
-router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10), async (req, res) => {
+// Sonnet 업그레이드로 5토큰으로 조정 (Phase 10.3), Phase 12.3에서 무료화 플래그 도입
+router.post('/', auth, screenshotTokenGate, upload.array('images', 10), async (req, res) => {
   const files = req.files || [];
   const filePaths = files.map(f => f.path);
 
@@ -281,6 +299,19 @@ router.post('/', auth, requireTokens(5, 'screenshot'), upload.array('images', 10
 
     // 신뢰도 내림차순 정렬
     results.sort((a, b) => b.confidence - a.confidence);
+
+    // 임포트 무료화 기간 — 차감 없이 사용량만 관찰 기록 (기존 빈 결과 무차감 패턴과 동일)
+    if (req.tokenInfo.required === 0) {
+      logZeroUsage(req.user.id, 'import', {
+        image_count: files.length, extracted_count: allExtracted.length,
+      }).catch(err => console.error('임포트 무료 사용 로그 실패 (screenshot):', err.message));
+
+      return res.json({
+        success: true,
+        data: results,
+        meta: { token_balance: req.tokenInfo.balance },
+      });
+    }
 
     // 결과가 확정된 뒤에 차감 (실패해도 사용자 응답은 정상 반환).
     // 차감 후에도 TMDB 매칭이 남아 있으면 거기서 터졌을 때 500을 받으면서

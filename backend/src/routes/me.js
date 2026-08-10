@@ -237,6 +237,8 @@ router.get('/tokens', auth, async (req, res) => {
           total_tokens: monthRows[0]?.total_tokens ?? 0,
           cost_estimate_krw: monthRows[0]?.cost_estimate_krw ?? 0,
         },
+        // 임포트 무료화 플래그 (Phase 12.3) — 프론트 토큰 고지 문구 분기용
+        import_free: process.env.IMPORT_TOKEN_FREE !== 'false',
       },
     });
   } catch (err) {

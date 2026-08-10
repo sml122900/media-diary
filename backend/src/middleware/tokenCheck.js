@@ -9,7 +9,7 @@ const pool = require('../db');
  * AI 기능 사용 전 토큰 잔액 확인 미들웨어 팩토리
  * 잔액 부족 시 402 반환. 통과 시 req.tokenInfo에 정보 저장.
  * @param {number} requiredTokens 필요한 토큰 수
- * @param {string} feature 기능 식별자 ('chat' | 'screenshot' | 'search' | 'report')
+ * @param {string} feature 기능 식별자 ('chat' | 'screenshot' | 'search' | 'report' | 'import')
  */
 function requireTokens(requiredTokens, feature) {
   return async (req, res, next) => {
