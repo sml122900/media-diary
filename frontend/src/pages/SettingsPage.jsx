@@ -11,6 +11,8 @@ import useAuthStore from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
 import useTokenStore from '../store/tokenStore';
 import { deleteAccount } from '../api/auth';
+import { useMediaList } from '../hooks/useMediaList';
+import ScreenshotImportModal from '../components/ScreenshotImportModal';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -22,6 +24,10 @@ export default function SettingsPage() {
   const { theme, themePref, setThemePref } = useTheme();
   const { balance } = useTokenStore();
   // 토큰 잔액 초기 로딩은 App 루트에서 한 번 처리한다
+
+  // 다른 앱 기록 가져오기 (Phase 12.3) — 기존 스크린샷 임포트 플로우 재사용
+  const { handleAdd } = useMediaList(user);
+  const [screenshotOpen, setScreenshotOpen] = useState(false);
 
   const [form, setForm] = useState({
     username: '',
@@ -109,6 +115,16 @@ export default function SettingsPage() {
       </div>
 
       <div className="settings-form">
+        {/* 다른 앱 기록 가져오기 (Phase 12.3) */}
+        <div className="settings-section">
+          <div className="settings-label">다른 앱 기록 가져오기</div>
+          <div style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>
+            {/* [카피 초안 — 사용자 검수 예정] */}
+            왓챠피디아·키노라이츠 등의 내 별점 목록 화면을 캡처해 올려주세요. AI가 작품을 자동으로 인식해서 가져와드려요.
+          </div>
+          <button className="btn" onClick={() => setScreenshotOpen(true)}>📸 스크린샷으로 가져오기</button>
+        </div>
+
         {/* 기본 정보 (읽기 전용) */}
         <div className="settings-section">
           <div className="settings-label">이름</div>
@@ -295,6 +311,13 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {screenshotOpen && (
+        <ScreenshotImportModal
+          onClose={() => setScreenshotOpen(false)}
+          onAdd={handleAdd}
+        />
+      )}
     </div>
   );
 }
