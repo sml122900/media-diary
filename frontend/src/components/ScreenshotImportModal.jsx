@@ -244,6 +244,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
         cast_info: '',
         poster_url: r.poster_url,
         tmdb_id: r.tmdb_id,
+        rating: r.rating || 0,
       });
       if (saved) setAddedIds(prev => new Set([...prev, r.tmdb_id]));
     }
@@ -417,6 +418,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
                             <div style={{ fontSize: 11, color: '#999', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                               <span>{r.year} · {TYPE_LABEL[r.type] || r.type}</span>
                               <ConfidenceBadge confidence={item.confidence} />
+                              {r.rating > 0 && <span style={{ color: '#f0a500' }}>{'★'.repeat(r.rating)} 인식됨</span>}
                             </div>
                             {item.inputTitle !== r.title && (
                               <div style={{ fontSize: 10, color: '#bbb' }}>"{item.inputTitle}" 인식</div>

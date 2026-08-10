@@ -103,7 +103,8 @@ ${pattern}
   {
     "title": "정확한 작품명 (한글 우선)",
     "year": 2024,
-    "type": "movie"
+    "type": "movie",
+    "rating": 4
   }
 ]
 
@@ -111,6 +112,7 @@ ${pattern}
 - title: 문자열 (필수)
 - year: 정수 또는 null (연도 불명 시)
 - type: "movie" (영화) 또는 "tv" (드라마·애니·시리즈)
+- rating: 화면에 사용자의 별점·평점이 표시돼 있으면 1~5 정수, 안 보이면 null (임의로 추정 금지)
 - 작품이 없으면 []
 
 응답:`;

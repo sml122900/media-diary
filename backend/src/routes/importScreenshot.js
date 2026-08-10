@@ -165,6 +165,14 @@ function calcConfidence(extracted, tmdbResult) {
 }
 
 /**
+ * AI가 추출한 별점 값 검증 — 1~5 정수만 통과, 그 외(범위 밖·소수·문자열 등)는 null
+ * (프롬프트가 1~5 정수 또는 null만 지시하지만 모델 출력은 신뢰하지 않고 방어)
+ */
+function normalizeRating(rating) {
+  return Number.isInteger(rating) && rating >= 1 && rating <= 5 ? rating : null;
+}
+
+/**
  * Claude Vision으로 이미지에서 작품 목록 추출 (구조화 JSON)
  */
 async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplayName) {
@@ -174,7 +182,10 @@ async function extractWorksFromImage(imageBuffer, mediaType, ottType, ottDisplay
   // Sonnet 4.6 — Haiku 대비 인식 정확도 대폭 향상 (Phase 10.3)
   const message = await claude.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1500,
+    // max_tokens 4000 (Phase 12.3) — 실측 결과 title+year+type+rating 40개 응답이
+    // pretty-print 기준 1667 토큰(compact 기준 876 토큰)이라 기존 1500으로는 40개
+    // 언저리에서 잘림. 4000은 같은 밀도로 pretty-print 기준 약 95개까지 여유
+    max_tokens: 4000,
     messages: [{
       role: 'user',
       content: [
@@ -228,14 +239,17 @@ router.post('/', auth, screenshotTokenGate, upload.array('images', 10), async (r
       })
     );
 
-    // 전체 추출 결과 병합 + 제목 기준 중복 제거
-    const seenTitles = new Set();
+    // 전체 추출 결과 병합 + (제목, 연도) 복합 기준 중복 제거
+    // 연도가 없으면 제목만으로 판단 (동명이작을 연도 없이는 구분할 수 없음)
+    const seenKeys = new Set();
     const allExtracted = [];
     for (const works of perImageResults) {
       for (const w of works) {
-        const key = w.title?.toLowerCase();
-        if (key && !seenTitles.has(key)) {
-          seenTitles.add(key);
+        const title = w.title?.toLowerCase();
+        if (!title) continue;
+        const key = w.year ? `${title}::${w.year}` : title;
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
           allExtracted.push(w);
         }
       }
@@ -292,6 +306,7 @@ router.post('/', auth, screenshotTokenGate, upload.array('images', 10), async (r
             overview: (tmdb.overview || '').slice(0, 100),
             vote_average: tmdb.vote_average || 0,
             in_my_list: inMyList,
+            rating: normalizeRating(extracted.rating),
           },
         };
       })
