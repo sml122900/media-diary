@@ -370,7 +370,7 @@ export default function DetailModal({
             {/* 시청 컨텍스트 (Phase 5.6) */}
             <div style={{ marginTop: 12 }}>
               <button
-                style={{ fontSize: 12, color: '#888', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', display: 'flex', alignItems: 'center', gap: 4 }}
+                style={{ fontSize: 12, color: '#888', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', minHeight: 44, display: 'flex', alignItems: 'center', gap: 4 }}
                 onClick={() => setContextOpen(v => !v)}
               >
                 {contextOpen ? '▾' : '▸'} 시청 컨텍스트 {(ctxWith || ctxPlace || ctxMood) ? '✓' : '(선택)'}
@@ -425,8 +425,8 @@ export default function DetailModal({
                     type="date"
                     value={watchedDate}
                     onChange={e => setWatchedDate(e.target.value)}
-                    style={{ flex: 1, padding: '5px 8px', fontSize: 13, border: '1px solid #ddd',
-                      borderRadius: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
+                    style={{ flex: 1, padding: '5px 8px', minHeight: 44, fontSize: 13, border: '1px solid #ddd',
+                      borderRadius: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit', boxSizing: 'border-box' }}
                   />
                   <button
                     className="mghost-btn"
@@ -436,8 +436,8 @@ export default function DetailModal({
                   >오늘</button>
                   <button
                     onClick={() => { setDateUnknown(true); setWatchedDate(''); }}
-                    style={{ fontSize: 12, padding: '5px 10px', background: 'none', border: '1px solid #ddd',
-                      borderRadius: 6, cursor: 'pointer', color: '#999', whiteSpace: 'nowrap' }}
+                    style={{ fontSize: 12, padding: '5px 10px', minHeight: 44, background: 'none', border: '1px solid #ddd',
+                      borderRadius: 6, cursor: 'pointer', color: '#999', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}
                   >기억이 안 나요</button>
                 </div>
               ) : (
@@ -523,8 +523,8 @@ export default function DetailModal({
                         type="date"
                         value={rewatchDate}
                         onChange={e => setRewatchDate(e.target.value)}
-                        style={{ fontSize: 12, padding: '4px 8px', border: '1px solid #ddd', borderRadius: 6,
-                          background: 'transparent', color: 'inherit', flex: 1 }}
+                        style={{ fontSize: 12, padding: '4px 8px', minHeight: 44, border: '1px solid #ddd', borderRadius: 6,
+                          background: 'transparent', color: 'inherit', flex: 1, boxSizing: 'border-box' }}
                       />
                       <button
                         className="mghost-btn"
@@ -534,8 +534,8 @@ export default function DetailModal({
                       >오늘</button>
                       <button
                         onClick={() => setRewatchDateUnknown(true)}
-                        style={{ fontSize: 11, padding: '4px 8px', background: 'none', border: '1px solid #ddd',
-                          borderRadius: 6, cursor: 'pointer', color: '#999', whiteSpace: 'nowrap' }}
+                        style={{ fontSize: 11, padding: '4px 8px', minHeight: 44, background: 'none', border: '1px solid #ddd',
+                          borderRadius: 6, cursor: 'pointer', color: '#999', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}
                       >기억 안 나요</button>
                     </div>
                   ) : (

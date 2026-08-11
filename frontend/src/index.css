@@ -195,25 +195,29 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
 /* 탭 내비게이션 */
 .mtab-nav { display: flex; gap: 0; border-bottom: 1px solid #eee; margin-bottom: 12px; }
 .mtab-btn {
-  padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+  padding: 6px 14px; min-height: 44px; display: inline-flex; align-items: center;
+  font-size: 13px; font-weight: 500; cursor: pointer;
   background: none; border: none; border-bottom: 2px solid transparent;
   color: #999; transition: color .15s, border-color .15s;
 }
 .mtab-btn.active { color: #1a1a1a; border-bottom-color: #1a1a1a; }
 /* 시청 날짜/재시청 날짜 섹션의 보조 버튼(오늘·날짜 입력 등) — 인라인 #555는
    라이트에서만 대비가 나와 다크에서 판독 어려움(2.29:1), 클래스로 분리해 오버라이드 */
-.mghost-btn { color: #555; }
+.mghost-btn { color: #555; min-height: 44px; display: inline-flex; align-items: center; }
 /* 보조/음소거 텍스트 공용 클래스 — 인라인 #666은 라이트 전용값이라 다크에서 대비 부족(2.97:1) */
 .text-muted { color: #666; }
 /* 스크린샷 임포트 결과의 "재검색" 토글 버튼 */
-.mresearch-btn { border: 1px solid #ddd; border-radius: 6px; cursor: pointer; background: none; color: #666; }
+.mresearch-btn {
+  border: 1px solid #ddd; border-radius: 6px; cursor: pointer; background: none; color: #666;
+  min-height: 44px; display: inline-flex; align-items: center;
+}
 .mresearch-btn.active { background: #eee; }
 /* 포스터 변경 버튼 */
 .poster-change-btn {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
   background: rgba(0,0,0,.55); color: #fff; border: none; cursor: pointer;
-  font-size: 14px; padding: 5px 0; border-radius: 0 0 10px 10px;
-  opacity: 0; transition: opacity .15s;
+  font-size: 14px; min-height: 44px; display: flex; align-items: center; justify-content: center;
+  border-radius: 0 0 10px 10px; opacity: 0; transition: opacity .15s;
 }
 .mposter:hover .poster-change-btn { opacity: 1; }
 .minfo { flex: 1; min-width: 0; }
@@ -1173,7 +1177,7 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   display: flex; flex-direction: column; gap: 10px; margin-top: 6px;
 }
 .theme-radio-item {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 10px; min-height: 44px;
   font-size: 14px; cursor: pointer; color: var(--text-primary, #eee);
 }
 .theme-radio-item input[type="radio"] {
