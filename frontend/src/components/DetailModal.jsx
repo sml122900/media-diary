@@ -8,6 +8,7 @@ import axios from 'axios';
 import TmdbInfoPanel from './TmdbInfoPanel';
 import StarRating from './StarRating';
 import PosterPicker from './PosterPicker';
+import EpithetPicker from './EpithetPicker';
 import { fetchTmdbDetail, searchTmdbPoster } from '../api/tmdb';
 import { AWARDS } from '../utils/constants';
 
@@ -79,6 +80,9 @@ export default function DetailModal({
 
   // 친구 활동 상태
   const [friendsActivity, setFriendsActivity] = useState(null);
+  // 수식어 (Phase 13.1)
+  const [epithets, setEpithets] = useState([]);
+  const [epithetPickerOpen, setEpithetPickerOpen] = useState(false);
 
   // 다른 사람들의 공개 리뷰 + 친구 활동 로드 (TMDB 매칭된 작품만)
   useEffect(() => {
@@ -101,6 +105,14 @@ export default function DetailModal({
       .then(res => setRewatchHistory(res.data.data || []))
       .catch(() => {});
   }, [item.id]);
+
+  // 수식어 목록 로드
+  useEffect(() => {
+    const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+    axios.get(`${BASE}/epithets`, { headers: auth })
+      .then(res => setEpithets(res.data.data || []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setTmdbUrl(tmdbUrlCache.current[cacheKey] || null);
@@ -414,6 +426,23 @@ export default function DetailModal({
               )}
             </div>
 
+            {/* 수식어 (Phase 13.1) — 별점과 별개로 "어떻게 좋았나" */}
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>수식어</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                {epithets
+                  .filter(ep => ep.items.some(i => i.user_media_id === item.id))
+                  .map(ep => (
+                    <span key={ep.id} className="epithet-chip">
+                      {ep.emoji && <span>{ep.emoji}</span>}{ep.label}
+                    </span>
+                  ))}
+                <button className="epithet-add-btn" onClick={() => setEpithetPickerOpen(true)}>
+                  + 수식어
+                </button>
+              </div>
+            </div>
+
             {/* 시청 날짜 + 기억이 안 나요 (통합 섹션) */}
             <div style={{ marginTop: 14 }}>
               <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>시청 날짜</div>
@@ -606,6 +635,16 @@ export default function DetailModal({
           item={item}
           onClose={() => setPosterPickerOpen(false)}
           onApply={handleApplyPoster}
+        />
+      )}
+
+      {/* 수식어 피커 */}
+      {epithetPickerOpen && (
+        <EpithetPicker
+          mediaId={item.id}
+          epithets={epithets}
+          onClose={() => setEpithetPickerOpen(false)}
+          onChange={setEpithets}
         />
       )}
     </>
