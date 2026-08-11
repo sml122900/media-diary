@@ -95,6 +95,7 @@ android/        Capacitor 네이티브 프로젝트
 | 2026-08-05 | 제목이 안 닮은 매칭은 **연도 정확 일치 + 표 100개 이상**일 때만 채택 | TMDB `original_title`이 원어면(`Сталкер`) 유사도가 무력 → 이를 살리려 연도 제약 검색에 가산점을 줬더니 유사도 0인 무명작(표 2~11개)까지 통과 | 연도 가산점 제거(원어 제목 매칭 포기) |
 | 2026-08-05 | 잔액 조회(`fetchBalance`)를 App 루트에서 1회 호출 | 페이지별 호출이라 미호출 페이지를 직접 열면 배지가 `···`로 비었음 — `useTheme`을 루트로 올린 것과 동일 원인. 신규 페이지가 추가돼도 자동 커버 | 공통 훅 신설(부르는 걸 잊는 실패 모드가 그대로 남음) |
 | 2026-08-05 | 리포트 재생성은 `regenerate` 플래그로 캐시 우회 | 기존엔 리포트 있으면 무조건 `cached` 조기 반환이라 `ON CONFLICT DO UPDATE` 도달 불가 → "다시 생성" 무동작. 캐시 조회는 0토큰 유지 필요라 무조건 재생성 불가 | 캐시 반환 제거(모든 조회가 5토큰이 됨) |
+| 2026-08-12 | 수식어 공유 카드 저장은 CSV 내보내기와 동일한 Blob+`<a download>` 패턴 재사용, 공유는 `navigator.canShare` 감지 시에만 버튼 노출 | `@capacitor/filesystem`·`@capacitor/share` 둘 다 미설치 — 신규 플러그인 없이 점진적 향상(progressive enhancement)만으로 구현 범위 충족. CSV 내보내기의 실기기 저장 검증 이력이 원래 없어 이 한계를 그대로 승계 | `@capacitor/share` 설치 후 네이티브 공유 시트 사용 |
 
 ---
 
@@ -134,6 +135,7 @@ android/        Capacitor 네이티브 프로젝트
 | 2026-08-05 | 리포트 "다시 생성" 버튼이 아무 동작도 안 함 | `/generate`가 기존 리포트가 있으면 무조건 `cached: true` 조기 반환 → 아래 `ON CONFLICT DO UPDATE`에 도달 불가. UI 안내("덮어씁니다")와 실제 동작 불일치 → `regenerate` 플래그로 캐시 우회 |
 | 2026-08-05 | gradle 파일 2개가 계속 `modified` (내용 차이 없음) | 줄바꿈 문제로 오진했으나 **워크트리 해시가 HEAD blob과 동일**. 실제 원인은 `cap sync`가 같은 내용으로 재작성해 mtime만 바뀐 **git stat 캐시 불일치** → `git add`로 인덱스 stat 갱신(스테이징 0). 재발 방지용 `.gitattributes` 별도 추가 |
 | 2026-08-05 | curl로 보낸 한글 쿼리가 서버에서 "홍길동"으로 해석됨 | AI 비결정성으로 오진 → DB 저장 바이트가 `efbfbd`(U+FFFD) 반복. Git Bash가 한글을 UTF-8 아닌 바이트로 curl에 넘겨 도착 시점에 이미 깨짐. 기기 WebView 요청은 정상 → **관측값이 이상하면 관측 도구부터 검증** |
+| 2026-08-12 | 수식어 카드용 TMDB 포스터가 `crossOrigin="anonymous"` 로드에서 매번 실패 (taint) | TMDB CDN은 실제로 `Access-Control-Allow-Origin: *`를 보냄(curl로 확인) — CORS 미지원이 원인이 아니었음. 같은 포스터 URL이 앱 다른 화면에서 이미 crossOrigin 없이 `<img>`로 로드된 뒤라 브라우저가 그 캐시(오염된 상태)를 재사용해 이후 crossOrigin 요청이 서버 재검증 없이 실패 — 재현 확인(같은 URL을 캐시 무효 상태에서 먼저 요청하면 성공). 캐시 키를 분리하는 더미 쿼리 파라미터(`?_cors=1`)를 붙여 우회 |
 
 ---
 
