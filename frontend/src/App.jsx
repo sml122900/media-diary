@@ -37,6 +37,7 @@ import BillingFailPage from './pages/BillingFailPage';
 import BillingHistoryPage from './pages/BillingHistoryPage';
 import BillingUsagePage from './pages/BillingUsagePage';
 import PolicyPage from './pages/PolicyPage';
+import EpithetsPage from './pages/EpithetsPage';
 
 /**
  * 로그인이 필요한 경로 보호 컴포넌트
@@ -127,6 +128,14 @@ function App() {
           element={
             <PrivateRoute>
               <ListsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/epithets"
+          element={
+            <PrivateRoute>
+              <EpithetsPage />
             </PrivateRoute>
           }
         />
