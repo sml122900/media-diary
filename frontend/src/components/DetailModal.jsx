@@ -9,6 +9,7 @@ import TmdbInfoPanel from './TmdbInfoPanel';
 import StarRating from './StarRating';
 import PosterPicker from './PosterPicker';
 import EpithetPicker from './EpithetPicker';
+import AxisRatingPicker from './AxisRatingPicker';
 import { fetchTmdbDetail, searchTmdbPoster } from '../api/tmdb';
 import { AWARDS } from '../utils/constants';
 
@@ -83,6 +84,9 @@ export default function DetailModal({
   // 수식어 (Phase 13.1)
   const [epithets, setEpithets] = useState([]);
   const [epithetPickerOpen, setEpithetPickerOpen] = useState(false);
+  // 다면 별점 (Phase 13.3) — 내 별점(rating)과 완전 독립된 부가 평가 축
+  const [axes, setAxes] = useState([]);
+  const [axisPickerOpen, setAxisPickerOpen] = useState(false);
 
   // 다른 사람들의 공개 리뷰 + 친구 활동 로드 (TMDB 매칭된 작품만)
   useEffect(() => {
@@ -111,6 +115,14 @@ export default function DetailModal({
     const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
     axios.get(`${BASE}/epithets`, { headers: auth })
       .then(res => setEpithets(res.data.data || []))
+      .catch(() => {});
+  }, []);
+
+  // 다면 별점 축 목록 로드
+  useEffect(() => {
+    const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+    axios.get(`${BASE}/rating-axes`, { headers: auth })
+      .then(res => setAxes(res.data.data || []))
       .catch(() => {});
   }, []);
 
@@ -217,6 +229,27 @@ export default function DetailModal({
     setCurrentPosterUrl(url);
     if (title) setEditFields(prev => ({ ...prev, title }));
     setPosterPickerOpen(false);
+  };
+
+  /** 다면 별점 축 하나에 점수 부여/수정 — 이미 매긴 별을 다시 탭하면 0점(해제) */
+  const rateAxis = async (axisId, currentRating, n) => {
+    const auth = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+    const next = currentRating === n ? 0 : n;
+    try {
+      if (next === 0) {
+        await axios.delete(`${BASE}/user-media/${item.id}/axis-ratings/${axisId}`, { headers: auth });
+        setAxes(prev => prev.map(ax => ax.id === axisId
+          ? { ...ax, items: ax.items.filter(i => i.user_media_id !== item.id) }
+          : ax));
+      } else {
+        const res = await axios.put(`${BASE}/user-media/${item.id}/axis-ratings/${axisId}`, { rating: next }, { headers: auth });
+        setAxes(prev => prev.map(ax => {
+          if (ax.id !== axisId) return ax;
+          const exists = ax.items.some(i => i.user_media_id === item.id);
+          return { ...ax, items: exists ? ax.items.map(i => i.user_media_id === item.id ? res.data.data : i) : [...ax.items, res.data.data] };
+        }));
+      }
+    } catch { /* 네트워크 오류 시 조용히 무시 — 목록이 그대로면 사용자가 다시 탭 가능 */ }
   };
 
   return (
@@ -356,6 +389,24 @@ export default function DetailModal({
 
             <label>별점</label>
             <StarRating value={rating} onChange={setRating} />
+
+            {/* 다면 별점 (Phase 13.3) — 내 별점과 별개로 여러 기준으로 평가 */}
+            <div style={{ marginTop: 10, marginBottom: 14 }}>
+              {axes
+                .filter(ax => ax.items.some(i => i.user_media_id === item.id))
+                .map(ax => {
+                  const ir = ax.items.find(i => i.user_media_id === item.id);
+                  return (
+                    <div key={ax.id} className="axis-row">
+                      <span className="axis-row-label">{ax.emoji} {ax.label}</span>
+                      <StarRating value={ir.rating} onChange={n => rateAxis(ax.id, ir.rating, n)} />
+                    </div>
+                  );
+                })}
+              <button className="epithet-add-btn" onClick={() => setAxisPickerOpen(true)}>
+                + 다른 기준 별점
+              </button>
+            </div>
 
             <label>감상 메모</label>
             <textarea
@@ -645,6 +696,17 @@ export default function DetailModal({
           epithets={epithets}
           onClose={() => setEpithetPickerOpen(false)}
           onChange={setEpithets}
+        />
+      )}
+
+      {/* 다면 별점 피커 */}
+      {axisPickerOpen && (
+        <AxisRatingPicker
+          mediaId={item.id}
+          axes={axes}
+          onClose={() => setAxisPickerOpen(false)}
+          onChange={setAxes}
+          onRate={rateAxis}
         />
       )}
     </>
