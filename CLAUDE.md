@@ -104,6 +104,7 @@ android/        Capacitor 네이티브 프로젝트
 |------|------|------|
 | 2026-08-11 | `companion_names` 프론트 입력 UI 미구현 | DB 컬럼(`user_media.companion_names`)과 백엔드 PUT 라우트(`userMedia.js`)는 존재하나, DetailModal "시청 컨텍스트" 섹션은 `watched_with`(누구와, 프리셋 칩)까지만 노출하고 동반자 실명 자유 텍스트 입력창은 없음. 보류 결정(2026-08-11) — 추가 여부는 별도 기획 필요 |
 | 2026-08-11 | 백엔드 테스트 프레임워크 부재 | vitest 등 테스트 프레임워크 미설치, config 없음, `backend/package.json`의 `test` 스크립트는 자리표시자(`echo "Error: no test specified"`). 도입 보류(2026-08-11). 도입 시 전제: 운영 DB(Supabase) 접속 금지 — 로컬 postgres 또는 별도 테스트용 Supabase 프로젝트로 분리할 것 |
+| 2026-08-11 | 미정의 CSS 커스텀 프로퍼티(`var(--x, fallback)`) 77곳 — 전부 fallback으로만 동작 | `--border`(21) · `--border-color`(20) · `--card-bg`(15) · `--text-primary`(18) · `--text-secondary`(23) — 5개 이름, `index.css` + `ScreenshotImportModal.jsx`/`CurationListPage.jsx`/`MemoryChatPage.jsx`/`OnboardingPage.jsx`/`RestorePage.jsx`/`StatsPage.jsx`/`WishlistPage.jsx`에서 참조. `:root`에 실제 값을 정의하는 곳이 프로젝트 어디에도 없어 **항상 fallback 값(라이트 고정)** 으로 렌더링됨 — 다크모드에서 전혀 반응하지 않는 죽은 토큰. Phase 12.4에서 발견, 이번 커밋 범위 밖이라 수정 보류. `:root`에 정의를 채우면 이 7개 파일 전체(다크모드 미적용 화면 포함, 촬영 대상 6개 화면 밖도 다수)에 한 번에 영향을 미치므로 별도 작업으로 분리해 전수 검토 필요 — 이 프로젝트의 실제 다크모드 메커니즘은 `[data-theme="dark"] { .selector {...} }` 개별 오버라이드 방식(기술 결정 로그 참고)이라, 두 메커니즘을 혼용하지 않도록 방향을 먼저 정할 것 |
 
 ---
 
