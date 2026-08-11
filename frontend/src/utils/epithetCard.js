@@ -75,6 +75,11 @@ function drawCover(ctx, img, dx, dy, dw, dh) {
  * 서버가 CORS 헤더를 안 주면 drawImage 자체는 성공하지만 이후 toBlob에서
  * SecurityError가 난다 — 그러면 카드 전체가 실패하므로, 작은 오프스크린
  * 캔버스에 먼저 그려 getImageData로 오염 여부를 개별 확인한다.
+ *
+ * TMDB(image.tmdb.org)는 실제로 Access-Control-Allow-Origin을 보내지만,
+ * 같은 포스터가 앱 다른 화면에서 이미 crossOrigin 없이 <img>로 로드된 적
+ * 있으면 브라우저가 그 오염된 캐시 항목을 재사용해 crossOrigin 요청이
+ * 실패한다(실측 확인). 캐시 키를 분리하는 더미 쿼리 파라미터로 우회.
  * @returns {Promise<HTMLImageElement|null>} 실패 시 null (호출부가 폴백 타일 처리)
  */
 function loadPosterSafe(url) {
@@ -95,7 +100,7 @@ function loadPosterSafe(url) {
       }
     };
     img.onerror = () => resolve(null);
-    img.src = url;
+    img.src = url + (url.includes('?') ? '&' : '?') + '_cors=1';
   });
 }
 

@@ -1599,6 +1599,22 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   padding: 1px 6px; border-radius: 8px; margin-left: 4px;
 }
 
+/* 수식어 공유 카드 선택 UI (Phase 13.2) */
+.epithet-card.selected { border-color: #1a1a1a; box-shadow: inset 0 0 0 1px #1a1a1a; }
+.epithet-card.disabled { opacity: .4; cursor: not-allowed; }
+.epithet-card-check {
+  position: absolute; top: 6px; right: 6px; width: 22px; height: 22px;
+  border-radius: 50%; background: rgba(255,255,255,.9); border: 1px solid #ccc;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #1a1a1a;
+}
+.epithet-cardbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 44px; padding: 14px 20px; font-size: 13px; color: #555;
+  background: #fff; border-top: 1px solid #e8e8e6;
+}
+
 /* 밝은 배경 패널 (안내 박스, 프로필 요약 등) */
 .surface-muted { background: #f8f8f6; border: 1px solid #eee; }
 .surface-error { background: #fdf0ef; border: 1px solid #e0b4b0; color: #c0392b; }
@@ -1629,6 +1645,10 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .epithet-item-row.drag-over { border-color: #e8e8e8; }
   .epithet-drag-handle { color: #777; }
   .epithet-rep-badge { background: #2a2a2a; color: #e8e8e8; }
+
+  .epithet-card.selected { border-color: #e8e8e8; box-shadow: inset 0 0 0 1px #e8e8e8; }
+  .epithet-card-check { background: rgba(28,28,28,.9); border-color: #444; color: #e8e8e8; }
+  .epithet-cardbar { background: #1c1c1c; border-color: #2e2e2e; color: #ccc; }
 
   .surface-muted { background: #1c1c1c; border-color: #2e2e2e; }
   .surface-error { background: #3a1f1e; border-color: #6b3a36; color: #f5928a; }

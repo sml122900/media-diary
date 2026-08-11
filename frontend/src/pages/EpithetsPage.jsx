@@ -8,6 +8,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTheme } from '../hooks/useTheme';
+import useAuthStore from '../store/authStore';
+import { renderEpithetCard } from '../utils/epithetCard';
 
 const BASE = `${import.meta.env.VITE_API_URL}/api`;
 const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
@@ -26,13 +28,18 @@ const PRESETS = [
   { label: '못 잊을 엔딩', emoji: '🌅' },
 ];
 
-/** 부문 카드 (그리드) */
-function EpithetCard({ ep, onClick }) {
+/** 부문 카드 (그리드) — selectMode일 땐 탭으로 카드용 선택/해제 (작품 0개는 선택 불가) */
+function EpithetCard({ ep, onClick, selectMode, selected, disabled }) {
   const rep = ep.items[0]; // sort_order 첫 번째 = 대표작
   const restCount = ep.items.length - 1;
   return (
-    <button className="epithet-card" onClick={onClick}>
+    <button
+      className={`epithet-card${selected ? ' selected' : ''}${selectMode && disabled ? ' disabled' : ''}`}
+      onClick={onClick}
+      disabled={selectMode && disabled}
+    >
       <div className="epithet-card-poster">
+        {selectMode && <span className="epithet-card-check">{selected ? '✓' : ''}</span>}
         {rep?.poster_url
           ? <img src={rep.poster_url} alt={rep.title} loading="lazy" onError={e => { e.target.style.display = 'none'; }} />
           : <span style={{ fontSize: 28, opacity: .3 }}>🎬</span>}
@@ -208,11 +215,16 @@ function EpithetDetail({ epithet, onBack, onUpdate, onDelete }) {
 export default function EpithetsPage() {
   const navigate = useNavigate();
   useTheme();
+  const user = useAuthStore(s => s.user);
   const [epithets, setEpithets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [newLabel, setNewLabel] = useState('');
   const [creating, setCreating] = useState(false);
+  const [cardMode, setCardMode] = useState(false);
+  const [selectedForCard, setSelectedForCard] = useState(new Set());
+  const [cardBusy, setCardBusy] = useState(false);
+  const [cardPreview, setCardPreview] = useState(null); // { blob, url, canShare }
 
   const load = () => {
     setLoading(true);
@@ -248,6 +260,52 @@ export default function EpithetsPage() {
     setSelectedId(null);
   };
 
+  // ── 공유 카드 (Phase 13.2) ────────────────────────────────────────────────
+  const toggleCardSelect = (ep) => {
+    if (ep.items.length === 0) return;
+    setSelectedForCard(prev => {
+      const next = new Set(prev);
+      if (next.has(ep.id)) next.delete(ep.id);
+      else if (next.size < 6) next.add(ep.id);
+      return next;
+    });
+  };
+
+  const exitCardMode = () => { setCardMode(false); setSelectedForCard(new Set()); };
+
+  const generateCard = async () => {
+    setCardBusy(true);
+    try {
+      const chosen = epithets.filter(ep => selectedForCard.has(ep.id));
+      const blob = await renderEpithetCard(chosen, user?.name);
+      const url = URL.createObjectURL(blob);
+      const file = new File([blob], 'card.png', { type: 'image/png' });
+      const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+      setCardPreview({ blob, url, canShare });
+      exitCardMode();
+    } catch { /* 렌더 실패 — 개별 포스터 실패는 이미 폴백 처리되므로 도달 드묾 */ }
+    setCardBusy(false);
+  };
+
+  const closePreview = () => {
+    if (cardPreview) URL.revokeObjectURL(cardPreview.url);
+    setCardPreview(null);
+  };
+
+  const saveCard = () => {
+    const link = document.createElement('a');
+    link.href = cardPreview.url;
+    link.download = `수식어카드_${new Date().toISOString().slice(0, 10)}.png`;
+    link.click();
+  };
+
+  const shareCard = async () => {
+    try {
+      const file = new File([cardPreview.blob], '수식어카드.png', { type: 'image/png' });
+      await navigator.share({ files: [file], title: '나의 인생영화들' });
+    } catch { /* 사용자가 공유 시트에서 취소한 경우 등 — 무시 */ }
+  };
+
   const selected = epithets.find(ep => ep.id === selectedId);
   const existingLabels = new Set(epithets.map(ep => ep.label));
   const visiblePresets = epithets.length <= 3 ? PRESETS.filter(p => !existingLabels.has(p.label)) : [];
@@ -257,6 +315,9 @@ export default function EpithetsPage() {
       <div className="mdb-header" style={{ marginBottom: 24 }}>
         <h1 className="mdb-title">나의 수식어</h1>
         <div className="mdb-controls">
+          {!loading && !selected && !cardMode && epithets.length > 0 && (
+            <button className="btn" onClick={() => setCardMode(true)}>카드 만들기</button>
+          )}
           <button className="btn" onClick={() => navigate('/')}>← 돌아가기</button>
         </div>
       </div>
@@ -310,13 +371,49 @@ export default function EpithetsPage() {
           )}
 
           {epithets.length > 0 && (
-            <div className="epithet-grid">
+            <div className="epithet-grid" style={{ paddingBottom: cardMode ? 84 : 0 }}>
               {epithets.map(ep => (
-                <EpithetCard key={ep.id} ep={ep} onClick={() => setSelectedId(ep.id)} />
+                <EpithetCard
+                  key={ep.id}
+                  ep={ep}
+                  selectMode={cardMode}
+                  selected={selectedForCard.has(ep.id)}
+                  disabled={ep.items.length === 0}
+                  onClick={() => cardMode ? toggleCardSelect(ep) : setSelectedId(ep.id)}
+                />
               ))}
             </div>
           )}
         </>
+      )}
+
+      {cardMode && (
+        <div className="epithet-cardbar">
+          <span>{selectedForCard.size}/6 선택됨 (3~6개)</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn" onClick={exitCardMode}>취소</button>
+            <button
+              className="btn btn-primary"
+              disabled={selectedForCard.size < 3 || selectedForCard.size > 6 || cardBusy}
+              onClick={generateCard}
+            >
+              {cardBusy ? '생성 중...' : '카드 생성'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {cardPreview && (
+        <div className="backdrop" onClick={e => e.target === e.currentTarget && closePreview()}>
+          <div className="add-modal" style={{ maxWidth: 400 }}>
+            <img src={cardPreview.url} alt="수식어 카드 미리보기" style={{ width: '100%', borderRadius: 8, display: 'block', marginBottom: 16 }} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn" onClick={closePreview}>닫기</button>
+              {cardPreview.canShare && <button className="btn" onClick={shareCard}>공유</button>}
+              <button className="btn btn-primary" style={{ flex: 1 }} onClick={saveCard}>저장</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
