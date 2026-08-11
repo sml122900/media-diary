@@ -96,6 +96,9 @@ android/        Capacitor 네이티브 프로젝트
 | 2026-08-05 | 잔액 조회(`fetchBalance`)를 App 루트에서 1회 호출 | 페이지별 호출이라 미호출 페이지를 직접 열면 배지가 `···`로 비었음 — `useTheme`을 루트로 올린 것과 동일 원인. 신규 페이지가 추가돼도 자동 커버 | 공통 훅 신설(부르는 걸 잊는 실패 모드가 그대로 남음) |
 | 2026-08-05 | 리포트 재생성은 `regenerate` 플래그로 캐시 우회 | 기존엔 리포트 있으면 무조건 `cached` 조기 반환이라 `ON CONFLICT DO UPDATE` 도달 불가 → "다시 생성" 무동작. 캐시 조회는 0토큰 유지 필요라 무조건 재생성 불가 | 캐시 반환 제거(모든 조회가 5토큰이 됨) |
 | 2026-08-12 | 수식어 공유 카드 저장은 CSV 내보내기와 동일한 Blob+`<a download>` 패턴 재사용, 공유는 `navigator.canShare` 감지 시에만 버튼 노출 | `@capacitor/filesystem`·`@capacitor/share` 둘 다 미설치 — 신규 플러그인 없이 점진적 향상(progressive enhancement)만으로 구현 범위 충족. CSV 내보내기의 실기기 저장 검증 이력이 원래 없어 이 한계를 그대로 승계 | `@capacitor/share` 설치 후 네이티브 공유 시트 사용 |
+| 2026-08-12 | 다면 별점 축 점수 조회는 `GET /api/rating-axes`가 축+`items[]`(user_media_id, rating)를 함께 반환(수식어 `GET /api/epithets` 구조 그대로 복제) | 축 목록 자체가 특정 미디어가 아니라 유저 전역 소유 리소스라 관리(생성·이름변경·삭제)에 어차피 이 GET이 필요함 — 검증된 패턴을 복제해 새 코드를 최소화. media별 상세조회(`/history`)에 axis_ratings를 얹는 안은 "내 축 전체 목록"을 별도로 못 얻어 피커에 못 씀 | `/user-media/:id/history` 응답에 axis_ratings 배열 추가 |
+| 2026-08-12 | 다면 별점 해제는 **이미 매긴 별을 다시 탭 = 0점 = DELETE** (별도 해제 버튼 없음) | 재시청 별점 입력에 이미 있던 `r === n ? 0 : n` 토글 패턴을 그대로 재사용 — `StarRating` 신규 변형 없이 기존 컴포넌트만으로 부착·수정·해제 3동작을 한 위젯에 통합 | 체크박스형 별도 "부착" 버튼 + 해제 아이콘 |
+| 2026-08-12 | 다면 별점 축 관리(이름변경·삭제)는 전용 페이지 없이 `AxisRatingPicker` 안에 인라인, **재정렬 UI는 이번 커밋 범위에서 생략** | "전용 페이지 신설 금지" 제약 + 저비용 우선 — `sort_order` 컬럼·PATCH 파라미터는 만들어 뒀지만 드래그 정렬 UI(수식어 페이지 수준의 포인터 이벤트 로직)까지 넣기엔 피커 하나에 과함. 항상 생성 순서로 노출되어도 기능상 문제 없음 | 수식어 페이지(`EpithetsPage`)의 드래그 정렬 로직 그대로 이식 |
 
 ---
 
@@ -107,6 +110,10 @@ android/        Capacitor 네이티브 프로젝트
 | 2026-08-11 | 백엔드 테스트 프레임워크 부재 | vitest 등 테스트 프레임워크 미설치, config 없음, `backend/package.json`의 `test` 스크립트는 자리표시자(`echo "Error: no test specified"`). 도입 보류(2026-08-11). 도입 시 전제: 운영 DB(Supabase) 접속 금지 — 로컬 postgres 또는 별도 테스트용 Supabase 프로젝트로 분리할 것 |
 | 2026-08-11 | 미정의 CSS 커스텀 프로퍼티(`var(--x, fallback)`) 77곳 — 전부 fallback으로만 동작 | `--border`(21) · `--border-color`(20) · `--card-bg`(15) · `--text-primary`(18) · `--text-secondary`(23) — 5개 이름, `index.css` + `ScreenshotImportModal.jsx`/`CurationListPage.jsx`/`MemoryChatPage.jsx`/`OnboardingPage.jsx`/`RestorePage.jsx`/`StatsPage.jsx`/`WishlistPage.jsx`에서 참조. `:root`에 실제 값을 정의하는 곳이 프로젝트 어디에도 없어 **항상 fallback 값(라이트 고정)** 으로 렌더링됨 — 다크모드에서 전혀 반응하지 않는 죽은 토큰. Phase 12.4에서 발견, 이번 커밋 범위 밖이라 수정 보류. `:root`에 정의를 채우면 이 7개 파일 전체(다크모드 미적용 화면 포함, 촬영 대상 6개 화면 밖도 다수)에 한 번에 영향을 미치므로 별도 작업으로 분리해 전수 검토 필요 — 이 프로젝트의 실제 다크모드 메커니즘은 `[data-theme="dark"] { .selector {...} }` 개별 오버라이드 방식(기술 결정 로그 참고)이라, 두 메커니즘을 혼용하지 않도록 방향을 먼저 정할 것 |
 | 2026-08-11 | 전역 공유 클래스 44px 터치 타깃 미달 (Phase 12.4 44dp 감사) | 촬영 대상 6개 화면(홈/다이어리·상세모달·통계·검색·설정·임포트) 감사에서 발견했으나, 아래는 전부 해당 화면 밖(리스트·위시리스트·리포트·피드·비교 등)까지 광범위하게 쓰이는 공유 클래스라 높이를 키우면 감사 범위 밖 화면에도 번져 수정 보류: `.btn`/`.btn-primary`/`.btn-danger`(약 36px, 앱 전역 거의 모든 버튼) · `.tab`(40px, HomePage+FeedPage) · `.tab-btn`(25px, StatsPage+DetailModal+WishlistPage) · `.token-chip`(29px, HomePage+ReportsPage) · `.search-input`(35px, HomePage+FeedPage+WishlistPage) · `.settings-input`(39px, SettingsPage+ListsPage+WatchlistsPage) · `.add-input`(37px, AiSearchModal+AddModal+PosterPicker). `.sort-select`(37px)는 HomePage 전용이지만 같은 헤더 행(`.mdb-controls`)에서 위 공유 요소들과 나란히 있어 혼자만 키우면 행 안에서 높이가 들쭉날쭉해져 함께 보류. 화면 전용 요소(`.theme-radio-item`/`.poster-change-btn`/`.mtab-btn`/`.mghost-btn`/`.mresearch-btn`/DetailModal 인라인 버튼 일부)는 같은 커밋에서 이미 44px로 보정함 |
+| 2026-08-12 | 다면 별점(Phase 13.3) 축별 통계/차트 미구현 | `user_media_axis_ratings`는 저장·조회만 가능, StatsPage에 축별 평균/분포를 보여주는 차트 없음. Non-goal로 범위 밖 처리(2026-08-12) — 축 개수·데이터량이 유저마다 제각각이라 차트 설계(축 몇 개까지 한 화면에? 축이 0개인 유저는?) 먼저 필요 |
+| 2026-08-12 | 다면 별점(Phase 13.3) CSV 내보내기/가져오기 컬럼 미구현 | CSV 내보내기에 축별 점수 컬럼 없음, Letterboxd 등 가져오기도 대응 안 함. **임포트 호환 리스크**: 축은 유저가 자유 생성하는 이름 있는 목록이라 CSV 컬럼을 고정 스키마로 못 박기 어렵고(유저마다 축 종류·개수 다름), 기존 CSV 파서가 모르는 컬럼을 만나면 무시하는지 에러내는지 먼저 확인 안 됨 — 섣불리 붙이면 기존 CSV 가져오기 회귀 위험. Non-goal로 범위 밖 처리(2026-08-12) |
+| 2026-08-12 | 다면 별점(Phase 13.3) MediaCard 다축 노출 안 함 | 홈 그리드 카드에는 대표 별점(`rating`)만 표시, 축별 점수는 DetailModal에서만 보임. Non-goal로 범위 밖 처리(2026-08-12) — 카드가 좁아 축 여러 개를 동시에 보여줄 공간 설계가 우선 필요 |
+| 2026-08-12 | 다면 별점(Phase 13.3) 축 재정렬(드래그) UI 없음 | `user_rating_axes.sort_order` 컬럼과 `PATCH .../sort_order`는 존재하나, 이를 조작하는 UI가 없어 항상 생성 순서로 노출됨. 저비용 우선으로 이번 커밋 범위에서 생략(기술 결정 로그 참고) — 필요해지면 `EpithetsPage`의 포인터 이벤트 드래그 정렬 로직을 재사용 가능 |
 
 ---
 
@@ -136,6 +143,7 @@ android/        Capacitor 네이티브 프로젝트
 | 2026-08-05 | gradle 파일 2개가 계속 `modified` (내용 차이 없음) | 줄바꿈 문제로 오진했으나 **워크트리 해시가 HEAD blob과 동일**. 실제 원인은 `cap sync`가 같은 내용으로 재작성해 mtime만 바뀐 **git stat 캐시 불일치** → `git add`로 인덱스 stat 갱신(스테이징 0). 재발 방지용 `.gitattributes` 별도 추가 |
 | 2026-08-05 | curl로 보낸 한글 쿼리가 서버에서 "홍길동"으로 해석됨 | AI 비결정성으로 오진 → DB 저장 바이트가 `efbfbd`(U+FFFD) 반복. Git Bash가 한글을 UTF-8 아닌 바이트로 curl에 넘겨 도착 시점에 이미 깨짐. 기기 WebView 요청은 정상 → **관측값이 이상하면 관측 도구부터 검증** |
 | 2026-08-12 | 수식어 카드용 TMDB 포스터가 `crossOrigin="anonymous"` 로드에서 매번 실패 (taint) | TMDB CDN은 실제로 `Access-Control-Allow-Origin: *`를 보냄(curl로 확인) — CORS 미지원이 원인이 아니었음. 같은 포스터 URL이 앱 다른 화면에서 이미 crossOrigin 없이 `<img>`로 로드된 뒤라 브라우저가 그 캐시(오염된 상태)를 재사용해 이후 crossOrigin 요청이 서버 재검증 없이 실패 — 재현 확인(같은 URL을 캐시 무효 상태에서 먼저 요청하면 성공). 캐시 키를 분리하는 더미 쿼리 파라미터(`?_cors=1`)를 붙여 우회 |
+| 2026-08-12 | 다면 별점 축 삭제 확인창(`window.confirm`)이 데스크톱 크롬 자동화(CDP)를 블록 | 2026-08-05에 실기기 WebView에서 이미 겪은 "JS `confirm()`이 렌더러를 블록" 현상이 데스크톱 크롬 자동화에서도 동일 재현 — `Input.dispatchMouseEvent`·`Page.captureScreenshot`·`Page.navigate` 전부 30초 타임아웃. CDP로는 다이얼로그를 못 닫아 사용자에게 수동으로 닫아달라고 요청 후 새 탭에서 재로그인해 이어감. 삭제 자체의 CASCADE 동작은 이미 curl로 검증됐던 터라 UI 재검증은 스킵 — 삭제 확인처럼 파괴적 확인창이 있는 흐름은 브라우저 자동화 대신 API(curl)로 검증할 것 |
 
 ---
 
