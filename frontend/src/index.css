@@ -794,9 +794,9 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   position: fixed;
   bottom: 24px;
   right: 20px;
-  width: 52px;
   height: 52px;
-  border-radius: 50%;
+  padding: 0 20px 0 16px;
+  border-radius: 26px;
   background: #1a1a1a;
   color: #fff;
   font-size: 22px;
@@ -806,9 +806,12 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   z-index: 900;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
   transition: transform .15s, box-shadow .15s;
 }
 .fab-btn:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+.fab-label { font-size: 14px; font-weight: 700; }
 @media (max-width: 768px) { .fab-btn { display: flex; } }
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateX(-50%) translateY(10px); }

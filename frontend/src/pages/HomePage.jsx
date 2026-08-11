@@ -656,7 +656,9 @@ export default function HomePage() {
         title="빠른 기록 (Cmd+K)"
         aria-label="빠른 기록"
       >
-        ⚡
+        <span aria-hidden="true">⚡</span>
+        {/* [카피 초안 — 사용자 검수 예정] */}
+        <span className="fab-label">빠른 기록</span>
       </button>
     </div>
   );
