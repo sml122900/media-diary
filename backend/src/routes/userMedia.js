@@ -264,6 +264,62 @@ router.patch('/:id/poster', auth, async (req, res) => {
 });
 
 /**
+ * PUT /api/user-media/:id/axis-ratings/:axisId
+ * 다면 별점(Phase 13.3) — 축별 점수 upsert. rating 1~5, media·axis 양쪽 소유권 확인
+ */
+router.put('/:id/axis-ratings/:axisId', auth, async (req, res) => {
+  const rating = Number(req.body.rating);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return res.status(400).json({ success: false, message: 'rating은 1~5 사이 정수여야 합니다' });
+  }
+  try {
+    const { rows: mediaRows } = await pool.query(
+      'SELECT id FROM user_media WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.id]
+    );
+    if (!mediaRows[0]) return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
+
+    const { rows: axisRows } = await pool.query(
+      'SELECT id FROM user_rating_axes WHERE id = $1 AND user_id = $2',
+      [req.params.axisId, req.user.id]
+    );
+    if (!axisRows[0]) return res.status(404).json({ success: false, message: '축을 찾을 수 없습니다' });
+
+    const { rows } = await pool.query(
+      `INSERT INTO user_media_axis_ratings (user_media_id, axis_id, rating)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_media_id, axis_id) DO UPDATE SET rating = EXCLUDED.rating
+       RETURNING *`,
+      [req.params.id, req.params.axisId, rating]
+    );
+    res.json({ success: true, data: rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
+ * DELETE /api/user-media/:id/axis-ratings/:axisId
+ * 다면 별점 해제 — media·axis 양쪽 소유권 확인
+ */
+router.delete('/:id/axis-ratings/:axisId', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `DELETE FROM user_media_axis_ratings
+       WHERE axis_id = $1 AND user_media_id = $2
+         AND axis_id IN (SELECT id FROM user_rating_axes WHERE id = $1 AND user_id = $3)
+         AND user_media_id IN (SELECT id FROM user_media WHERE id = $2 AND user_id = $3)
+       RETURNING id`,
+      [req.params.axisId, req.params.id, req.user.id]
+    );
+    if (!rows[0]) return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+/**
  * GET /api/user-media/public/:tmdbId
  * 특정 TMDB 작품의 공개 리뷰 목록 (다른 사람들의 리뷰)
  * 별점 또는 리뷰가 있고 is_public=true인 항목만 반환

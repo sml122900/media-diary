@@ -21,6 +21,7 @@ const billingRouter  = require('./routes/billing');
 const discoverRouter        = require('./routes/discover');
 const healthRouter = require('./routes/health');
 const epithetsRouter = require('./routes/epithets');
+const ratingAxesRouter = require('./routes/ratingAxes');
 const { router: reportTemplatesRouter } = require('./routes/reportTemplates');
 // wishlistRouter는 meRouter 내부에서 /watchlist로 마운트 (me.js 참고)
 
@@ -51,6 +52,7 @@ app.use('/api/discover', discoverRouter);
 app.use('/api/reports',  reportTemplatesRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/epithets', epithetsRouter);
+app.use('/api/rating-axes', ratingAxesRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -305,6 +307,29 @@ async function initDB() {
       sort_order    INTEGER     DEFAULT 0,
       created_at    TIMESTAMPTZ DEFAULT now(),
       UNIQUE(epithet_id, user_media_id)
+    )
+  `);
+
+  // 다면 별점 테이블 (Phase 13.3) — user_media.rating(대표 축)과 완전 독립, 유저가 만드는 추가 평가 축
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_rating_axes (
+      id         SERIAL      PRIMARY KEY,
+      user_id    INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      label      TEXT        NOT NULL,
+      emoji      TEXT        DEFAULT NULL,
+      sort_order INTEGER     DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT now(),
+      UNIQUE(user_id, label)
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_media_axis_ratings (
+      id            SERIAL      PRIMARY KEY,
+      user_media_id INTEGER     NOT NULL REFERENCES user_media(id) ON DELETE CASCADE,
+      axis_id       INTEGER     NOT NULL REFERENCES user_rating_axes(id) ON DELETE CASCADE,
+      rating        INTEGER     NOT NULL,
+      created_at    TIMESTAMPTZ DEFAULT now(),
+      UNIQUE(user_media_id, axis_id)
     )
   `);
 
