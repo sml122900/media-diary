@@ -275,7 +275,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
 
         {/* OTT 종류 선택 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span style={{ fontSize: 13, color: '#666', flexShrink: 0 }}>앱 종류:</span>
+          <span className="text-muted" style={{ fontSize: 13, flexShrink: 0 }}>앱 종류:</span>
           <select
             value={ottType}
             onChange={e => setOttType(e.target.value)}
@@ -367,7 +367,7 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
         {/* 결과 목록 */}
         {results && (
           <>
-            <div style={{ fontSize: 13, color: '#666', margin: '14px 0 8px' }}>
+            <div className="text-muted" style={{ fontSize: 13, margin: '14px 0 8px' }}>
               {validResults.length}개 인식됨
               {failedResults.length > 0 && ` · ${failedResults.length}개 미매칭`}
               {' '}— 추가할 작품을 선택하세요
@@ -443,9 +443,8 @@ export default function ScreenshotImportModal({ onClose, onAdd }) {
                           (item.confidence < 0.7 || !r) && (
                             <button
                               onClick={(e) => { e.stopPropagation(); setReSearchIdx(isResearching ? null : i); }}
-                              style={{ fontSize: 11, padding: '3px 8px', border: '1px solid #ddd',
-                                borderRadius: 6, cursor: 'pointer', background: isResearching ? '#eee' : 'none',
-                                color: '#666' }}
+                              className={`mresearch-btn${isResearching ? ' active' : ''}`}
+                              style={{ fontSize: 11, padding: '3px 8px' }}
                             >
                               {isResearching ? '닫기' : '🔍 수정'}
                             </button>

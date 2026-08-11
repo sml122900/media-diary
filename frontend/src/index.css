@@ -200,6 +200,14 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   color: #999; transition: color .15s, border-color .15s;
 }
 .mtab-btn.active { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+/* 시청 날짜/재시청 날짜 섹션의 보조 버튼(오늘·날짜 입력 등) — 인라인 #555는
+   라이트에서만 대비가 나와 다크에서 판독 어려움(2.29:1), 클래스로 분리해 오버라이드 */
+.mghost-btn { color: #555; }
+/* 보조/음소거 텍스트 공용 클래스 — 인라인 #666은 라이트 전용값이라 다크에서 대비 부족(2.97:1) */
+.text-muted { color: #666; }
+/* 스크린샷 임포트 결과의 "재검색" 토글 버튼 */
+.mresearch-btn { border: 1px solid #ddd; border-radius: 6px; cursor: pointer; background: none; color: #666; }
+.mresearch-btn.active { background: #eee; }
 /* 포스터 변경 버튼 */
 .poster-change-btn {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
@@ -688,7 +696,7 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .btn-primary { background: #e8e8e8; color: #111; border-color: #e8e8e8; }
   .btn-primary:hover { background: #ccc; }
   .tab-bar { border-color: #2e2e2e; }
-  .tab { color: #555; }
+  .tab { color: #999; }
   .tab.active { color: #e8e8e8; border-color: #e8e8e8; }
   .poster, .mposter, .result-thumb, .recent-poster { background: #2a2a2a; }
   .card-title, .mtitle { color: #e8e8e8; }
@@ -701,6 +709,10 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .mtab-nav { border-color: #2e2e2e; }
   .mtab-btn { color: #555; }
   .mtab-btn.active { color: #e8e8e8; border-bottom-color: #e8e8e8; }
+  .mghost-btn { color: #999; }
+  .text-muted { color: #999; }
+  .mresearch-btn { color: #999; }
+  .mresearch-btn.active { background: #333; color: #e8e8e8; }
   .result-item { border-color: #2e2e2e; }
   .result-item:hover { background: #222; }
   .result-title { color: #e8e8e8; }
@@ -711,7 +723,6 @@ input, select, textarea, button { font-family: inherit; font-size: 14px; }
   .tmdb-score { background: #1a3a2a; color: #66bb6a; }
   .tmdb-overview { color: #999; }
   .ott-box { background: #1e1e1e !important; border-color: #2e2e2e !important; }
-  .year-header { color: #555; }
   .year-header::after { background: #2e2e2e; }
   .add-modal h2 { color: #e8e8e8; }
   .filter-panel { background: #1a1a1a; border-color: #2e2e2e; }

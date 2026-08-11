@@ -31,15 +31,20 @@ const CALENDAR_SCALE = {
   dark:  ['#2e2e2e', '#0e4429', '#006d32', '#26a641', '#39d353'],
 };
 
-/** 커스텀 파이차트 라벨 */
-function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) {
+/**
+ * 커스텀 파이차트 라벨
+ * movie 조각은 다크 모드에서 밝은 색(PIE_COLORS.dark.movie)으로 뒤집히므로
+ * 라벨도 같이 뒤집지 않으면 흰 글자가 밝은 조각 위에서 안 보임
+ */
+function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, payload, theme }) {
   if (percent < 0.05) return null;
   const RADIAN = Math.PI / 180;
   const r = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + r * Math.cos(-midAngle * RADIAN);
   const y = cy + r * Math.sin(-midAngle * RADIAN);
+  const fill = payload?.type === 'movie' && theme === 'dark' ? '#1a1a1a' : 'white';
   return (
-    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600}>
+    <text x={x} y={y} fill={fill} textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600}>
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
@@ -300,7 +305,7 @@ export default function StatsPage() {
                 outerRadius={90}
                 dataKey="value"
                 labelLine={false}
-                label={PieLabel}
+                label={(props) => <PieLabel {...props} theme={theme} />}
               >
                 {typeData.map(entry => (
                   <Cell key={entry.type} fill={(PIE_COLORS[theme] || PIE_COLORS.light)[entry.type] || '#888'} />

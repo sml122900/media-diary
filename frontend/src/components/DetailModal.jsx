@@ -429,9 +429,10 @@ export default function DetailModal({
                       borderRadius: 6, fontFamily: 'inherit', background: 'transparent', color: 'inherit' }}
                   />
                   <button
+                    className="mghost-btn"
                     onClick={() => setWatchedDate(new Date().toISOString().slice(0, 10))}
                     style={{ fontSize: 12, padding: '5px 10px', background: 'none', border: '1px solid #ddd',
-                      borderRadius: 6, cursor: 'pointer', color: '#555', whiteSpace: 'nowrap' }}
+                      borderRadius: 6, cursor: 'pointer', whiteSpace: 'nowrap' }}
                   >오늘</button>
                   <button
                     onClick={() => { setDateUnknown(true); setWatchedDate(''); }}
@@ -445,9 +446,10 @@ export default function DetailModal({
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                     <span style={{ fontSize: 12, color: '#999', flex: 1 }}>날짜 미기록</span>
                     <button
+                      className="mghost-btn"
                       onClick={() => setDateUnknown(false)}
                       style={{ fontSize: 12, padding: '4px 10px', background: 'none', border: '1px solid #ddd',
-                        borderRadius: 6, cursor: 'pointer', color: '#555', whiteSpace: 'nowrap' }}
+                        borderRadius: 6, cursor: 'pointer', whiteSpace: 'nowrap' }}
                     >날짜 입력하기</button>
                   </div>
                   <input
@@ -525,9 +527,10 @@ export default function DetailModal({
                           background: 'transparent', color: 'inherit', flex: 1 }}
                       />
                       <button
+                        className="mghost-btn"
                         onClick={() => setRewatchDate(new Date().toISOString().slice(0, 10))}
                         style={{ fontSize: 11, padding: '4px 8px', background: 'none', border: '1px solid #ddd',
-                          borderRadius: 6, cursor: 'pointer', color: '#555', whiteSpace: 'nowrap' }}
+                          borderRadius: 6, cursor: 'pointer', whiteSpace: 'nowrap' }}
                       >오늘</button>
                       <button
                         onClick={() => setRewatchDateUnknown(true)}
@@ -539,9 +542,10 @@ export default function DetailModal({
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                       <span style={{ fontSize: 12, color: '#999', flex: 1 }}>날짜 미기록</span>
                       <button
+                        className="mghost-btn"
                         onClick={() => setRewatchDateUnknown(false)}
                         style={{ fontSize: 11, padding: '4px 8px', background: 'none', border: '1px solid #ddd',
-                          borderRadius: 6, cursor: 'pointer', color: '#555' }}
+                          borderRadius: 6, cursor: 'pointer' }}
                       >날짜 입력</button>
                     </div>
                   )}
