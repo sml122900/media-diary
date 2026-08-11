@@ -250,7 +250,8 @@ function ScreenshotStep({ onAddedCount, onSkip }) {
       method: 'POST', headers: jsonHdr(),
       body: JSON.stringify({ type: item.type, title: item.title, year: item.year,
         director: item.director || '', cast_info: item.cast_info || '',
-        tmdb_id: item.tmdb_id || 0, poster_url: item.poster_url || '' }),
+        tmdb_id: item.tmdb_id || 0, poster_url: item.poster_url || '',
+        rating: item.rating || 0 }),
     });
     const json = await res.json();
     if (json.success) {
