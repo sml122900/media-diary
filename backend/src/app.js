@@ -20,6 +20,7 @@ const onboardingRouter = require('./routes/onboarding');
 const billingRouter  = require('./routes/billing');
 const discoverRouter        = require('./routes/discover');
 const healthRouter = require('./routes/health');
+const epithetsRouter = require('./routes/epithets');
 const { router: reportTemplatesRouter } = require('./routes/reportTemplates');
 // wishlistRouter는 meRouter 내부에서 /watchlist로 마운트 (me.js 참고)
 
@@ -49,6 +50,7 @@ app.use('/api/billing',  billingRouter);
 app.use('/api/discover', discoverRouter);
 app.use('/api/reports',  reportTemplatesRouter);
 app.use('/api/health', healthRouter);
+app.use('/api/epithets', epithetsRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Media Diary API is running' });
@@ -282,6 +284,29 @@ async function initDB() {
 
   // 시청 시기 태그 컬럼 (Phase 6.5.1 — NULL 허용, 자유 텍스트)
   await pool.query(`ALTER TABLE user_media ADD COLUMN IF NOT EXISTS life_period TEXT DEFAULT NULL`);
+
+  // 수식어 테이블 (Phase 13.1) — 유저가 직접 만드는 "어떻게 좋았나" 부문
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_epithets (
+      id         SERIAL      PRIMARY KEY,
+      user_id    INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      label      TEXT        NOT NULL,
+      emoji      TEXT        DEFAULT NULL,
+      sort_order INTEGER     DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT now(),
+      UNIQUE(user_id, label)
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS user_epithet_items (
+      id            SERIAL      PRIMARY KEY,
+      epithet_id    INTEGER     NOT NULL REFERENCES user_epithets(id) ON DELETE CASCADE,
+      user_media_id INTEGER     NOT NULL REFERENCES user_media(id) ON DELETE CASCADE,
+      sort_order    INTEGER     DEFAULT 0,
+      created_at    TIMESTAMPTZ DEFAULT now(),
+      UNIQUE(epithet_id, user_media_id)
+    )
+  `);
 
   console.log('Database tables ready');
 }
