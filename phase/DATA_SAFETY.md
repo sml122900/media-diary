@@ -36,7 +36,12 @@ companion_names, is_public(공개 여부)
 
 ### 1-5. AI 기능 관련
 - `user_taste_profile`: 장르/감독/연대별 집계 수치 (원본 텍스트 아님, 통계값)
-- `recommendations`, `daily_recommendations`, `year_in_review_cache`: AI/TMDB 응답 캐시
+- `year_in_review_cache`: AI/TMDB 응답 캐시
+- ~~`recommendations`, `daily_recommendations`~~: **Phase 12.1(2026-08-11)에서 관련
+  기능("오늘의 추천", "이 작품을 좋아하셨다면") 및 `/api/recommend/*` 라우트 자체가
+  삭제되면서 이 두 캐시 테이블을 생성·기록하는 코드도 함께 제거됨. 신규 설치
+  DB에는 아예 생성되지 않고, 기존 운영 DB에 테이블이 남아 있어도 더 이상
+  기록되지 않음
 - `ai_reports.content`: 월간 AI 리포트 생성 결과 텍스트
 - `discovery_chats`: AI 채팅 추천의 role/content(대화 내용)/session_id
 - `report_templates.components`: 리포트 커스터마이징 설정값
