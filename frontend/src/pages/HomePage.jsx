@@ -448,7 +448,7 @@ export default function HomePage() {
         <span className="discover-entry-icon">🎬</span>
         <div>
           <div className="discover-entry-title">발견하기</div>
-          <div className="discover-entry-sub">취향 기반 추천 · AI 채팅 추천</div>
+          <div className="discover-entry-sub">AI 채팅 추천 · 큐레이션 둘러보기</div>
         </div>
         <span className="discover-entry-arrow">→</span>
       </div>
